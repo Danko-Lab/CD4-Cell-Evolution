@@ -43,16 +43,15 @@ cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if (($3-$2) > '"$PROM"')
                                          else if ($6 == "-") print $1,$2,($3-'"$PROM"')}
                                         else print $1,$2,$3} {print $4,$5,$6,$7,$8,$9,$10}' > genebodies.tsv
 
-## Diff w/ gaps, then partition.
-bedops --difference genebodies.tsv gapMerge.tsv | ~/bin/bin/bedops --partition - genebodies.tsv > gene.gap.part.tsv
+## Partition on the merged gaps.
+~/bin/bin/bedops --partition gapMerge.tsv genebodies.tsv > gene.gap.part.tsv
 
 ## Remove partition bits that fall in gaps.
-bedops --echo --indicator gene.gap.part.tsv $GENCODE_TSV > gene.woGap.tsv 
+bedops --echo --indicator gene.gap.part.tsv $GENCODE_TSV | grep "0$" | sed "s/\|/\t/g" > gene.woGap.tsv 
 
 ## Get an all-by-all comparison.
-overlapSelect -selectCoordCols=0 -inCoordCols=0 -mergeOutput $GENCODE_TSV gene.woGap.tsv $GENCODE_TSV.noGap.olSel ## Think this is right?!  Sanity check it...
-## Now parse the resulting file to get data in a useful format.
+overlapSelect -selectCoordCols=0 -inCoordCols=0 -mergeOutput $GENCODE_TSV gene.woGap.tsv $GENCODE_TSV.noGap.olSel
 
-rm *.tsv *.save
+#rm *.tsv *.save
 
 
