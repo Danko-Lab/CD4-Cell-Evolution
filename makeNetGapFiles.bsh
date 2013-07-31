@@ -19,53 +19,22 @@ function getAnnotations {
 getAnnotations ## Run on 7/23/2013.
 
 function makeOrthoAnnot {
-# hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 2 or level like 4" | grep "^c" | gzip > $NET.gap.bed.gz
-# hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 1 or level like 3" | grep "^c" | \
-#	awk 'BEGIN{OFS="\t"} {if(($3-$2)> '"$NET_LEN_FILT"') {print $0}}' | sort-bed - > $NET.inc.bed ## Get top nets
-#
-# zcat $NET.gap.bed.gz > $NET.bed
-# cat $NET.inc.bed >> $NET.bed
-# sort-bed $NET.bed > $NET.sort.bed
-# rm $NET.bed $NET.gap.bed.gz
- 
- ## Get genes completely in L4, L3, L2, or L1 and NOT in the levels further to the left.
-# cat $GENCODE_TSV | bedmap --fraction-ref 1.0 --count --echo-map - $NET.sort.bed | sed s/\|/\\t/g | sed s/\;/\\t/g | \
-#	awk 'BEGIN{OFS="\t"; ORS=""} {print $1,"\t"} {
-#		if ($1==$6) print $5,($4-$3); \
-#		else if ($1==$11) print $10,($9-$8); \
-#		else if ($1==$16) print $15,($14-$13); \
-#		else if ($1==$21) print $20,($19-$18); \
-#		else print "0","0"}
-#		{print "\n"}' > $NET.fo.tsv
-# cat $GENCODE_TSV | bedmap --bp-ovr $NET_PART_OL --count - $NET.inc.bed > $NET.part.tsv
-
  ## Get gap data.
  hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 2" | grep "^c" | sort-bed - > $NET.L2.bed
  hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 3" | grep "^c" | sort-bed - > $NET.L3.bed
  hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 4" | grep "^c" | sort-bed - > $NET.L4.bed
  bedops --difference $NET.L2.bed $NET.L3.bed > $NET.Gap2.bed ## Gets those in L2 which aren't in L3 ...
- bedops --merge $NET.Gap2.bed $NET.L4.bed > $NET.gapMerge.bed ## Add back gaps in L4 ...
+ bedops --merge $NET.Gap2.bed $NET.L4.bed > $NET.gapMerge.save ## Add back gaps in L4 ...
 
  ## Get location of un-gapped genes.
  cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"} {if (($3-$2) > '"$PROM"')
                                                 {if ($4 == "+") print $1,($2+'"$PROM"'),$3,$5 
                                                 else if ($4 == "-") print $1,$2,($3-'"$PROM"'),$5}
                                         else print $1,$2,$3,$5}' | \
-        bedops --difference - $NET.gapMerge.bed > $NET.gene.woGap
-
-
- ## Get sizes of un-gapped regions.
-# cat $GENCODE_TSV | bedmap --bases-uniq - $NET.gapMerge.bed > $NET.gapInGene.all.tsv
-# cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"} {if (($3-$2) > '"$PROM"')
-#						{if ($4 == "+") print $1,($2+'"$PROM"'),$3 
-#						else if ($4 == "-") print $1,$2,($3-'"$PROM"')}
-#					else print $1,$2,$3}' | \
-#	bedmap --bases-uniq - $NET.gapMerge.bed > $NET.gapInGene.gene_body.tsv 
- 
-# paste $NET.gapInGene.all.tsv $NET.gapInGene.gene_body.tsv $NET.fo.tsv $NET.part.tsv > $NET.tsv
+        bedops --difference - $NET.gapMerge.bed > $NET.gene.save
 
  ## Cleanup
- rm $NET*.bed $NET.fo.tsv $NET.part.tsv
+ rm $NET*.bed 
 }
 
 export NET=$CHIMP_NET
@@ -75,11 +44,22 @@ makeOrthoAnnot
 
 #paste $GENCODE_TSV $CHIMP_NET.tsv $RHESUS_NET.tsv | gzip > $GENCODE_TSV.cs.tsv.gz
 
-## Toward the end, have to combine 
-bedops --intersect $CHIMP_NET.gene.woGap $RHESUS_NET.gene.woGap | ~/bin/bin/bedops --partition - | less ##   > gene.woGap.tsv
+## Combine gaps.
+bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save > gapMerge.tsv 
+
+## Combine gene lists, and partition.
+bedops --intersect $CHIMP_NET.gene.save $RHESUS_NET.gene.save | ~/bin/bin/bedops --partition - $GENCODE_TSV > gene.gap.part.tsv
+
+## Combine gaps.
+bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save > gapMerge.tsv
+
+## Remove partition bits that fall in gaps.
+bedops --echo --indicator gene.gap.part.tsv $GENCODE_TSV > gene.woGap.tsv 
+
+## Get an all-by-all comparison.
 overlapSelect -selectCoordCols=0 -inCoordCols=0 -mergeOutput $GENCODE_TSV gene.woGap.tsv $GENCODE_TSV.noGap.olSel ## Think this is right?!  Sanity check it...
 ## Now parse the resulting file to get data in a useful format.
 
-rm *.tsv
+rm *.tsv *.save
 
 
