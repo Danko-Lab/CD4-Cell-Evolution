@@ -12,7 +12,7 @@ export PROM=1000
 function getAnnotations {
 # wget ftp://ftp.sanger.ac.uk/pub/gencode/release_17/gencode.v17.annotation.gtf.gz # 7/23/2013
  zcat gencode.v17.annotation.gtf.gz | \
-	awk 'BEGIN{OFS="\t"}{ if($3 == "transcript") {print $1,$4,$5,$7,"GC."$1"_"$4"_"$5"_"$7,$18,$10,$12,$14} }' | \
+	awk 'BEGIN{OFS="\t"}{ if($3 == "transcript") {print $1,$4,$5,"GC."$1"_"$4"_"$5"_"$7,"0",$7,$14,$18,$10,$12} }' | \
 	sed 's/"//g' | sed 's/;//g' | sed '/#.*/d' | uniq | awk '$3 > $2 {print $0}' | sort-bed - > $GENCODE_TSV
  cat $GENCODE_TSV | perl ~/perl/col.stdin.pl 8 | sort | uniq > UNIQUETYPES
 }
@@ -26,14 +26,6 @@ function makeOrthoAnnot {
  bedops --difference $NET.L2.bed $NET.L3.bed > $NET.Gap2.bed ## Gets those in L2 which aren't in L3 ...
  bedops --merge $NET.Gap2.bed $NET.L4.bed > $NET.gapMerge.save ## Add back gaps in L4 ...
 
- ## Get location of un-gapped genes.
- cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"} {if (($3-$2) > '"$PROM"')
-                                                {if ($4 == "+") print $1,($2+'"$PROM"'),$3,$5 
-                                                else if ($4 == "-") print $1,$2,($3-'"$PROM"'),$5}
-                                        else print $1,$2,$3,$5}' | \
-        bedops --difference - $NET.gapMerge.bed > $NET.gene.save
-
- ## Cleanup
  rm $NET*.bed 
 }
 
@@ -42,16 +34,17 @@ makeOrthoAnnot
 export NET=$RHESUS_NET
 makeOrthoAnnot
 
-#paste $GENCODE_TSV $CHIMP_NET.tsv $RHESUS_NET.tsv | gzip > $GENCODE_TSV.cs.tsv.gz
-
 ## Combine gaps.
 bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save > gapMerge.tsv 
 
-## Combine gene lists, and partition.
-bedops --intersect $CHIMP_NET.gene.save $RHESUS_NET.gene.save | ~/bin/bin/bedops --partition - $GENCODE_TSV > gene.gap.part.tsv
+## Make a gene list and partition.
+cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if (($3-$2) > '"$PROM"')
+                                         {if ($6 == "+") print $1,($2+'"$PROM"'),$3 
+                                         else if ($6 == "-") print $1,$2,($3-'"$PROM"')}
+                                        else print $1,$2,$3} {print $4,$5,$6,$7,$8,$9,$10}' > genebodies.tsv
 
-## Combine gaps.
-bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save > gapMerge.tsv
+## Diff w/ gaps, then partition.
+bedops --difference genebodies.tsv gapMerge.tsv | ~/bin/bin/bedops --partition - genebodies.tsv > gene.gap.part.tsv
 
 ## Remove partition bits that fall in gaps.
 bedops --echo --indicator gene.gap.part.tsv $GENCODE_TSV > gene.woGap.tsv 
