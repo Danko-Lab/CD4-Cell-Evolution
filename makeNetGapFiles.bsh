@@ -47,7 +47,7 @@ cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if (($3-$2) > '"$PROM"')
 ~/bin/bin/bedops --partition gapMerge.tsv genebodies.tsv > gene.gap.part.tsv
 
 ## Remove partition bits that fall in gaps.
-bedops --echo --indicator gene.gap.part.tsv $GENCODE_TSV | grep "0$" | sed "s/\|/\t/g" > gene.woGap.tsv 
+bedmap --echo --indicator gene.gap.part.tsv $GENCODE_TSV | grep "0$" | sed "s/|0//g" > gene.woGap.tsv 
 
 ## Get an all-by-all comparison.
 overlapSelect -selectCoordCols=0 -inCoordCols=0 -mergeOutput $GENCODE_TSV gene.woGap.tsv $GENCODE_TSV.noGap.olSel
