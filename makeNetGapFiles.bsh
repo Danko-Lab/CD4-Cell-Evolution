@@ -8,6 +8,9 @@ export RHESUS_NET=netRheMac3
 
 export PROM=0 ## 1000
 
+export INCREMENTS=gene.increments.bed
+export GENEBODIES=genebodies.tsv
+
 ## Get annotations from GenCode.
 function getAnnotations {
 # wget ftp://ftp.sanger.ac.uk/pub/gencode/release_17/gencode.v17.annotation.gtf.gz # 7/23/2013
@@ -41,7 +44,7 @@ bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save > gapMerge.tsv
 cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if (($3-$2) > '"$PROM"')
                                          {if ($6 == "+") print $1,($2+'"$PROM"'),$3 
                                          else if ($6 == "-") print $1,$2,($3-'"$PROM"')}
-                                        else print $1,$2,$3} {print $4,$5,$6,$7,$8,"\n"}' | uniq > genebodies.tsv
+                                        else print $1,$2,$3} {print "\t",$4,$5,$6,$7,$8,"\n"}' | uniq > $GENEBODIES
 
 ## Partition on the merged gaps.  IMPORTANT: Should not have any partial matches in later steps.
 ~/bin/bin/bedops --partition gapMerge.tsv genebodies.tsv > gene.gap.part.tsv
@@ -53,18 +56,9 @@ bedmap --echo --indicator gene.gap.part.tsv gapMerge.tsv | grep "0$" | sed "s/|0
 bedmap --echo --echo-map gene.woGap.tsv genebodies.tsv | sed "s/|chr/\t/g" \
 							 | awk 'BEGIN{OFS="\t"} {p= match($0, "+")} {m= match($0, "-")} 
 								{if(p>0) print $1,$2,$3,"N","0","+"}
-								{if(m>0) print $1,$2,$3,"N","0","-"}' > gene.increments.bed
-
-## Get counts, and place this in 'score'.
-R --no-save < ...
-
-## Get 
-#bedmap --echo --sum ...
+								{if(m>0) print $1,$2,$3,"N","0","-"}' > $INCREMENTS
 
 ## Get an all-by-all comparison.
 #overlapSelect -selectCoordCols=0 -inCoordCols=0 -mergeOutput $GENCODE_TSV gene.woGap.tsv $GENCODE_TSV.noGap.olSel
 
-
 #rm *.tsv *.save
-
-

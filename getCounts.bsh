@@ -1,0 +1,23 @@
+#!/usr/bin/bash
+export INCREMENTS=gene.increments.bed
+export GENEBODIES=genebodies.tsv
+
+function getCounts {
+ R --no-save --args $INCREMENTS $COUNTFILE $BWPLUS $BWMINUS < getCounts.R
+
+ bedmap --echo --sum $GENEBODIES $COUNTFILE | less
+}
+
+
+## Get counts, and place this in 'score'.
+export COUNTFILE=h1.count.bed
+export BWPLUS=/usr/projects/GROseq/CD4/Alignments/CD4-U_plus.bw
+export BWMINUS=/usr/projects/GROseq/CD4/Alignments/CD4-U_minus.bw
+getCounts
+
+## Get 
+#bedmap --echo --sum ...
+
+#rm *.tsv *.save
+
+
