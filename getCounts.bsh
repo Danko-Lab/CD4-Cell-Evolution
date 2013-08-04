@@ -3,7 +3,8 @@ export INCREMENTS=gene.increments.bed
 export GENEBODIES=genebodies.tsv
 export COUNTALL=countall.tsv
 
-cat $GENEBODIES > $COUNTALL
+bedmap --bases-uniq $GENEBODIES $INCREMENTS > olSize.sum
+paste $GENEBODIES olSize.sum > $COUNTALL
 
 function getCounts {
  R --no-save --args $INCREMENTS $COUNTFILE $BWPLUS $BWMINUS < getCounts.R

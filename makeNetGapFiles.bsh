@@ -17,7 +17,7 @@ function getAnnotations {
  zcat gencode.v17.annotation.gtf.gz | \
 	awk 'BEGIN{OFS="\t"}{ if($3 == "transcript") {print $1,$4,$5,"GC."$1"_"$4"_"$5"_"$7,"0",$7,$14,$18,$10,$12} }' | \
 	sed 's/"//g' | sed 's/;//g' | sed '/#.*/d' | uniq | awk '$3 > $2 {print $0}' | sort-bed - > $GENCODE_TSV
- cat $GENCODE_TSV | perl ~/perl/col.stdin.pl 8 | sort | uniq > UNIQUETYPES
+ cat $GENCODE_TSV | perl ~/perl/col.stdin.pl 7 | sort | uniq > UNIQUETYPES
 }
 getAnnotations ## Run on 7/23/2013.
 
@@ -58,7 +58,3 @@ bedmap --echo --echo-map gene.woGap.tsv genebodies.tsv | sed "s/|chr/\t/g" \
 								{if(p>0) print $1,$2,$3,"N","0","+"}
 								{if(m>0) print $1,$2,$3,"N","0","-"}' > $INCREMENTS
 
-## Get an all-by-all comparison.
-#overlapSelect -selectCoordCols=0 -inCoordCols=0 -mergeOutput $GENCODE_TSV gene.woGap.tsv $GENCODE_TSV.noGap.olSel
-
-#rm *.tsv *.save
