@@ -43,14 +43,27 @@ cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if (($3-$2) > '"$PROM"')
                                          else if ($6 == "-") print $1,$2,($3-'"$PROM"')}
                                         else print $1,$2,$3} {print $4,$5,$6,$7,$8,"\n"}' | uniq > genebodies.tsv
 
-## Partition on the merged gaps.
+## Partition on the merged gaps.  IMPORTANT: Should not have any partial matches in later steps.
 ~/bin/bin/bedops --partition gapMerge.tsv genebodies.tsv > gene.gap.part.tsv
 
 ## Remove partition bits that fall in gaps.
 bedmap --echo --indicator gene.gap.part.tsv gapMerge.tsv | grep "0$" | sed "s/|0//g" > gene.woGap.tsv 
 
+## Get the strand(s) of the gene(s) associated with each interval.
+bedmap --echo --echo-map gene.woGap.tsv genebodies.tsv | sed "s/|chr/\t/g" \
+							 | awk 'BEGIN{OFS="\t"} {p= match($0, "+")} {m= match($0, "-")} 
+								{if(p>0) print $1,$2,$3,"N","0","+"}
+								{if(m>0) print $1,$2,$3,"N","0","-"}' > gene.increments.bed
+
+## Get counts, and place this in 'score'.
+R --no-save < ...
+
+## Get 
+#bedmap --echo --sum ...
+
 ## Get an all-by-all comparison.
-overlapSelect -selectCoordCols=0 -inCoordCols=0 -mergeOutput $GENCODE_TSV gene.woGap.tsv $GENCODE_TSV.noGap.olSel
+#overlapSelect -selectCoordCols=0 -inCoordCols=0 -mergeOutput $GENCODE_TSV gene.woGap.tsv $GENCODE_TSV.noGap.olSel
+
 
 #rm *.tsv *.save
 
