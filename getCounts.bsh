@@ -3,12 +3,14 @@ export INCREMENTS=gene.increments.bed
 export GENEBODIES=genebodies.tsv
 export COUNTALL=countall.tsv
 
-cat $GENEBODIES>$COUNTALL
+cat $GENEBODIES > $COUNTALL
 
 function getCounts {
  R --no-save --args $INCREMENTS $COUNTFILE $BWPLUS $BWMINUS < getCounts.R
  bedmap --sum $GENEBODIES $COUNTFILE > $COUNTFILE.sum
- paste $COUNTALL $COUNTFILE.sum > $COUNTALL
+ paste $COUNTALL $COUNTFILE.sum > tmp
+ mv tmp $COUNTALL
+ rm $COUNTFILE $COUNTFILE.sum
 }
 
 
@@ -18,12 +20,12 @@ export BWPLUS=/usr/projects/GROseq/CD4/Alignments/J-U_plus.bw
 export BWMINUS=/usr/projects/GROseq/CD4/Alignments/J-U_minus.bw
 getCounts
 
-export COUNTFILE=h1.count.bed
+export COUNTFILE=H1.count.bed
 export BWPLUS=/usr/projects/GROseq/CD4/Alignments/CD4-U_plus.bw
 export BWMINUS=/usr/projects/GROseq/CD4/Alignments/CD4-U_minus.bw
 getCounts
 
-export COUNTFILE=h3.count.bed
+export COUNTFILE=H3.count.bed
 export BWPLUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/H3-PI.bed.gz_plus.bw
 export BWMINUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/H3-PI.bed.gz_minus.bw
 getCounts
@@ -42,10 +44,5 @@ export COUNTFILE=M2.count.bed
 export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-PI.bed.gz_plus.hg19.bw
 export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-PI.bed.gz_minus.hg19.bw
 getCounts
-
-#Get 
-#bedmap --echo --sum ...
-
-#rm *.tsv *.save
 
 
