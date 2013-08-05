@@ -16,11 +16,11 @@ REFFILE=${!nref}
 #_args=${array[@]:0:nref}
 #echo $_args
 
-grep "+" $MAPFILE > tmp.plus.$MAPFILE.tmp
-grep "-" $MAPFILE > tmp.minus.$MAPFILE.tmp
+cat $MAPFILE | awk '$6=="+" {print $0}' > tmp.plus.$MAPFILE.tmp
+cat $MAPFILE | awk '$6=="-" {print $0}' > tmp.minus.$MAPFILE.tmp
 
-grep "+" $REFFILE > tmp.plus.$REFFILE.tmp
-grep "-" $REFFILE > tmp.minus.$REFFILE.tmp
+cat $REFFILE | awk '$6=="+" {print $0}' > tmp.plus.$REFFILE.tmp
+cat $REFFILE | awk '$6=="-" {print $0}' > tmp.minus.$REFFILE.tmp
 
 bedmap --echo --sum tmp.plus.$REFFILE.tmp tmp.plus.$MAPFILE.tmp > plus.map.tmp
 bedmap --echo --sum tmp.minus.$REFFILE.tmp tmp.minus.$MAPFILE.tmp > minus.map.tmp
