@@ -8,11 +8,11 @@ paste $GENEBODIES olSize.sum > $COUNTALL
 
 function getCounts {
  R --no-save --args $INCREMENTS $COUNTFILE $BWPLUS $BWMINUS < getCounts.R
- #bedmap --sum $GENEBODIES $COUNTFILE > $COUNTFILE.sum ## DOES NOT RESPECT STRAND?!
- bedmap-strand $GENEBODIES $COUNTFILE | sed s/^.*\|//g > $COUNTFILE.sum 
+ ###bedmap --sum $GENEBODIES $COUNTFILE > $COUNTFILE.sum ## DOES NOT RESPECT STRAND?!
+ bash bedmap-strand.bsh $GENEBODIES $COUNTFILE | sed s/^.*\|//g > $COUNTFILE.sum 
  paste $COUNTALL $COUNTFILE.sum > tmp
  mv tmp $COUNTALL
-# rm $COUNTFILE $COUNTFILE.sum
+ rm $COUNTFILE $COUNTFILE.sum
 }
 
 
