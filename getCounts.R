@@ -18,8 +18,7 @@ bed <- read.table(bed_file)
 bw_plus <- load.bigWig(bw_plus_file)
 bw_minus<- load.bigWig(bw_minus_file)
 
-counts <- bedQuery.bigWig(bed, bw_plus, bw_minus)
-counts[is.na(counts)] <- 0  ## bigWig seems to return NA if no counts are found in the region?! Ask Andre...
+counts <- bedQuery.bigWig(bed, bw_plus, bw_minus, gapValue=0)
 counts <- abs(counts)  ## Reverse strand for minus.
 
 bed[,5] <- counts

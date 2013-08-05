@@ -8,10 +8,11 @@ paste $GENEBODIES olSize.sum > $COUNTALL
 
 function getCounts {
  R --no-save --args $INCREMENTS $COUNTFILE $BWPLUS $BWMINUS < getCounts.R
- bedmap --sum $GENEBODIES $COUNTFILE > $COUNTFILE.sum
+ #bedmap --sum $GENEBODIES $COUNTFILE > $COUNTFILE.sum ## DOES NOT RESPECT STRAND?!
+ bedmap-strand $GENEBODIES $COUNTFILE | sed s/^.*\|//g > $COUNTFILE.sum 
  paste $COUNTALL $COUNTFILE.sum > tmp
  mv tmp $COUNTALL
- rm $COUNTFILE $COUNTFILE.sum
+# rm $COUNTFILE $COUNTFILE.sum
 }
 
 
@@ -27,8 +28,8 @@ export BWMINUS=/usr/projects/GROseq/CD4/Alignments/CD4-U_minus.bw
 getCounts
 
 export COUNTFILE=H3.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/H3-PI.bed.gz_plus.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/H3-PI.bed.gz_minus.bw
+export BWPLUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/H3-U.bed.gz_plus.bw
+export BWMINUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/H3-U.bed.gz_minus.bw
 getCounts
 
 export COUNTFILE=C3.count.bed
@@ -42,8 +43,8 @@ export BWMINUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/M1-U.bed.gz_minus.hg1
 getCounts
 
 export COUNTFILE=M2.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-PI.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-PI.bed.gz_minus.hg19.bw
+export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-U.bed.gz_plus.hg19.bw
+export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-U.bed.gz_minus.hg19.bw
 getCounts
 
 
