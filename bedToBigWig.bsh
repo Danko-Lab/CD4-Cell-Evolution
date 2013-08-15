@@ -12,7 +12,7 @@ function makeBigWig {
    echo $f
 
    ## Remove rRNA and reverse the strand (PRO-seq).
-   zcat $f | grep "rRNA" -v | grep "_" -v | \
+   zcat $f | grep "rRNA" -v | \ ## THIS IS REMOVING RANDOM CHROMS: grep "_" -v | \
          awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,$5,$6=="+"?"-":"+"}' | gzip > $f.nr.rs.bed.gz
  
    ## Convert to wig
