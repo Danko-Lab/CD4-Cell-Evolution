@@ -67,12 +67,14 @@ makeBigWig
 FILES=`ls C*.bed.gz`
 CHINFO=chromInfo.panTro4
 makeBigWig
-MAPCHAIN=/home/dankoc/liftOver/panTro4ToHg19.over.chain.gz
+MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.panTro4/panTro4.hg19.rbest.chain.gz # Use rbest
+#MAPCHAIN=/home/dankoc/liftOver/panTro4ToHg19.over.chain.gz
 liftToHg19
 
 FILES=`ls M*.bed.gz`
 CHINFO=chromInfo.rheMac3
 makeBigWig
-MAPCHAIN=/gbdb/rheMac3/liftOver/rheMac3ToHg19.over.chain.gz
+MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.chain.gz # Use rbest
+#MAPCHAIN=/gbdb/rheMac3/liftOver/rheMac3ToHg19.over.chain.gz
 liftToHg19
 
