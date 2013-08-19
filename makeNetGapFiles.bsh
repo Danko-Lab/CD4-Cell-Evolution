@@ -3,8 +3,8 @@
 export GENCODE_TSV=gencode.v17.transcript.tsv
 export NET_LEN_FILT=100 # bp
 export NET_PART_OL=10000 # bp, threshold for declaring a partial overlap.
-export CHIMP_NET=netPanTro4
-export RHESUS_NET=netRheMac3
+export CHIMP_NET=panTro4_net_rbest     # netPanTro4
+export RHESUS_NET=rheMac3_net_rbest    # netRheMac3
 
 export PROM=0 ## 1000
 
@@ -24,9 +24,9 @@ getAnnotations ## Run on 7/23/2013.
 function makeOrthoAnnot {
  ## Get gap data.
  hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 2" | grep "^c" | sort-bed - > $NET.L2.bed
- hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 3" | grep "^c" | sort-bed - > $NET.L3.bed
+ hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 3" | grep "^c" | sort-bed - > $NET.L3.bed.keep
  hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 4" | grep "^c" | sort-bed - > $NET.L4.bed
- bedops --difference $NET.L2.bed $NET.L3.bed > $NET.Gap2.bed ## Gets those in L2 which aren't in L3 ...
+ bedops --difference $NET.L2.bed $NET.L3.bed.keep > $NET.Gap2.bed ## Gets those in L2 which aren't in L3 ...
  bedops --merge $NET.Gap2.bed $NET.L4.bed > $NET.gapMerge.save ## Add back gaps in L4 ...
 
  rm $NET*.bed 
@@ -38,7 +38,7 @@ export NET=$RHESUS_NET
 makeOrthoAnnot
 
 ## Combine gaps.
-bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save > gapMerge.tsv 
+bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save > gapMerge.tmp
 
 ## Make a gene list and partition.
 cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if (($3-$2) > '"$PROM"')
@@ -47,14 +47,15 @@ cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if (($3-$2) > '"$PROM"')
                                         else print $1,$2,$3} {print "\t",$4,$5,$6,$7,$8,"\n"}' | uniq > $GENEBODIES
 
 ## Partition on the merged gaps.  IMPORTANT: Should not have any partial matches in later steps.
-~/bin/bin/bedops --partition gapMerge.tsv genebodies.tsv > gene.gap.part.tsv
+~/bin/bin/bedops --partition gapMerge.tmp $GENEBODIES > gene.gap.part.tmp
 
 ## Remove partition bits that fall in gaps.
-bedmap --echo --indicator gene.gap.part.tsv gapMerge.tsv | grep "0$" | sed "s/|0//g" > gene.woGap.tsv 
+bedmap --echo --indicator gene.gap.part.tmp gapMerge.tmp | grep "0$" | sed "s/|0//g" > gene.woGap.tmp
 
 ## Get the strand(s) of the gene(s) associated with each interval.
-bedmap --echo --echo-map gene.woGap.tsv genebodies.tsv | sed "s/|chr/\t/g" \
+bedmap --echo --echo-map gene.woGap.tmp $GENEBODIES | sed "s/|chr/\t/g" \
 							 | awk 'BEGIN{OFS="\t"} {p= match($0, "+")} {m= match($0, "-")} 
 								{if(p>0) print $1,$2,$3,"N","0","+"}
 								{if(m>0) print $1,$2,$3,"N","0","-"}' > $INCREMENTS
 
+rm *.save *.tmp

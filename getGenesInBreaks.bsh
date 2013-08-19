@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+## Add information about net/chain gap info
+bedmap --echo-map --fraction-ref 1.0 genebodies.tsv netPanTro4.L3.bed.keep | awk 'BEGIN {OFS="\t"} ($2-$1)>0 {print $2-$1,$4} ($2-$1) == 0 {print "0","NONE"}' > panTro4.ingap.tmp
+bedmap --echo-map --fraction-ref 1.0 genebodies.tsv netRheMac3.L3.bed.keep | awk 'BEGIN {OFS="\t"} ($2-$1)>0 {print $2-$1,$4} ($2-$1) == 0 {print "0","NONE"}' > rheMac3.ingap.tmp
+paste panTro4.ingap.tmp rheMac3.ingap.tmp > genes.inGap
+rm *.tmp
+

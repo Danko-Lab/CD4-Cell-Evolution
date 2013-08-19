@@ -6,8 +6,6 @@ changeExpr <- fdr_df$fdr_min < 0.05
 ## Comput RPKM
 isExpr <- rowMeans(rpkm_df) > 1e-4
 
-##############################################################################
-## Compare frequency of changes in expression for genes, and non-coding RNAs.
 sum(changeExpr & isExpr)/ sum(isExpr)
 summary(fdr_df$type[changeExpr & isExpr])/summary(fdr_df$type[isExpr])
 
@@ -50,4 +48,43 @@ dev.off()
 ##############################################################################
 ## Compare frequency of changes in expression for transcripts inside re-arrangements.
 
+ca <- read.table("countall.tsv")
+gap <- read.table("genes.inGap")[!is.na(ca[,10]),]
+ca <- ca[!is.na(ca[,10]),]
+
+summary(gap$V2[fdr_df$ChimpFDR< 0.05])/ summary(gap$V2)
+summary(gap$V4[fdr_df$MacaqueFDR< 0.05])/ summary(gap$V4)
+
+summary(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr])/ summary(gap$V2[isExpr])
+summary(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr])/ summary(gap$V4[isExpr])
+
+fisher.test(data.frame(c(sum(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr] == "nonSyn"), 
+						sum(gap$V2[isExpr] == "nonSyn")), 
+						c(sum(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr] == "NONE"), 
+						sum(gap$V2[isExpr] == "NONE"))))$p.value
+
+fisher.test(data.frame(c(sum(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr] == "nonSyn"), 
+						sum(gap$V4[isExpr] == "nonSyn")), 
+						c(sum(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr] == "NONE"), 
+						sum(gap$V4[isExpr] == "NONE"))))$p.value
+
+fisher.test(data.frame(c(sum(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr] == "inv"), 
+						sum(gap$V2[isExpr] == "inv")), 
+						c(sum(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr] == "NONE"), 
+						sum(gap$V2[isExpr] == "NONE"))))$p.value
+
+fisher.test(data.frame(c(sum(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr] == "inv"), 
+						sum(gap$V4[isExpr] == "inv")), 
+						c(sum(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr] == "NONE"), 
+						sum(gap$V4[isExpr] == "NONE"))))$p.value
+
+fisher.test(data.frame(c(sum(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr] == "syn"), 
+						sum(gap$V2[isExpr] == "syn")), 
+						c(sum(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr] == "NONE"), 
+						sum(gap$V2[isExpr] == "NONE"))))$p.value
+
+fisher.test(data.frame(c(sum(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr] == "syn"), 
+						sum(gap$V4[isExpr] == "syn")), 
+						c(sum(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr] == "NONE"), 
+						sum(gap$V4[isExpr] == "NONE"))))$p.value
 
