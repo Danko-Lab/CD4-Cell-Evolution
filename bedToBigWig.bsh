@@ -78,3 +78,6 @@ MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.
 #MAPCHAIN=/gbdb/rheMac3/liftOver/rheMac3ToHg19.over.chain.gz
 liftToHg19
 
+## Cleanup.
+rm *.nr.rs.*
+
