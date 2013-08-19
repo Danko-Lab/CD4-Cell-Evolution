@@ -26,8 +26,13 @@ function makeOrthoAnnot {
  hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 2" | grep "^c" | sort-bed - > $NET.L2.bed
  hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 3" | grep "^c" | sort-bed - > $NET.L3.bed.keep
  hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 4" | grep "^c" | sort-bed - > $NET.L4.bed
+ hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 5" | grep "^c" | sort-bed - > $NET.L5.bed.keep
+ hgsql hg19 -e "select tName,tStart,tEnd,type,level from $NET where level like 6" | grep "^c" | sort-bed - > $NET.L6.bed
+
  bedops --difference $NET.L2.bed $NET.L3.bed.keep > $NET.Gap2.bed ## Gets those in L2 which aren't in L3 ...
- bedops --merge $NET.Gap2.bed $NET.L4.bed > $NET.gapMerge.save ## Add back gaps in L4 ...
+ bedops --difference $NET.L4.bed $NET.L5.bed.keep > $NET.Gap3.bed ## Gets those in L2 which aren't in L3 ...
+
+ bedops --merge $NET.Gap2.bed $NET.Gap3.bed $NET.L6.bed > $NET.gapMerge.save ## Add back gaps in L4 ...
 
  rm $NET*.bed 
 }
