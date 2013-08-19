@@ -12,7 +12,7 @@ function makeBigWig {
    echo $f
 
    ## Remove rRNA and reverse the strand (PRO-seq).
-   zcat $f | grep "rRNA" -v | \ ## THIS IS REMOVING RANDOM CHROMS: grep "_" -v | \
+   zcat $f | grep "rRNA" -v | \
          awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,$5,$6=="+"?"-":"+"}' | gzip > $f.nr.rs.bed.gz
  
    ## Convert to wig
@@ -57,6 +57,9 @@ function liftToHg19 {
  done
 }
 
+## Preclean
+rm *.wig.gz *.bw *.bedGraph *.bedGraph.gz
+
 UNMAPPED=tmp
 CHINFOhg=chromInfo.hg19
 
@@ -79,5 +82,5 @@ MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.
 liftToHg19
 
 ## Cleanup.
-rm *.nr.rs.*
+rm *.nr.rs.* tmp *.bedGraph *.bedGraph.gz
 
