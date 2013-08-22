@@ -5,6 +5,7 @@ export CHIMP_NET=panTro4_net_rbest     # netPanTro4
 export RHESUS_NET=rheMac3_net_rbest    # netRheMac3
 
 export PROM=0 ## 1000
+export MAXLEN=60000 ## Max length in base pairs.
 
 export INCREMENTS=gene.increments.bed
 export GENEBODIES=genebodies.tsv
@@ -45,9 +46,9 @@ bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save > gapMerge.tmp
 
 ## Make a gene list and partition.
 cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if (($3-$2) > '"$PROM"')
-                                         {if ($6 == "+") print $1,($2+'"$PROM"'),$3 
-                                         else if ($6 == "-") print $1,$2,($3-'"$PROM"')}
-                                        else print $1,$2,$3} {print "\t",$4,$5,$6,$7,$8,"\n"}' | uniq > $GENEBODIES
+                                         {if ($6 == "+") print $1,($2+'"$PROM"'), ($3<($2+'"$MAXLEN"')) ? $3 : ($2+'"$MAXLEN"')
+                                         else if ($6 == "-") print $1, ($2>($3-'"$MAXLEN"')) ? $2 : $3-'"$MAXLEN"' ,($3-'"$PROM"')}
+                                        else print $1,$2,$3} {print "\t",$4,$5,$6,$7,$8,"\n"}' | uniq | sort-bed - > $GENEBODIES
 
 ## Partition on the merged gaps.  IMPORTANT: Should not have any partial matches in later steps.
 ~/bin/bin/bedops --partition gapMerge.tmp $GENEBODIES > gene.gap.part.tmp
