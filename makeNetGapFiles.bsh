@@ -4,7 +4,7 @@ export GENCODE_TSV=gencode.v17.transcript.tsv
 export CHIMP_NET=panTro4_net_rbest     # netPanTro4
 export RHESUS_NET=rheMac3_net_rbest    # netRheMac3
 
-export PROM=0 ## 1000
+export PROM=250 ## 1000
 export MAXLEN=60000 ## Max length in base pairs.
 
 export INCREMENTS=gene.increments.bed
