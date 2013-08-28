@@ -8,7 +8,7 @@ paste $GENEBODIES olSize.sum > $COUNTALL
 
 function getCounts {
  ~/bin/R/R-3.0.1/bin/R --no-save --args $INCREMENTS $COUNTFILE $BWPLUS $BWMINUS < getCounts.R
- bash bedmap-strand.bsh $GENEBODIES $COUNTFILE | sed s/^.*\|//g > $COUNTFILE.sum 
+ bash bedmap-strand.bsh $GENEBODIES $COUNTFILE | sed s/^.*\|//g | sed "s/NAN/NA/g" > $COUNTFILE.sum 
  paste $COUNTALL $COUNTFILE.sum > tmp
  mv tmp $COUNTALL
  rm $COUNTFILE $COUNTFILE.sum
@@ -27,8 +27,8 @@ export BWMINUS=/usr/projects/GROseq/CD4/Alignments/CD4-U_minus.bw
 getCounts
 
 export COUNTFILE=H2.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/H2-U.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/H2-U.bed.gz_minus.hg19.bw
+export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/H2-U.bed.gz_plus.bw
+export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/H2-U.bed.gz_minus.bw
 getCounts
 
 export COUNTFILE=H3.count.bed
@@ -68,8 +68,8 @@ export BWMINUS=/usr/projects/GROseq/CD4/Alignments/CD4-PI_minus.bw
 getCounts
 
 export COUNTFILE=H2.pi.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/H2-PI.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/H2-PI.bed.gz_minus.hg19.bw
+export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/H2-PI.bed.gz_plus.bw
+export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/H2-PI.bed.gz_minus.bw
 getCounts
 
 export COUNTFILE=H3.pi.count.bed
@@ -97,4 +97,19 @@ export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-PI.bed.gz_plus.hg19
 export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-PI.bed.gz_minus.hg19.bw
 getCounts
 
+## Other cell types.
+export COUNTFILE=K562.count.bed
+export BWPLUS=/usr/data/GROseq.parser/hg19/k562/proseq/K562_unt.sort.bed.gz_plus.bw
+export BWMINUS=/usr/data/GROseq.parser/hg19/k562/proseq/K562_unt.sort.bed.gz_minus.bw
+getCounts
+
+export COUNTFILE=GM12878.groseq.bed
+export BWPLUS=/usr/data/GROseq.parser/hg19/gm12878/groseq/groseq_plus.bigWig
+export BWMINUS=/usr/data/GROseq.parser/hg19/gm12878/groseq/groseq_minus.bigWig
+getCounts
+
+export COUNTFILE=IMR90.groseq.bed
+export BWPLUS=/usr/data/GROseq.parser/hg19/imr90/groseq/groseq_plus.bigWig
+export BWMINUS=/usr/data/GROseq.parser/hg19/imr90/groseq/groseq_minus.bigWig
+getCounts
 
