@@ -202,13 +202,13 @@ makeHmm <- function() {
 	#####################################################
 	## Set up model parameters.
 
-	g <- 1e-3 ## \gamma --> Parameter for a complete gain or loss.
+	g <- 5e-3 ## \gamma --> Parameter for a complete gain or loss.
 
 	b <- 1e-2 ## \beta  --> Parameter for a transition from B->T.
 	a <- 1e-2 ## \alpha --> Parameter for a change in start or end site.
 	d <- 1e-2 ## \delta --> Parameter specifying the 'length' of 'extension' in start site.
 
-	e <- 1e-2 ## \eta --> Transition from T->B.
+	e <- 1e-4 ## \eta --> Transition from T->B.
 	ap<- a    ## \alpha^prime --> Parameter for a change in end site.
 	dp<- d    ## \delta --> Parameter specifying the 'length' of 'extension' in end site.
 
@@ -297,7 +297,7 @@ decode_hmm <- function(chrom, hmm, full.data, train.data, missing.lst, step = 50
       ends = c(ends, (coords[2,]+1) * step - 1)
       names = c(names, paste("T:", chrom, ":", coords[1,], "-", coords[2,], ":", strand, sep=''))
 	  cols = c(cols, rep(pal3[iteration], NCOL(coords)))
-	  iteration <<- iteration+1
+	  iteration <- iteration+1
 	}
 
     return(data.frame(chrom = chrom, start = starts, end = ends, name = names, score = 0, strand = strand, thickStart= starts, thickEnd= ends, color= cols))
@@ -333,7 +333,7 @@ decode_hmm <- function(chrom, hmm, full.data, train.data, missing.lst, step = 50
  
  bed <- decode_hmm("chr22", hmm, all.data$data, dataset.train, all.data$missing, step = 50)
 
- write('track name="TranscriptData" description="NHP" visibility=2 itemRgb="On"')
+ write('track name="TranscriptData" description="NHP" visibility=2 itemRgb="On"', "tmp.bed")
  write.table(bed, "tmp.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t", append=TRUE)
  
 # path_plus = viterbi.qhmm(hmm, all.data$data[[1]][c(2:5),], missing = all.data$missing[[1]])
