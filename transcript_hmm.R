@@ -204,7 +204,7 @@ makeHmm <- function() {
 
 
 	b <- 1e-2 ## \beta  --> Parameter for a transition from B->T.
-	e <- 1e-3 ## \eta --> Transition from T->B.
+	e <- 1e-2 ## \eta --> Transition from T->B.
 	
 	g <- 5e-2 ## \gamma --> Parameter for a complete gain or loss.
 	a <- 1e-1 ## \alpha --> Parameter for a change in start or end site.
@@ -260,14 +260,14 @@ makeHmm <- function() {
 	set.emission.params.qhmm(hmm, 1, 1/2000, slot = 1, fixed=c(TRUE))
     set.emission.params.qhmm(hmm, c(2:n_states), 1/50, slot = 1, fixed=c(TRUE)) ## All other states have at least one sequence transcribed.
 	
-	back_emissions <- c(3, 1/3, 1) ## NOTE: Setting a third parameter equal to the 'mean' fixes the mean.
+	back_emissions <- c(2, 1/2, 1) ## NOTE: Setting a third parameter equal to the 'mean' fixes the mean.
 	tran_emissions <- c(10, 3/10)
 
-   set.emission.params.qhmm(hmm, slot1_bg, back_emissions, slot = 2, fixed=c(FALSE, FALSE, FALSE))
+   set.emission.params.qhmm(hmm, slot1_bg, back_emissions, slot = 2, fixed=c(FALSE, FALSE, TRUE))
    set.emission.params.qhmm(hmm, slot1_tr, tran_emissions, slot = 2, fixed=c(FALSE, FALSE))
-   set.emission.params.qhmm(hmm, slot2_bg, back_emissions, slot = 3, fixed=c(FALSE, FALSE, FALSE))
+   set.emission.params.qhmm(hmm, slot2_bg, back_emissions, slot = 3, fixed=c(FALSE, FALSE, TRUE))
    set.emission.params.qhmm(hmm, slot2_tr, tran_emissions, slot = 3, fixed=c(FALSE, FALSE))
-   set.emission.params.qhmm(hmm, slot3_bg, back_emissions, slot = 4, fixed=c(FALSE, FALSE, FALSE))
+   set.emission.params.qhmm(hmm, slot3_bg, back_emissions, slot = 4, fixed=c(FALSE, FALSE, TRUE))
    set.emission.params.qhmm(hmm, slot3_tr, tran_emissions, slot = 4, fixed=c(FALSE, FALSE))
 
    return(hmm)
