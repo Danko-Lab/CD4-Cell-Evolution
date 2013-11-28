@@ -196,19 +196,19 @@ makeHmm <- function() {
 	
 	hmm = new.qhmm(data.shape= list(c(1, rep(1, n_species)), NULL), support.missing = TRUE,
 	  valid.transitions= vtrans,
-	  transition.functions= c("autocorr", rep("discrete", 6), "discrete", rep("discrete", 24)),
+	  transition.functions= c("discrete", rep("discrete", 6), "discrete", rep("discrete", 24)),
 	  emission.functions= as.list(rep(list(emissions.functions), n_states)), emission.groups= emissions)
 
 	#####################################################
 	## Set up model parameters.
 
 
-	b <- 1e-2 ## \beta  --> Parameter for a transition from B->T.
-	e <- 1e-2 ## \eta --> Transition from T->B.
+	b <- 5e-2 ## \beta  --> Parameter for a transition from B->T.
+	e <- 5e-2 ## \eta --> Transition from T->B.
 	
-	g <- 5e-2 ## \gamma --> Parameter for a complete gain or loss.
-	a <- 1e-1 ## \alpha --> Parameter for a change in start or end site.
-	d <- 1e-1 ## \delta --> Parameter specifying the 'length' of 'extension' in start site.
+	g <- 5e-1 ## \gamma --> Parameter for a complete gain or loss.
+	a <- 8e-1 ## \alpha --> Parameter for a change in start or end site.
+	d <- 8e-1 ## \delta --> Parameter specifying the 'length' of 'extension' in start site.
     ap<- a    ## \alpha^prime --> Parameter for a change in end site.
 	dp<- d    ## \delta --> Parameter specifying the 'length' of 'extension' in end site.
 
