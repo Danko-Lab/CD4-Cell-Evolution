@@ -5,6 +5,17 @@ library(rqhmm)
 library(bigWig)
 library(bitops)
 
+
+slot1_bg <- c(1,3,4,7,11,13,14,15,16,17,18,19,21,24,26,29,31,32)
+slot1_tr <- c(1:32)[!(c(1:32) %in% slot1_bg)]
+
+slot2_bg <- c(1,2,4,6,10,12,14,15,18,20,21,22,23,24,25,28,30,32)
+slot2_tr <- c(1:32)[!(c(1:32) %in% slot2_bg)]
+
+slot3_bg <- c(1,2,3,5, 9,12,13,16,19,20,23,25,26,27,28,29,30,31)
+slot3_tr <- c(1:32)[!(c(1:32) %in% slot3_bg)]
+
+
 make.data <- function(chrom, bwSet.plus, bwSet.minus, step = 50) {
   # for each strand:
   # 1. collect reads by step
@@ -172,22 +183,13 @@ makeHmm <- function() {
 	#####################################################
 	## Create an emissions group matrix.
 	
-	slot1_bg <- c(1,3,4,7,11,13,14,15,16,17,18,19,21,24,26,29,31,32)
-	slot1_tr <- c(1:32)[!(c(1:32) %in% slot1_bg)]
-
-	slot2_bg <- c(1,2,4,6,10,12,14,15,18,20,21,22,23,24,25,28,30,32)
-	slot2_tr <- c(1:32)[!(c(1:32) %in% slot2_bg)]
-
-	slot3_bg <- c(1,2,3,5, 9,12,13,16,19,20,23,25,26,27,28,29,30,31)
-	slot3_tr <- c(1:32)[!(c(1:32) %in% slot3_bg)]
-
 	emissions <- new.emission.groups(n_states, 1+n_species)
 	emissions <- add.emission.groups(emissions, states= c(1:n_states), slots= rep(1, n_states))
 	emissions <- add.emission.groups(emissions, states= c(slot1_bg,slot2_bg,slot3_bg),
 								slots= c(rep(2, NROW(slot1_bg)), rep(3, NROW(slot2_bg)), rep(4, NROW(slot3_bg))))
 	emissions <- add.emission.groups(emissions, states= c(slot1_tr,slot2_tr,slot3_tr),
 								slots= c(rep(2, NROW(slot1_tr)), rep(3, NROW(slot2_tr)), rep(4, NROW(slot3_tr))))
-	emissions.functions <- c("geometric", rep("neg_binomial", n_species))
+	emissions.functions <- c("geometric", rep("dgamma", n_species))
 
 	#####################################################
 	## Create the HMM.
@@ -269,100 +271,36 @@ makeHmm <- function() {
 
 #########
 #set.transition.option.qhmm ## Set the tree...
+pal3 <- c("23,185,43", "230,53,13", "111,210,240")
+decode_hmm <- function(chrom, hmm, full.data, train.data, missing.lst, step = 50) {
 
-decode_hmm <- function(chrom, hmm, full.data, train.data, missing.lst, step = 50, min.len = NA) {
-
-  # common info
-  n.tracks = dim(train.data[[1]])[1] - 1
-  next.idx = 1
-
-  print.pattern.stats <- function(stats) {
-    cat.pattern <- function(pat) {
-      for (i in 1:n.tracks) {
-        if (bitAnd(pat, 2^(i - 1)) > 0)
-          cat("#")
-        else
-          cat(" ")
-      }
-    }
-
-    m = 2^n.tracks
-    for (k in 1:m) {
-      cat.pattern(k)
-      cat(" :", stats[k], "\n")
-    }
-  }
-  
   decode.path <- function(path, positions, strand) {
-    tcount.stats = rep(0, n.tracks)
-    pattern.stats = rep(0, 2^n.tracks)
     
-    blocks = path.blocks.qhmm(path, 2:(hmm$n.states))
+	starts <- NULL
+	ends <- NULL
+	names <- NULL
+	cols <- NULL
+	iteration <- 1
+	for(i in list(slot1_tr, slot2_tr, slot3_tr)) {
+	
+      blocks = path.blocks.qhmm(path, i)
+      cat("# blocks:", dim(blocks)[2], "\n")
 
-    cat("# blocks:", dim(blocks)[2], "\n")
+      coords = rbind(positions[blocks[1,]], positions[blocks[2,]])
+      if (strand == '-')
+        coords = rbind(positions[blocks[2,]], positions[blocks[1,]])
 
-    coords = rbind(positions[blocks[1,]], positions[blocks[2,]])
-    if (strand == '-')
-      coords = rbind(positions[blocks[2,]], positions[blocks[1,]])
+      N = dim(blocks)[2]
+      cat("# blocks:", N, "\n")
 
-    len = coords[2,] - coords[1,] + 1
-    if (!is.na(min.len)) {
-      coords = coords[, len > min.len]
-      blocks = blocks[, len > min.len]
-    }
+      starts = c(starts, coords[1,] * step - 1)
+      ends = c(ends, (coords[2,]+1) * step - 1)
+      names = c(names, paste("T:", chrom, ":", coords[1,], "-", coords[2,], ":", strand, sep=''))
+	  cols = c(cols, rep(pal3[iteration], NCOL(coords)))
+	  iteration <<- iteration+1
+	}
 
-#    coords = t(coords)*step
-#    coords[,1] = coords[,1] - 1 # convert to zero-based, right-open
-    N = dim(blocks)[2]
-
-    cat("# blocks:", N, "\n")
-    
-    #
-    # now need to produce the sub-tracks by examining the state path
-    # within the block
-    starts = NULL
-    ends = NULL
-    names = NULL
-    for (i in 1:N) {
-      idx.start = blocks[1, i]
-      idx.end = blocks[2, i]
-
-      subpath = path[idx.start:idx.end]
-
-      tcount = 0
-      pattern = 0
-      for (j in 1) { #:n.tracks) {
-
-        edge.offset = length(subpath) #1
-        start.ij = positions[idx.start]
-        end.ij = positions[idx.start + edge.offset - 1]
-        if (strand == '-') {
-          start.ij = positions[idx.start + edge.offset - 1]
-          end.ij = positions[idx.start]
-        }
-
-        start.ij.coord = start.ij * step - 1
-		end.ij.coord = (end.ij + 1) * step - 1
-        if (is.na(min.len) || (end.ij.coord - start.ij.coord) > min.len) {
-          starts = c(starts, start.ij.coord)
-          ends = c(ends, end.ij.coord)
-          names = c(names, paste("T:", chrom, ":", next.idx, ":", j, sep=''))
-          tcount = tcount + 1
-          pattern = pattern #+ bmask
-        }
-      }
-      tcount.stats[tcount] = tcount.stats[tcount] + 1
-      pattern.stats[pattern] = pattern.stats[pattern] + 1
-      if (tcount > 0)
-        next.idx <<- next.idx + 1
-    }
-
-    print(tcount.stats)
-    print.pattern.stats(pattern.stats)
-    
-    return(data.frame(chrom = chrom, start = starts, end = ends, name = names, score = 0, strand = strand))
-
-    # return number of groups
+    return(data.frame(chrom = chrom, start = starts, end = ends, name = names, score = 0, strand = strand, thickStart= starts, thickEnd= ends, color= cols))
   }
 
   path.plus = viterbi.qhmm(hmm, train.data[[1]], missing = missing.lst[[1]])
@@ -371,8 +309,6 @@ decode_hmm <- function(chrom, hmm, full.data, train.data, missing.lst, step = 50
   bed.plus = decode.path(path.plus, full.data[[1]][1,], "+")
   bed.minus = decode.path(path.minus, full.data[[2]][1,], "-")
 
-  print(next.idx - 1)
-  
   return(rbind(bed.plus, bed.minus))
 }
 
@@ -395,20 +331,22 @@ decode_hmm <- function(chrom, hmm, full.data, train.data, missing.lst, step = 50
  em.qhmm(hmm, dataset.train, missing.lst = all.data$missing, n_threads = 4)
  collect.params.qhmm(hmm)
  
- bed <- decode_hmm("chr22", hmm, all.data$data, dataset.train, all.data$missing, step = 50, min.len = NA)
- write.table(bed, "tmp.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+ bed <- decode_hmm("chr22", hmm, all.data$data, dataset.train, all.data$missing, step = 50)
+
+ write('track name="TranscriptData" description="NHP" visibility=2 itemRgb="On"')
+ write.table(bed, "tmp.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t", append=TRUE)
  
- path_plus = viterbi.qhmm(hmm, all.data$data[[1]][c(2:5),], missing = all.data$missing[[1]])
- path_minus = viterbi.qhmm(hmm, all.data$data[[2]][c(2:5),], missing = all.data$missing[[2]])
+# path_plus = viterbi.qhmm(hmm, all.data$data[[1]][c(2:5),], missing = all.data$missing[[1]])
+# path_minus = viterbi.qhmm(hmm, all.data$data[[2]][c(2:5),], missing = all.data$missing[[2]])
 
  ## SANITY CHECK
- head(cbind( (t(all.data$data[1][[1]])), path_plus ), 100) ## SANITY CHECK
+# head(cbind( (t(all.data$data[1][[1]])), path_plus ), 100) ## SANITY CHECK
  
 # posterior decoding
-fw = forward.qhmm(hmm, rolls)
-bk = backward.qhmm(hmm, rolls)
-
-logPx = attributes(fw)$loglik
-
-posterior = exp(fw + bk - logPx)
+#fw = forward.qhmm(hmm, rolls)
+#bk = backward.qhmm(hmm, rolls)
+#
+#logPx = attributes(fw)$loglik
+#
+#posterior = exp(fw + bk - logPx)
 
