@@ -196,22 +196,21 @@ makeHmm <- function() {
 	
 	hmm = new.qhmm(data.shape= list(c(1, rep(1, n_species)), NULL), support.missing = TRUE,
 	  valid.transitions= vtrans,
-	  transition.functions= rep("discrete", n_states),
+	  transition.functions= c("autocorr", rep("discrete", 6), "discrete", rep("discrete", 24)),
 	  emission.functions= as.list(rep(list(emissions.functions), n_states)), emission.groups= emissions)
 
 	#####################################################
 	## Set up model parameters.
 
-	g <- 5e-3 ## \gamma --> Parameter for a complete gain or loss.
 
 	b <- 1e-2 ## \beta  --> Parameter for a transition from B->T.
-	a <- 1e-2 ## \alpha --> Parameter for a change in start or end site.
-	d <- 1e-2 ## \delta --> Parameter specifying the 'length' of 'extension' in start site.
-
-	e <- 1e-4 ## \eta --> Transition from T->B.
-	ap<- a    ## \alpha^prime --> Parameter for a change in end site.
+	e <- 1e-3 ## \eta --> Transition from T->B.
+	
+	g <- 5e-2 ## \gamma --> Parameter for a complete gain or loss.
+	a <- 1e-1 ## \alpha --> Parameter for a change in start or end site.
+	d <- 1e-1 ## \delta --> Parameter specifying the 'length' of 'extension' in start site.
+    ap<- a    ## \alpha^prime --> Parameter for a change in end site.
 	dp<- d    ## \delta --> Parameter specifying the 'length' of 'extension' in end site.
-
 
 	## Phylogenetic tree.
 	H <- 6/(6+6+25)  ## branch length for human/ (h+c+m)
@@ -225,15 +224,19 @@ makeHmm <- function() {
 			g*C*b/2, g*a*(M+C)*b/4, g*a*(C+M)*b/4,                               #TBT
 			g*M*b/2, g*a*(H+C)*b/4, g*a*(C+H)*b/4,                               #TTB
 			g*H*b/2, g*C*b/2, g*M*b/2                             ),  fixed=rep(TRUE, 20)) #TBB,BTB,BBT
+
 			
-	set.transition.params.qhmm(hmm, 8, c( 1-e, e*(1-ap),
-			e*ap*M/2, e*ap*C/2, e*ap*H/2, e*ap*H/2, e*ap*C/2, e*ap*M/2 ),  fixed=rep(TRUE, 8))
-			
+	set.transition.params.qhmm(hmm, 8, c( 1-e, e*(1-ap), e*ap*M/2, e*ap*C/2, e*ap*H/2, e*ap*H/2, e*ap*C/2, e*ap*M/2 ),  fixed=rep(TRUE, 8))
+
 	## Intermediate states with T in 1 species -> TTT|(T in 2 species).
-	  set.transition.params.qhmm(hmm, c(2:4), c(1-d, d*a/2, d*a/2, d*(1-a)), fixed=rep(TRUE, 4))
+    set.transition.params.qhmm(hmm, c(2:4), c(1-d, d*a/2, d*a/2, d*(1-a)), fixed=rep(TRUE, 4))
+#	for(i in 2:4)
+#	  set.transition.covars.qhmm(hmm, i, c(a/2, a/2, (1-a)))
 	  
 #	## Intermediate states with T in 1 species -> TTT|(other knockout state).
-	  set.transition.params.qhmm(hmm, c(5:7,15:16,20:21,25:26), c(1-d, d), fixed=rep(TRUE, 2))
+    set.transition.params.qhmm(hmm, c(5:7,15:16,20:21,25:26), c(1-d, d), fixed=rep(TRUE, 2))
+#	for(i in c(5:7,15:16,20:21,25:26))
+#	  set.transition.covars.qhmm(hmm, i, c(a/2, a/2, (1-a)))
 
 	## Intermediate states with T in 2 species -> BBB|(T in 1 species).
 	  set.transition.params.qhmm(hmm, c(9:11), c(1-dp, dp*ap/2, dp*ap/2, dp*(1-ap)), fixed=rep(TRUE, 4))
@@ -247,24 +250,25 @@ makeHmm <- function() {
 	## For species-specific gains on terminal branches.
 	  set.transition.params.qhmm(hmm, c(30:32), c(1-e,e), fixed=rep(TRUE, 2))
 
+	  
 	#################################
 	## Set initial probabilities.
 	set.initial.probs.qhmm(hmm, c(1, rep(0, n_states - 1))) # start with background
 
 	#################################
 	## Set emissions params.
-	set.emission.params.qhmm(hmm, 1, 1/3000, slot = 1)
-    set.emission.params.qhmm(hmm, c(2:n_states), 1/20, slot = 1) ## All other states have at least one sequence transcribed.
+	set.emission.params.qhmm(hmm, 1, 1/2000, slot = 1, fixed=c(TRUE))
+    set.emission.params.qhmm(hmm, c(2:n_states), 1/50, slot = 1, fixed=c(TRUE)) ## All other states have at least one sequence transcribed.
 	
-	back_emissions <- c(5, 1/5) ## NOTE: Setting a third parameter equal to the 'mean' fixes the mean.
+	back_emissions <- c(3, 1/3, 1) ## NOTE: Setting a third parameter equal to the 'mean' fixes the mean.
 	tran_emissions <- c(10, 3/10)
 
-   set.emission.params.qhmm(hmm, slot1_bg, back_emissions, slot = 2)
-   set.emission.params.qhmm(hmm, slot1_tr, tran_emissions, slot = 2)
-   set.emission.params.qhmm(hmm, slot2_bg, back_emissions, slot = 3)
-   set.emission.params.qhmm(hmm, slot2_tr, tran_emissions, slot = 3)
-   set.emission.params.qhmm(hmm, slot3_bg, back_emissions, slot = 4)
-   set.emission.params.qhmm(hmm, slot3_tr, tran_emissions, slot = 4)
+   set.emission.params.qhmm(hmm, slot1_bg, back_emissions, slot = 2, fixed=c(FALSE, FALSE, FALSE))
+   set.emission.params.qhmm(hmm, slot1_tr, tran_emissions, slot = 2, fixed=c(FALSE, FALSE))
+   set.emission.params.qhmm(hmm, slot2_bg, back_emissions, slot = 3, fixed=c(FALSE, FALSE, FALSE))
+   set.emission.params.qhmm(hmm, slot2_tr, tran_emissions, slot = 3, fixed=c(FALSE, FALSE))
+   set.emission.params.qhmm(hmm, slot3_bg, back_emissions, slot = 4, fixed=c(FALSE, FALSE, FALSE))
+   set.emission.params.qhmm(hmm, slot3_tr, tran_emissions, slot = 4, fixed=c(FALSE, FALSE))
 
    return(hmm)
 }
@@ -328,19 +332,19 @@ decode_hmm <- function(chrom, hmm, full.data, train.data, missing.lst, step = 50
  
  dataset.train = lapply(all.data$data, function(data) { data[2:5,] })
  hmm <- makeHmm()
- em.qhmm(hmm, dataset.train, missing.lst = all.data$missing, n_threads = 4)
+ em.qhmm(hmm, dataset.train, missing.lst = all.data$missing, n_threads = 8)
  collect.params.qhmm(hmm)
- 
- bed <- decode_hmm("chr22", hmm, all.data$data, dataset.train, all.data$missing, step = 50)
 
+ ## DECODE 
+ bed <- decode_hmm("chr22", hmm, all.data$data, dataset.train, all.data$missing, step = 50)
  write('track name="TranscriptData" description="NHP" visibility=2 itemRgb="On"', "tmp.bed")
  write.table(bed, "tmp.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t", append=TRUE)
- 
-# path_plus = viterbi.qhmm(hmm, all.data$data[[1]][c(2:5),], missing = all.data$missing[[1]])
-# path_minus = viterbi.qhmm(hmm, all.data$data[[2]][c(2:5),], missing = all.data$missing[[2]])
 
  ## SANITY CHECK
-# head(cbind( (t(all.data$data[1][[1]])), path_plus ), 100) ## SANITY CHECK
+ path_plus = viterbi.qhmm(hmm, all.data$data[[1]][c(2:5),], missing = all.data$missing[[1]])
+ path_minus = viterbi.qhmm(hmm, all.data$data[[2]][c(2:5),], missing = all.data$missing[[2]])
+
+ head(cbind( (t(all.data$data[1][[1]])), path_plus ), 100) ## SANITY CHECK
  
 # posterior decoding
 #fw = forward.qhmm(hmm, rolls)
