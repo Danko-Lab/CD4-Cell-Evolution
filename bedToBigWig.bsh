@@ -13,10 +13,10 @@ function makeBigWig {
 
    ## Remove rRNA and reverse the strand (PRO-seq).
    zcat $f | grep "rRNA" -v | \
-         awk 'BEGIN{OFS="\t"} {print $1,$2,($3+1),$4,$5,$6=="+"?"-":"+"}' | gzip > $f.nr.rs.bed.gz
+         awk 'BEGIN{OFS="\t"} {print $1,$2,($2+1),$4,$5,$6=="+"?"-":"+"}' | gzip > $f.nr.rs.bed.gz
  
    ## Convert to wig
-   ~/bin/bedToWig $f.nr.rs.bed.gz $f
+   bedToWig $f.nr.rs.bed.gz $f
    gzip $f*.wig
  
    ## Then to bigWig
