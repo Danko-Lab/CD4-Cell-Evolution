@@ -7,7 +7,7 @@ bedmap --bases-uniq $GENEBODIES $INCREMENTS > olSize.sum
 paste $GENEBODIES olSize.sum > $COUNTALL
 
 function getCounts {
- ~/bin/R/R-3.0.1/bin/R --no-save --args $INCREMENTS $COUNTFILE $BWPLUS $BWMINUS < getCounts.R
+ R --no-save --args $INCREMENTS $COUNTFILE $BWPLUS $BWMINUS < getCounts.R
  bash bedmap-strand.bsh $GENEBODIES $COUNTFILE | sed s/^.*\|//g | sed "s/NAN/NA/g" > $COUNTFILE.sum 
  paste $COUNTALL $COUNTFILE.sum > tmp
  mv tmp $COUNTALL
@@ -22,13 +22,13 @@ export BWMINUS=/usr/projects/GROseq/CD4/Alignments/J-U_minus.bw
 getCounts
 
 export COUNTFILE=H1.count.bed
-export BWPLUS=/usr/projects/GROseq/CD4/Alignments/CD4-U_plus.bw
-export BWMINUS=/usr/projects/GROseq/CD4/Alignments/CD4-U_minus.bw
+export BWPLUS=/usr/projects/GROseq/CD4/Alignments/H1-U_plus.bw
+export BWMINUS=/usr/projects/GROseq/CD4/Alignments/H1-U_minus.bw
 getCounts
 
 export COUNTFILE=H2.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/H2-U.bed.gz_plus.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/H2-U.bed.gz_minus.bw
+export BWPLUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/H2.2-U.bed.gz_plus.bw
+export BWMINUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/H2.2-U.bed.gz_minus.bw
 getCounts
 
 export COUNTFILE=H3.count.bed
@@ -46,6 +46,11 @@ export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/C3-U.bed.gz_plus.hg19.
 export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/C3-U.bed.gz_minus.hg19.bw
 getCounts
 
+export COUNTFILE=C4.count.bed
+export BWPLUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/C4-U.bed.gz_plus.hg19.bw
+export BWMINUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/C4-U.bed.gz_minus.hg19.bw
+getCounts
+
 export COUNTFILE=M1.count.bed
 export BWPLUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/M1-U.bed.gz_plus.hg19.bw
 export BWMINUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/M1-U.bed.gz_minus.hg19.bw
@@ -56,6 +61,11 @@ export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-U.bed.gz_plus.hg19.
 export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-U.bed.gz_minus.hg19.bw
 getCounts
 
+export COUNTFILE=M3.count.bed
+export BWPLUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/M3-U.bed.gz_plus.hg19.bw
+export BWMINUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/M3-U.bed.gz_minus.hg19.bw
+getCounts
+
 ## PI.
 export COUNTFILE=J.pi.count.bed
 export BWPLUS=/usr/projects/GROseq/CD4/Alignments/J-PI_plus.bw
@@ -63,8 +73,8 @@ export BWMINUS=/usr/projects/GROseq/CD4/Alignments/J-PI_minus.bw
 getCounts
 
 export COUNTFILE=H1.pi.count.bed
-export BWPLUS=/usr/projects/GROseq/CD4/Alignments/CD4-PI_plus.bw
-export BWMINUS=/usr/projects/GROseq/CD4/Alignments/CD4-PI_minus.bw
+export BWPLUS=/usr/projects/GROseq/CD4/Alignments/H1-PI_plus.bw
+export BWMINUS=/usr/projects/GROseq/CD4/Alignments/H1-PI_minus.bw
 getCounts
 
 export COUNTFILE=H2.pi.count.bed
@@ -87,6 +97,11 @@ export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/C3-PI.bed.gz_plus.hg19
 export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/C3-PI.bed.gz_minus.hg19.bw
 getCounts
 
+export COUNTFILE=C4.pi.count.bed
+export BWPLUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/C4-PI.bed.gz_plus.hg19.bw
+export BWMINUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/C4-PI.bed.gz_minus.hg19.bw
+getCounts
+
 export COUNTFILE=M1.pi.count.bed
 export BWPLUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/M1-PI.bed.gz_plus.hg19.bw
 export BWMINUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/M1-PI.bed.gz_minus.hg19.bw
@@ -95,6 +110,11 @@ getCounts
 export COUNTFILE=M2.pi.count.bed
 export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-PI.bed.gz_plus.hg19.bw
 export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-PI.bed.gz_minus.hg19.bw
+getCounts
+
+export COUNTFILE=M3.pi.count.bed
+export BWPLUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/M3-PI.bed.gz_plus.hg19.bw
+export BWMINUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/M3-PI.bed.gz_minus.hg19.bw
 getCounts
 
 ## Other cell types.
