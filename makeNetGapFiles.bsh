@@ -69,6 +69,7 @@ cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if ($6 == "+") print $1,($2-'"$
                                                  else if ($6 == "-") print $1,($3-'"$PROM"'),($3+'"$PROM"') }
                                           {print "\t",$4,$5,$6,$7,$8,"\n"}' | uniq | sort-bed - |
                                           bedmap --echo --indicator - gapMerge.tmp | grep "0$" | sed "s/|0//g" > $PAUSESITES
+## TODO: Further intersect pause sites with TSS, to identify the active subset of them!!
 
 
 rm *.save *.tmp
