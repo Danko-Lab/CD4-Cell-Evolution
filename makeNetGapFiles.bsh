@@ -9,6 +9,7 @@ export MAXLEN=60000 ## Max length in base pairs.
 
 export INCREMENTS=gene.increments.bed
 export GENEBODIES=genebodies.tsv
+export PAUSESITES=pausesites.tsv
 
 ## Get annotations from GenCode.
 function getAnnotations {
@@ -51,7 +52,7 @@ cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if (($3-$2) > '"$PROM"')
                                         else print $1,$2,$3} {print "\t",$4,$5,$6,$7,$8,"\n"}' | uniq | sort-bed - > $GENEBODIES
 
 ## Partition on the merged gaps.  IMPORTANT: Should not have any partial matches in later steps.
-~/bin/bin/bedops --partition gapMerge.tmp $GENEBODIES > gene.gap.part.tmp
+bedops --partition gapMerge.tmp $GENEBODIES > gene.gap.part.tmp
 
 ## Remove partition bits that fall in gaps.
 bedmap --echo --indicator gene.gap.part.tmp gapMerge.tmp | grep "0$" | sed "s/|0//g" > gene.woGap.tmp
@@ -61,5 +62,13 @@ bedmap --echo --echo-map gene.woGap.tmp $GENEBODIES | sed "s/|chr/\t/g" \
 							 | awk 'BEGIN{OFS="\t"} {p= match($0, "+")} {m= match($0, "-")} 
 								{if(p>0) print $1,$2,$3,"N","0","+"}
 								{if(m>0) print $1,$2,$3,"N","0","-"}' > $INCREMENTS
+
+
+## Get data from pause sites, removing any bits that fall into gaps.
+cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if ($6 == "+") print $1,($2-'"$PROM"'),($2+'"$PROM"')
+                                                 else if ($6 == "-") print $1,($3-'"$PROM"'),($3+'"$PROM"') }
+                                          {print "\t",$4,$5,$6,$7,$8,"\n"}' | uniq | sort-bed - |
+                                          bedmap --echo --indicator - gapMerge.tmp | grep "0$" | sed "s/|0//g" > $PAUSESITES
+
 
 rm *.save *.tmp
