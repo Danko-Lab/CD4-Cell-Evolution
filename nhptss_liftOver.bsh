@@ -3,16 +3,18 @@
 function liftToHg19 {
  for f in $FILES
  do
-   j=`echo $f | cut -d \. -f 1,2,3`
-   ngz=`echo $f | cut -d \. -f 1,2,3,4`
-   echo $j
- 
+   j=`echo $f | cut -d \. -f 1,2`
+   ngz=`echo $f | cut -d \. -f 1,2,3`
+
    ## Use liftOver.  Other options: -tab -minMatch=0.1
    gunzip $f
-   liftOver $ngz $MAPCHAIN $j.hg19.bedGraph $UNMAPPED
-   gzip $j.hg19.bedGraph
+   liftOver $ngz $MAPCHAIN $j.hg19.bedGraph $j.unmap.bedGraph
+   gzip $ngz $j.hg19.bedGraph $j.unmap.bedGraph
  done
 }
+
+## Remove old files
+rm *hg19*.bedGraph.gz *unmap*.bedGraph.gz
 
 ## Chimpanzee
 FILES=`ls C*.bedGraph.gz`
