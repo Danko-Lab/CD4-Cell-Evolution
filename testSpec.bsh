@@ -1,0 +1,35 @@
+##
+## Testing sensivitiy and specificity in GM12878.
+##
+
+infPos=gm12878.predictions.bedGraph.gz
+
+## DNAse-1
+dnase=dnase.narrowpeak.bed
+zcat /usr/data/GROseq.parser/hg19/cd4/dnase1/ | sort-bed - > $dnase
+
+## Combined file.
+cat $dnase | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' | sort-bed - > all
+
+################################################################
+## Test sensitivity ...
+
+## Use threshold 0.81 @ 10% FDR.
+cat $infPos | awk 'BEGIN{OFS="\t"} ($4 > 0.81) {print $1,$2-50,$3+51,$4}' | sort-bed - |  bedops --merge - | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"N",0,"+"}' > tmp.mergepred.out
+cat tmp.mergepred.out | sort-bed - > tmp.mergepred.merge.bed.out
+#~/bin/tcolapse tmp.mergepred.out 0 500 500 1 | sort-bed - > tmp.mergepred.merge.bed.out ## Not sure why this acts wonky on specificity?!?!
+cat tmp.mergepred.merge.bed.out > tmp.mergepred.bed
+
+## Compute SENS/ SPEC.
+SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - all | grep "|0|" -c -v` ## Specificity
+SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - all | grep "" -c` ## Specificity
+echo $[($SPECnum*100)/$SPECden]
+
+## Fractions of the genome covered by each.
+featureBits hg19 tmp.mergepred.bed
+featureBits hg19 $grocap
+
+####################################################################
+## Cleanup
+rm tmp.mergepred.out tmp.mergepred.merge.bed.out
+
