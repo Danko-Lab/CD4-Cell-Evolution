@@ -8,8 +8,8 @@ function liftToHg19 {
 
    ## Use liftOver.  Other options: -tab -minMatch=0.1
    gunzip $f
-   liftOver $ngz $MAPCHAIN $j.hg19.bedGraph $j.unmap.bedGraph
-   gzip $ngz $j.hg19.bedGraph $j.unmap.bedGraph
+   liftOver $ngz $MAPCHAIN $j\_hg19.bedGraph $j\_unmap.bedGraph
+   gzip $ngz $j\_hg19.bedGraph $j\_unmap.bedGraph
  done
 }
 
