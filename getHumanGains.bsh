@@ -1,15 +1,49 @@
 #!/usr/bin/bash
+HS=HighScore
+LS=LowScore
 
+## STRATEGY: ###########
 ## Naive intersections.
 # THe problem with this startegy: boundaries of peaks are often taken.
-featureBits hg19 $HS/H-U.TSS.bed.gz $HS/C-U.TSS_hg19.bed.gz $HS/M-U.TSS_hg19.bed.gz -bed=cons.bed      ## Conserved across all species.
+function getNaive {
+ echo "Conserved"
+ featureBits hg19 $HS/H-$1.TSS.bed.gz $HS/C-$1.TSS_hg19.bed.gz $HS/M-$1.TSS_hg19.bed.gz -bed=cons-$1.bed      ## Conserved across all species.
 
-featureBits hg19 $HS/H-U.TSS.bed.gz !$LS/C-U.TSS_hg19.bed.gz !$LS/M-U.TSS_hg19.bed.gz -bed=H.gain.bed  ## Human gains.
-featureBits hg19 !$LS/H-U.TSS.bed.gz $HS/C-U.TSS_hg19.bed.gz $HS/M-U.TSS_hg19.bed.gz -bed=H.loss.bed   ## Human loss.
+ echo "Human Gains"
+ featureBits hg19 $HS/H-$1.TSS.bed.gz !$LS/C-$1.TSS_hg19.bed.gz !$LS/M-$1.TSS_hg19.bed.gz -bed=H-$1.gain.bed  ## Human gains.
 
-cat  H.gain.bed H.loss.bed | sort-bed - | bedops --merge - > H.gain.loss.bed
-featureBits hg19 H.gain.loss.bed
+ echo "Human Loss"
+ featureBits hg19 !$LS/H-$1.TSS.bed.gz $HS/C-$1.TSS_hg19.bed.gz $HS/M-$1.TSS_hg19.bed.gz -bed=H-$1.loss.bed   ## Human loss.
 
-## Intersect peaks.
+ cat  H-$1.gain.bed H-$1.loss.bed | sort-bed - | bedops --merge - > H-$1.gain.loss.bed
 
+ echo "Human Gains AND Losses"
+ featureBits hg19 H.gain.loss.bed
+}
+
+echo "Naive U"
+getNaive U
+
+echo "Naive PI"
+getNaive PI
+
+## STRATEGY: ###########
+## Intersect superset.
+function getSuperset {
+ zcat $HS/H-$1.TSS.bed.gz $HS/C-$1.TSS_hg19.bed.gz $HS/M-$1.TSS_hg19.bed.gz | sort-bed - | bedops --merge - > tmp.bed
+
+ ## Get the max score for H, C, and M
+ zcat H-$1.TSS.bedGraph.gz      | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > H.tmp
+ zcat C-$1.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > C.tmp
+ zcat M-$1.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed- > M.tmp
+
+ paste tmp.bed H.tmp C.tmp M.tmp > HCM-$1.dREG.tsv
+ rm tmp.bed *.tmp
+}
+
+echo "Superset U"
+getSuperset U
+
+echo "Superset PI"
+getSuperset PI
 
