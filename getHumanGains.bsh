@@ -35,7 +35,7 @@ function getSuperset {
  ## Get the max score for H, C, and M
  zcat H-$1.TSS.bedGraph.gz      | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > H.tmp
  zcat C-$1.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > C.tmp
- zcat M-$1.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed- > M.tmp
+ zcat M-$1.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > M.tmp
 
  paste tmp.bed H.tmp C.tmp M.tmp > HCM-$1.dREG.tsv
  rm tmp.bed *.tmp
