@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+
+## Naive intersections.
+# THe problem with this startegy: boundaries of peaks are often taken.
+featureBits hg19 $HS/H-U.TSS.bed.gz $HS/C-U.TSS_hg19.bed.gz $HS/M-U.TSS_hg19.bed.gz -bed=cons.bed      ## Conserved across all species.
+
+featureBits hg19 $HS/H-U.TSS.bed.gz !$LS/C-U.TSS_hg19.bed.gz !$LS/M-U.TSS_hg19.bed.gz -bed=H.gain.bed  ## Human gains.
+featureBits hg19 !$LS/H-U.TSS.bed.gz $HS/C-U.TSS_hg19.bed.gz $HS/M-U.TSS_hg19.bed.gz -bed=H.loss.bed   ## Human loss.
+
+cat  H.gain.bed H.loss.bed | sort-bed - | bedops --merge - > H.gain.loss.bed
+featureBits hg19 H.gain.loss.bed
+
+## Intersect peaks.
+
+

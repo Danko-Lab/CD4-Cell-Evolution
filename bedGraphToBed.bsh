@@ -1,19 +1,35 @@
 #!/usr/bin/bash
-TH=0.7
 
 ## Merge into TSS. 
-for i in `ls *.bedGraph.gz`
-do
-  j=`echo $i | cut -d \. -f 1,2`
-  echo $j
+function writeBed {
+ for i in `ls *.bedGraph.gz`
+ do
+   j=`echo $i | cut -d \. -f 1,2`
+   echo $j
+ 
+   ## Merge into peaks.
+   zcat $i | awk 'BEGIN{OFS="\t"} ($4 > '"$TH"') {print $1,$2-50,$3+51}' | sort-bed - | bedops --merge - > $j.no_score.bed
+ 
+   ## Get max score in each peak. 
+   zcat $i | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --echo --max $j.no_score.bed - | sed "s/|/\t/g" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | gzip > $j.bed.gz
+ 
+   ## Clean temporary files.  
+   rm $j.no_score.bed
+ done
+}
 
-  ## Merge into peaks.
-  zcat $i | awk 'BEGIN{OFS="\t"} ($4 > '"$TH"') {print $1,$2-50,$3+51}' | sort-bed - | bedops --merge - > $j.no_score.bed
+HS=HighScore
+rm -Rf $HS
+mkdir $HS
+TH=0.6
+writeBed
+mv *.bed.gz $HS
 
-  ## Get max score in each peak. 
-  zcat $i | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --echo --max $j.no_score.bed - | sed "s/|/\t/g" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | gzip > $j.bed.gz
+LS=LowScore
+rm -Rf $LS
+mkdir $LS
+TH=0.3
+writeBed
+mv *.bed.gz $LS
 
-  ## Clean temporary files.  
-  rm $j.no_score.bed
-done
 
