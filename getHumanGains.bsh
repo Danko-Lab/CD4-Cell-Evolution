@@ -22,11 +22,11 @@ function getNaive {
  featureBits hg19 $RD/H.gain.loss.bed
 }
 
-echo "Naive U"
-getNaive U
+#echo "Naive U"
+#getNaive U
 
-echo "Naive PI"
-getNaive PI
+#echo "Naive PI"
+#getNaive PI
 
 ## STRATEGY: ###########
 ## Intersect superset.
