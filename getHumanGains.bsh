@@ -1,24 +1,25 @@
 #!/usr/bin/bash
 HS=HighScore
 LS=LowScore
+RD=Results
 
 ## STRATEGY: ###########
 ## Naive intersections.
 # THe problem with this startegy: boundaries of peaks are often taken.
 function getNaive {
  echo "Conserved"
- featureBits hg19 $HS/H-$1.TSS.bed.gz $HS/C-$1.TSS_hg19.bed.gz $HS/M-$1.TSS_hg19.bed.gz -bed=cons-$1.bed      ## Conserved across all species.
+ featureBits hg19 $HS/H-$1.TSS.bed.gz $HS/C-$1.TSS_hg19.bed.gz $HS/M-$1.TSS_hg19.bed.gz -bed=$RD/cons-$1.bed      ## Conserved across all species.
 
  echo "Human Gains"
- featureBits hg19 $HS/H-$1.TSS.bed.gz !$LS/C-$1.TSS_hg19.bed.gz !$LS/M-$1.TSS_hg19.bed.gz -bed=H-$1.gain.bed  ## Human gains.
+ featureBits hg19 $HS/H-$1.TSS.bed.gz !$LS/C-$1.TSS_hg19.bed.gz !$LS/M-$1.TSS_hg19.bed.gz -bed=$RD/H-$1.gain.bed  ## Human gains.
 
  echo "Human Loss"
- featureBits hg19 !$LS/H-$1.TSS.bed.gz $HS/C-$1.TSS_hg19.bed.gz $HS/M-$1.TSS_hg19.bed.gz -bed=H-$1.loss.bed   ## Human loss.
+ featureBits hg19 !$LS/H-$1.TSS.bed.gz $HS/C-$1.TSS_hg19.bed.gz $HS/M-$1.TSS_hg19.bed.gz -bed=$RD/H-$1.loss.bed   ## Human loss.
 
- cat  H-$1.gain.bed H-$1.loss.bed | sort-bed - | bedops --merge - > H-$1.gain.loss.bed
+ cat  $RD/H-$1.gain.bed $RD/H-$1.loss.bed | sort-bed - | bedops --merge - > $RD/H-$1.gain.loss.bed
 
  echo "Human Gains AND Losses"
- featureBits hg19 H.gain.loss.bed
+ featureBits hg19 $RD/H.gain.loss.bed
 }
 
 echo "Naive U"
@@ -37,7 +38,8 @@ function getSuperset {
  zcat C-$1.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > C.tmp
  zcat M-$1.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > M.tmp
 
- paste tmp.bed H.tmp C.tmp M.tmp > HCM-$1.dREG.tsv
+ paste tmp.bed H.tmp C.tmp M.tmp > all.tmp
+ R --no-save --args all.tmp $RD/HCM-$1.dREG < sortRatios.R 
  rm tmp.bed *.tmp
 }
 
