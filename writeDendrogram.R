@@ -108,11 +108,14 @@ dev.off()
 
 ## Print correlation matrix w/ hexbin.
 require(hexbin)
+rpkm_df <- as.matrix(ca[,indx.all])/(ca[,9]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
+for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*rpkm_df[,i]/sum(rpkm_df[,i])
+
 bin <- hexbin(x= log(rpkm_df[,2]+1,10), y=log(rpkm_df[,3]+1,10), 50)
 
 indx <- rowSums(rpkm_df) > 0
  
-png("scatterplots.png", width = 1000, height = 1000)
+png("scatterplots.png", width = 10000, height = 10000)
  hexplom(log(rpkm_df[indx,]+min(rpkm_df[rpkm_df>0]),10), xbins=25, colramp = magent)
  #pairs(log(rpkm_df,10), pch=19)
 dev.off()
