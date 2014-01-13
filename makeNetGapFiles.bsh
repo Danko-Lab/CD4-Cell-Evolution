@@ -34,7 +34,7 @@ function makeOrthoAnnot {
 
  bedops --merge $NET.Gap2.bed $NET.Gap3.bed $NET.L6.bed > $NET.gapMerge.save ## Add back gaps in L4 ...
 
-# rm $NET*.bed 
+ rm $NET*.bed 
 }
 
 export NET=$CHIMP_NET
@@ -72,4 +72,4 @@ cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if ($6 == "+") print $1,($2-'"$
 ## TODO: Further intersect pause sites with TSS, to identify the active subset of them!!
 
 
-#rm *.save *.tmp
+rm *.save *.tmp
