@@ -23,18 +23,18 @@ getAnnotations ## Run on 7/23/2013.
 
 function makeOrthoAnnot {
  ## Get gap data.
- hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 2" | grep "^c" | sort-bed - > $NET.L2.bed
- hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 3" | grep "^c" | sort-bed - > $NET.L3.bed.keep
- hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 4" | grep "^c" | sort-bed - > $NET.L4.bed
- hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 5" | grep "^c" | sort-bed - > $NET.L5.bed
- hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 6" | grep "^c" | sort-bed - > $NET.L6.bed
+ hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 2 AND qEnd > qStart" | grep "^c" | sort-bed - > $NET.L2.bed
+ hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 3 AND qEnd > qStart" | grep "^c" | sort-bed - > $NET.L3.bed.keep
+ hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 4 AND qEnd > qStart" | grep "^c" | sort-bed - > $NET.L4.bed
+ hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 5 AND qEnd > qStart" | grep "^c" | sort-bed - > $NET.L5.bed
+ hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 6 AND qEnd > qStart" | grep "^c" | sort-bed - > $NET.L6.bed
 
  bedops --difference $NET.L2.bed $NET.L3.bed.keep > $NET.Gap2.bed ## Gets those in L2 which aren't in L3 ...
  bedops --difference $NET.L4.bed $NET.L5.bed      > $NET.Gap3.bed ## Gets those in L2 which aren't in L3 ...
 
  bedops --merge $NET.Gap2.bed $NET.Gap3.bed $NET.L6.bed > $NET.gapMerge.save ## Add back gaps in L4 ...
 
- rm $NET*.bed 
+# rm $NET*.bed 
 }
 
 export NET=$CHIMP_NET
@@ -72,4 +72,4 @@ cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if ($6 == "+") print $1,($2-'"$
 ## TODO: Further intersect pause sites with TSS, to identify the active subset of them!!
 
 
-rm *.save *.tmp
+#rm *.save *.tmp
