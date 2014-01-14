@@ -42,7 +42,6 @@ mv *.bed.gz $LS
 ## Combine high and medium scores.  
 ## Get the precision of having a high cutoff threshold, and the sensitivity of a low one.
 ## Take any HS (as it is), and add MedScore for those sites that do not intersect.
-zcat $HS/H-U.TSS.bed.gz | sort-bed - > hs.bed.tmp
 MERGE=Merge
 rm -Rf $MERGE
 mkdir $MERGE
@@ -59,7 +58,8 @@ do
 
     bedmap --echo --indicator $f.ms.tmp $f.hs.tmp | grep "|0" | sed "s/|0//g" > tmp.bed.tmp
     cat tmp.bed.tmp $f.hs.tmp | sort-bed - | gzip > $MERGE/$f
-    rm *.tmp *.bed.gz
+    rm *.tmp 
   done
+  rm *.bed.gz
 done
 

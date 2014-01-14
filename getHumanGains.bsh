@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-HS=HighScore
+HS=Merge # HighScore
 LS=LowScore
 RD=Results
 
