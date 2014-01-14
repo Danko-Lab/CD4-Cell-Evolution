@@ -103,6 +103,6 @@ makeIncrements $PAUSESITES $PAUSEINCR
 
 ####
 ## Cleanup.
-rm *.save gapMerge
+rm *.save
 
 
