@@ -8,11 +8,12 @@ export PROM=250 ## 1000
 export MAXLEN=60000 ## Max length in base pairs.
 
 export GENEBODIES=genebodies.tsv
-export PAUSESITES=pausesites.tsv
-export TSSSITES=tss.tsv
-
 export INCREMENTS=gene.increments.bed
+
+export PAUSESITES=pausesites.tsv
 export PAUSEINCR=pause.increments.bed
+
+export TSSSITES=/usr/projects/GROseq/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.tsv
 export TSSINCR=tss.increments.bed
 
 ## Get annotations from GenCode.
@@ -54,7 +55,7 @@ makeOrthoAnnot
 
 ## Combine gaps.
 bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save > gapMerge
-
+rm *.save
 
 ######################################
 ## Now make increments.
@@ -64,13 +65,14 @@ function makeIncrements {
  bedops --partition gapMerge $1 > gene.gap.part.tmp
 
  ## Remove partition bits that fall in gaps.
- bedmap --echo --indicator gene.gap.part.tmp gapMerge.tmp | grep "0$" | sed "s/|0//g" > gene.woGap.tmp
+ bedmap --echo --indicator gene.gap.part.tmp gapMerge | grep "0$" | sed "s/|0//g" > gene.woGap.tmp
 
  ## Get the strand(s) of the gene(s) associated with each interval.
  bedmap --echo --echo-map gene.woGap.tmp $1 | sed "s/|chr/\t/g" \
-							 | awk 'BEGIN{OFS="\t"} {p= match($0, "+")} {m= match($0, "-")} 
+							 | awk 'BEGIN{OFS="\t"} {p= match($0, "\t+\t")} {m= match($0, "\t-\t")} {b= match($0, "\t.\t")} 
 								{if(p>0) print $1,$2,$3,"N","0","+"}
-								{if(m>0) print $1,$2,$3,"N","0","-"}' > $2
+								{if(m>0) print $1,$2,$3,"N","0","-"}
+								{if(b>0) print $1,$2,$3,"N","0","+\n" $1,$2,$3,"N","0","-"}' > $2
  ## Cleanup
  rm *.tmp
 }
@@ -95,14 +97,7 @@ makeIncrements $PAUSESITES $PAUSEINCR
 
 ####
 ## Now get data from TSS defined by dREG.
-#PATH2MERGE=/usr/projects/GROseq/NHP/tss_caller/Merge
-#zcat $PATH2MERGE/H*.bed.gz $PATH2MERGE/*hg19.bed.gz | sort-bed - | bedops --merge - | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,($1:$2-$3),0,1}' > $TSSSITES
+makeIncrements $TSSSITES $TSSINCR
 
-#makeIncrements $TSSSITES $TSSINCR
-
-
-####
-## Cleanup.
-rm *.save
 
 

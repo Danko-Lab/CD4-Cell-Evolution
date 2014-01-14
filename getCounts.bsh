@@ -7,13 +7,14 @@ export PAUSESITES=pausesites.tsv
 export PAUSEINCR=pause.increments.bed
 export COUNTPAUSE=countpause.tsv
 
-export TSSSITES=tss.tsv
+export TSSSITES=/usr/projects/GROseq/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.tsv
 export TSSINCR=tss.increments.bed
 export COUNTTSS=counttss.tsv
 
 bedmap --bases-uniq $GENEBODIES $INCREMENTS > olSize.sum
 paste $GENEBODIES olSize.sum > $COUNTALL
 cp $PAUSESITES $COUNTPAUSE
+cp $TSSSITES $COUNTTSS
 
 function getCounts {
  R --no-save --args $2 $COUNTFILE $BWPLUS $BWMINUS < getCounts.R
@@ -31,9 +32,9 @@ function getCounts {
 # rm $COUNTFILE $COUNTFILE.tmp
 #}
 
-function getTSSCounts {
- 
-}
+#function getTSSCounts {
+# 
+#}
 
 ## Get counts, and place this in 'score'.
 export COUNTFILE=J.count.bed
