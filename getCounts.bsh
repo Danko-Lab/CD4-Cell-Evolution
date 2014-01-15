@@ -7,7 +7,7 @@ export PAUSESITES=pausesites.tsv
 export PAUSEINCR=pause.increments.bed
 export COUNTPAUSE=countpause.tsv
 
-export TSSSITES=/usr/projects/GROseq/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.tsv
+export TSSSITES=tsssites.tsv
 export TSSINCR=tss.increments.bed
 export COUNTTSS=counttss.tsv
 

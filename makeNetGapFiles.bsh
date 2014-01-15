@@ -13,7 +13,7 @@ export INCREMENTS=gene.increments.bed
 export PAUSESITES=pausesites.tsv
 export PAUSEINCR=pause.increments.bed
 
-export TSSSITES=/usr/projects/GROseq/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.tsv
+export TSSSITES=tsssites.tsv
 export TSSINCR=tss.increments.bed
 
 ## Get annotations from GenCode.
@@ -97,6 +97,7 @@ makeIncrements $PAUSESITES $PAUSEINCR
 
 ####
 ## Now get data from TSS defined by dREG.
+cat /usr/projects/GROseq/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.tsv > $TSSSITES
 makeIncrements $TSSSITES $TSSINCR
 
 
