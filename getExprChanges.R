@@ -5,12 +5,9 @@ require(edgeR)
 PVAL <- 0.05
 
 ## Read count data.
-ca <- read.table("countall.tsv")
-names(ca) <- c("chrom", "chromStart", "chromEnd", "name", "score", "strand", "type", "mgi", "mapSize", 
-						"Jurkat", "Human 1", "Human 2", "Human 3", "Chimp 2", "Chimp 3", "Chimp 4", "R. Macaque 1", "R. Macaque 2", "R. Macaque 3",
-						"PI Jurkat ", "PI Human 1", "PI Human 2", "PI Human 3", "PI Chimp 2", "PI Chimp 3", "PI Chimp 4", "PI R. Macaque 1", "PI R. Macaque 2", "PI R. Macaque 3", 
-						"K562", "GM12878", "IMR90")
-indx.unt <- c(1:9,10:13,15:19,30:32)## ONLY UNTREATED, GOOD Remove C2-U
+source("readData.R")
+
+## Use only untreated, and get switch to RPKM
 ca <- ca[!is.na(ca[,10]),indx.unt]
 
 rpkm_df <- as.matrix(ca[,c(10:NCOL(ca))])/(ca[,9]) #/ (colSums(ca[,c(10:15)])) ## Normalize counts ... RPKM

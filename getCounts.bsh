@@ -11,10 +11,15 @@ export TSSSITES=tsssites.tsv
 export TSSINCR=tss.increments.bed
 export COUNTTSS=counttss.tsv
 
-bedmap --bases-uniq $GENEBODIES $INCREMENTS > olSize.sum
-paste $GENEBODIES olSize.sum > $COUNTALL
-cp $PAUSESITES $COUNTPAUSE
-cp $TSSSITES $COUNTTSS
+function initCounts {
+ bedmap --bases-uniq $1 $2 > olSize.sum
+ paste $1 olSize.sum > $3
+ rm olSize.sum
+}
+
+initCounts $GENEBODIES $INCREMENTS $COUNTALL
+initCounts $PAUSESITES $PAUSEINCR  $COUNTPAUSE
+initCounts $TSSSITES   $TSSINCR    $COUNTTSS
 
 function getCounts {
  R --no-save --args $2 $COUNTFILE $BWPLUS $BWMINUS < getCounts.R
