@@ -1,7 +1,17 @@
+##
+##
+
+load("fdr.RData")
+
+## Re-read data, and restrict search to known genes.
+ca <- read.table("countall.tsv")
+gap <- read.table("genes.inGap")[!is.na(ca[,10]),]
+ca <- ca[!is.na(ca[,10]),]
+fdr_df <- fdr_df[1:NROW(ca),]
+rpkm_df <- rpkm_df[1:NROW(ca),]
 
 ##############################################################################
 ## Compare frequency of changes in expression for genes, and non-coding RNAs.
-load("fdr.RData")
 
 summary(fdr_df$fdr_min < 0.05) ## ~12k transcripts that change expression.
 changeExpr <- fdr_df$fdr_min < 0.05
@@ -50,10 +60,6 @@ a <- ggplot(data_df, aes(Type, Changed)) + xlab("") + ylab("Fraction of Transcri
 
 ##############################################################################
 ## Compare frequency of changes in expression for transcripts inside re-arrangements.
-ca <- read.table("countall.tsv")
-gap <- read.table("genes.inGap")[!is.na(ca[,10]),]
-ca <- ca[!is.na(ca[,10]),]
-
 summary(gap$V2[fdr_df$ChimpFDR< 0.05])/ summary(gap$V2)
 summary(gap$V4[fdr_df$MacaqueFDR< 0.05])/ summary(gap$V4)
 
