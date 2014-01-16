@@ -10,10 +10,10 @@ function runINSIGHT {
 
  ## Summary plot.
  R --vanilla < ./scripts/executeEM/plotResults-INSIGHT.r --args \
-         ${outpath}/${dataID}.ins.results.txt ${outpath}/${dataID}.ins.results.pdf
+         ${outpath}/${dataID}.insight.results.txt ${outpath}/${dataID}.insight.results.pdf
 
  ## Then get poly-div stats.
- sh ./scripts/executeEM/getPolyDivStats.sh ${outpath}/${dataID}.ins ${outpath}/${dataID}.flankPoly.forBetas.ins ${outpath}/${dataID}.polyDiv.summary 15 PolyDiv
+ sh ./scripts/executeEM/getPolyDivStats.sh ${outpath}/emInput/${dataID}.ins ${outpath}/emInput/${dataID}.flankPoly.forBetas.ins ${outpath}/${dataID}.polyDiv.summary 15 PolyDiv
 }
 
 inpath=/usr/projects/GROseq/NHP/tss_caller/Results/

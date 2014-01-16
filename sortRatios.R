@@ -49,7 +49,7 @@ write.table(data[which((data$Hloss_log_ratio < -1) & (data$C_DREG > conf_th) & (
 	paste(out_file,".H-loss.",conf_th,".bed", sep=""), col.names=FALSE, row.names=FALSE, quote=FALSE, sep="\t")
 
 write.table(data[which((data$H_DREG > conf_th) & (data$C_DREG > conf_th) & (data$M_DREG > conf_th)), c(1:3)], 
-	paste(out_file,".conserved.",conf_th,".bed", sep=""), col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+	paste(out_file,".conserved.",conf_th,".bed", sep=""), col.names=FALSE, row.names=FALSE, quote=FALSE, sep="\t")
 
 
 
