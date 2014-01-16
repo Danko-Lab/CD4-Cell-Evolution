@@ -1,8 +1,10 @@
+#!/usr/bin/bash
 ##
 ## Testing sensivitiy and specificity in GM12878.
 ##
 
 infPos=H-U.TSS.bedGraph.gz
+dist=1000 #bp
 
 ## DNAse-1
 dnase=/usr/data/GROseq.parser/hg19/cd4/dnase1fp/dnase1.peaks_peaks.narrowPeak
@@ -22,10 +24,7 @@ do
  echo $th
 
  ## Use threshold 0.81 @ 10% FDR.
- zcat $infPos | awk 'BEGIN{OFS="\t"} ($4 > '"$th"') {print $1,$2-50,$3+51,$4}' | sort-bed - |  bedops --merge - | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"N",0,"+"}' > tmp.mergepred.out
-# cat tmp.mergepred.out | sort-bed - > tmp.mergepred.merge.bed.out
- ~/bin/tcolapse tmp.mergepred.out 0 1000 1000 1 | sort-bed - > tmp.mergepred.merge.bed.out ## Not sure why this acts wonky on specificity?!?!
- cat tmp.mergepred.merge.bed.out > tmp.mergepred.bed
+ zcat $infPos | awk 'BEGIN{OFS="\t"} ($4 > '"$th"') {print $1,$2-50,$3+51,$4}' | sort-bed - |  bedops --merge - | perl ~/perl/bed_merge.pl $dist > tmp.mergepred.bed
 
  ## Compute SENS/ SPEC.
  SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - all | grep "|0|" -c -v` ## Specificity
@@ -38,5 +37,5 @@ done
 
 ####################################################################
 ## Cleanup
-rm tmp.mergepred.bed tmp.mergepred.out tmp.mergepred.merge.bed.out all
+rm tmp.mergepred.bed
 

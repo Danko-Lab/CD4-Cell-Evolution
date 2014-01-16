@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+CLUST_SIZE=1000 ## bp
 
 ## Merge into TSS. 
 function writeBed {
@@ -25,20 +26,6 @@ TH=0.8
 writeBed
 mv *.bed.gz $HS
 
-MS=MedScore
-rm -Rf $MS
-mkdir $MS
-TH=0.6
-writeBed
-mv *.bed.gz $MS
-
-LS=LowScore
-rm -Rf $LS
-mkdir $LS
-TH=0.3
-writeBed
-mv *.bed.gz $LS
-
 ## Combine high and medium scores.  
 ## Get the precision of having a high cutoff threshold, and the sensitivity of a low one.
 ## Take any HS (as it is), and add MedScore for those sites that do not intersect.
@@ -47,7 +34,7 @@ rm -Rf $MERGE
 mkdir $MERGE
 cp $HS/*.bed.gz $MERGE
 
-for TH in 0.7 0.6
+for TH in 0.7 0.6 0.5
 do
   echo $TH
   writeBed
@@ -62,4 +49,23 @@ do
   done
   rm *.bed.gz
 done
+
+
+####
+## Now merge ALL datasets, to test for changes in the expression of dREG elements.
+## This set should be quite permissive.  Can intersect with higher confidence 'peaks' later, if desired.
+zcat $MERGE/H-*.TSS.bed.gz $MERGE/C-*.TSS_hg19.bed.gz $MERGE/M-*.TSS_hg19.bed.gz | sort-bed - | bedops --merge - |
+	 perl ~/perl/bed_merge.pl $CLUST_SIZE | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,($1"_"$2"_"$3),0,"."}' > tmp.bed
+
+## Get the max score for H, C, and M.
+zcat H-U.TSS.bedGraph.gz      | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > Hu.tmp
+zcat C-U.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > Cu.tmp
+zcat M-U.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > Mu.tmp
+zcat H-PI.TSS.bedGraph.gz      | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > Hp.tmp
+zcat C-PI.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > Cp.tmp
+zcat M-PI.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > Mp.tmp
+
+## Paste sites together. 
+paste tmp.bed Hu.tmp Cu.tmp Mu.tmp Hp.tmp Cp.tmp Mp.tmp | sed "s/NAN/NA/g" | sed "s/\s+\s/\t.\t/g" > HCM-U-PI.dREG-tss-clusters.tsv
+rm *.tmp tmp.bed
 

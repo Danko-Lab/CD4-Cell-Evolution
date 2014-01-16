@@ -1,0 +1,33 @@
+#!/usr/bin/bash
+cd /usr/projects/INSIGHT
+
+function runINSIGHT {
+ outpath=/usr/projects/GROseq/NHP/tss_caller/insight/${dataID}
+ setupfile=/usr/projects/INSIGHT/preprocessedHumanData/humanSetupFile-10KB-uniformPriors-general.txt
+
+ ## Run INSIGHT
+ bash scripts/runINSIGHT.sh ${inpath}/${inbed} ${dataID} ${outpath} 100 ${setupfile} 15 0
+
+ ## Summary plot.
+ R --vanilla < ./scripts/executeEM/plotResults-INSIGHT.r --args \
+         ${outpath}/${dataID}.ins.results.txt ${outpath}/${dataID}.ins.results.pdf
+
+ ## Then get poly-div stats.
+ sh ./scripts/executeEM/getPolyDivStats.sh ${outpath}/${dataID}.ins ${outpath}/${dataID}.flankPoly.forBetas.ins ${outpath}/${dataID}.polyDiv.summary 15 PolyDiv
+}
+
+inpath=/usr/projects/GROseq/NHP/tss_caller/Results/
+
+dataID=HCM-U.0.9.conserved
+inbed=HCM-U.dREG.conserved.0.9.bed
+runINSIGHT &
+
+dataID=HCM-U.0.9.H-gain
+inbed=HCM-PI.dREG.H-gain.0.9.bed
+runINSIGHT &
+
+dataID=HCM-U.0.9.H-loss
+inbed=HCM-U.dREG.H-loss.0.9.bed
+runINSIGHT &
+
+

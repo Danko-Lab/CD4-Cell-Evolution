@@ -2,6 +2,7 @@
 args <- commandArgs(trailingOnly=TRUE)
 in_file <- args[1]
 out_file <- args[2]
+conf_th  <- as.double(args[3])
 
 data <- read.table(in_file)
 o.v4 <- as.double(as.character(data$V4))
@@ -40,9 +41,15 @@ data <- data[ord,]
 colnames(data) <- c("chrom", "chromStart", "chromEnd", "H_DREG", "C_DREG", "M_DREG", "Hgain_log_ratio", "Cgain_log_ratio", "Mgain_log_ratio", "Hloss_log_ratio", "Closs_log_ratio", "Mloss_log_ratio")
 
 write.table(data, paste(out_file,".tsv", sep=""), col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
-write.table(data[data$Hgain_log_ratio >  1,c(1:3)], paste(out_file,".H-gain.bed", sep=""), col.names=FALSE, row.names=FALSE, quote=FALSE, sep="\t")
-write.table(data[data$Hloss_log_ratio < -1,c(1:3)], paste(out_file,".H-loss.bed", sep=""), col.names=FALSE, row.names=FALSE, quote=FALSE, sep="\t")
 
+write.table(data[which((data$Hgain_log_ratio >  1) & (data$H_DREG > conf_th)), c(1:3)], 
+	paste(out_file,".H-gain.",conf_th,".bed", sep=""), col.names=FALSE, row.names=FALSE, quote=FALSE, sep="\t")
+
+write.table(data[which((data$Hloss_log_ratio < -1) & (data$C_DREG > conf_th) & (data$M_DREG > conf_th)), c(1:3)], 
+	paste(out_file,".H-loss.",conf_th,".bed", sep=""), col.names=FALSE, row.names=FALSE, quote=FALSE, sep="\t")
+
+write.table(data[which((data$H_DREG > conf_th) & (data$C_DREG > conf_th) & (data$M_DREG > conf_th)), c(1:3)], 
+	paste(out_file,".conserved.",conf_th,".bed", sep=""), col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 
 
 
