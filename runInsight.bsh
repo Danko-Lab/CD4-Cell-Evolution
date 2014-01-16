@@ -18,16 +18,18 @@ function runINSIGHT {
 
 inpath=/usr/projects/GROseq/NHP/tss_caller/Results/
 
-dataID=HCM-U.0.9.conserved
-inbed=HCM-U.dREG.conserved.0.9.bed
-runINSIGHT &
+for i in 0.9 0.8 0.6
+do
+ dataID=HCM-U.$i.conserved
+ inbed=HCM-U.dREG.conserved.$i.bed
+ runINSIGHT &
 
-dataID=HCM-U.0.9.H-gain
-inbed=HCM-PI.dREG.H-gain.0.9.bed
-runINSIGHT &
+ dataID=HCM-U.$i.H-gain
+ inbed=HCM-PI.dREG.H-gain.$i.bed
+ runINSIGHT &
 
-dataID=HCM-U.0.9.H-loss
-inbed=HCM-U.dREG.H-loss.0.9.bed
-runINSIGHT &
-
+ dataID=HCM-U.$i.H-loss
+ inbed=HCM-U.dREG.H-loss.$i.bed
+ runINSIGHT &
+done
 
