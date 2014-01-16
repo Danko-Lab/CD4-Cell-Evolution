@@ -8,7 +8,7 @@ PVAL <- 0.05
 source("readData.R")
 
 ## Use only untreated, and get switch to RPKM
-ca <- ca[!is.na(ca[,10]),indx.unt]
+ca <- ca[!is.na(ca[,10]),c(1:9,indx.unt)]
 
 rpkm_df <- as.matrix(ca[,c(10:NCOL(ca))])/(ca[,9]) #/ (colSums(ca[,c(10:15)])) ## Normalize counts ... RPKM
 for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*rpkm_df[,i]/sum(rpkm_df[,i])
@@ -18,30 +18,37 @@ dge <- DGEList(counts=ca[,c(10:18)], genes=ca[,1:9])
 ## Build experimental design matrix
 sampleID <- c("Jurkat", "Human 1", "Human 2", "Human 3", "Chimp 3", "Chimp 4", "R. Macaque 1", "R. Macaque 2", "R. Macaque 3")
 prepDay  <- c(1, 1, 4, 2, 3, 4, 2, 3, 4)
+subject  <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
 species  <- c("J", "H", "H", "H", "C", "C", "M", "M", "M")
-data.frame(sampleID, prepDay, species)
+data.frame(sampleID, prepDay, subject, species)
 
-design <- model.matrix(~species)
-rownames(design) <- colnames(dge)
+fitModel <- function(species) {
+  design <- model.matrix(~species+prepDay)
+  rownames(design) <- colnames(dge)
 
-## Estimate dispersions.
-dge <- estimateGLMCommonDisp(dge, design, verbose=TRUE)
-dge <- estimateGLMTrendedDisp(dge,design)
+  ## Estimate dispersions.
+  dge <- estimateGLMCommonDisp(dge, design, verbose=TRUE)
+  dge <- estimateGLMTrendedDisp(dge,design)
 
-## Fit neg. binom. GLM.  Compute p-values using LRT.
-fit <- glmFit(dge,design)
-#lrt <- glmLRT(fit,coef=2)
+  ## Fit neg. binom. GLM.  Compute p-values using LRT.
+  fit <- glmFit(dge,design)
 
-HumSpec <- c(0,1,0,-0.5)
-hs <- glmLRT(fit,contrast=HumSpec)
+  SpeSpec <- makeContrasts(speciesSS-speciesSO, levels=design)
+  ss <- glmLRT(fit,contrast=SpeSpec)
+  return(ss)
+}
+
+## Treating alternatie primates as a single 'group'.
+species <- c("J", "SS", "SS", "SS", "SO", "SO", "SO", "SO", "SO")
+hs <- fitModel(species)
 topTags(hs)
 
-ChpSpec <- c(0,-0.5,0,-0.5)
-cs <- glmLRT(fit,contrast=ChpSpec)
+species <- c("J", "SO", "SO", "SO", "SS", "SS", "SO", "SO", "SO")
+cs <- fitModel(species)
 topTags(cs)
 
-MacSpec <- c(0,-0.5,0,1)
-ms <- glmLRT(fit,contrast=MacSpec)
+species <- c("J", "SO", "SO", "SO", "SO", "SO", "SS", "SS", "SS")
+ms <- fitModel(species)
 topTags(ms)
 
 ## Append tables.  

@@ -5,6 +5,8 @@ require(cluster)
 ## Create a dendrogram.
 ## Using more efficient counting/ merging using bedops and bash scripts.						
 source("readData.R")
+ca <- ca[grep("PauseSite", ca[,7], invert=TRUE),] ## Remove pause sites
+ca <- ca[grep("PromEnh", ca[,7], invert=TRUE),] ## Remove TSS
 
 yb.sig.pal <- function(n, scale=10) {
  ints<- c(0:(n-1))/(n-1)   ## Linear scale from 0:1 x N values.

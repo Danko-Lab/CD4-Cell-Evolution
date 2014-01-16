@@ -10,7 +10,7 @@ colnames(ps) <- colnames(ca)
 
 ## Get dREG counts.
 ts <- read.table("counttss.tsv")
-ts <- cbind(ts[,1:6], "TSS",  ts[,c(4,13:36)])
+ts <- cbind(ts[,1:6], "PromEnh",  ts[,c(4,13:36)])
 colnames(ts) <- colnames(ca)
 
 ## Join em
@@ -49,4 +49,5 @@ indx.all <- c(10:32)## ALL
 indx.unt <- c(10:13,15:19,30:32)## ONLY UNTREATED, GOOD Remove C2-U
 #indx <- c(10:11,13:21,23,25) ## "Good?!"  Remove H2-U, C2-PI, M1-PI
 indx.good <- c(10:13,15:23,25:26,28:32) ## "Good?!"  Remove C2-U+PI, M1-PI
+
 
