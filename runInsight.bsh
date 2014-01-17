@@ -51,4 +51,9 @@ inpath=/usr/data/GROseq.parser/hg19/cd4/dnase1fp/
 inbed=dnase1.peaks_peaks.narrowPeak
 runINSIGHT &
 
-
+## And the general data.
+dataID=dreg
+inpath=/usr/projects/GROseq/NHP/tss_caller/Merge/
+cat $inpath/H-U.TSS.bed.gz > $inpath/H-U.TSS.bed
+inbed=H-U.TSS.bed.gz
+runINSIGHT & 
