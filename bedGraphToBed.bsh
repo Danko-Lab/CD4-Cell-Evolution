@@ -22,9 +22,25 @@ function writeBed {
 HS=HighScore
 rm -Rf $HS
 mkdir $HS
-TH=0.8
+TH=0.9
 writeBed
 mv *.bed.gz $HS
+
+
+MS=MedScore
+rm -Rf $MS
+mkdir $MS
+TH=0.6
+writeBed
+mv *.bed.gz $MS
+
+LS=LowScore
+rm -Rf $LS
+mkdir $LS
+TH=0.3
+writeBed
+mv *.bed.gz $LS
+
 
 ## Combine high and medium scores.  
 ## Get the precision of having a high cutoff threshold, and the sensitivity of a low one.
@@ -34,7 +50,7 @@ rm -Rf $MERGE
 mkdir $MERGE
 cp $HS/*.bed.gz $MERGE
 
-for TH in 0.7 0.6 0.5
+for TH in 0.8 0.7 0.6 0.5
 do
   echo $TH
   writeBed
