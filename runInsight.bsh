@@ -18,8 +18,9 @@ function runINSIGHT {
 
 inpath=/usr/projects/GROseq/NHP/tss_caller/Results/
 
-for i in 0.9 0.8 0.6
+for i in 0.9 #0.8 0.6
 do
+## U
  dataID=HCM-U.$i.conserved
  inbed=HCM-U.dREG.conserved.$i.bed
  runINSIGHT &
@@ -32,6 +33,7 @@ do
  inbed=HCM-U.dREG.H-loss.$i.bed
  runINSIGHT &
 
+## PI
  dataID=HCM-PI.$i.conserved
  inbed=HCM-PI.dREG.conserved.$i.bed
  runINSIGHT &
@@ -43,17 +45,30 @@ do
  dataID=HCM-PI.$i.H-loss
  inbed=HCM-PI.dREG.H-loss.$i.bed
  runINSIGHT &
+
+## Combine U-PI
+ dataID=HCM-U-PI.$i.conserved
+ inbed=HCM-U-PI.conserved.$i.bed
+ runINSIGHT &
+
+ dataID=HCM-U-PI.$i.H-gain
+ inbed=HCM-U-PI.H-gain.$i.bed
+ runINSIGHT &
+
+ dataID=HCM-U-PI.$i.H-loss
+ inbed=HCM-U-PI.H-loss.$i.bed
+ runINSIGHT &
 done
 
 ## Also run DNAse-1 for comparison!
 dataID=dnase1
 inpath=/usr/data/GROseq.parser/hg19/cd4/dnase1fp/
 inbed=dnase1.peaks_peaks.narrowPeak
-runINSIGHT &
+#runINSIGHT &
 
 ## And the general data.
 dataID=dreg
 inpath=/usr/projects/GROseq/NHP/tss_caller/Merge/
 zcat $inpath/H-U.TSS.bed.gz > $inpath/H-U.TSS.bed
 inbed=H-U.TSS.bed
-runINSIGHT & 
+#runINSIGHT & 

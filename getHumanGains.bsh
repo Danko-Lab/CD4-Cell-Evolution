@@ -2,10 +2,6 @@
 HS=Merge # HighScore
 RD=Results
 
-
-
-
-
 ## STRATEGY: ###########
 ## Intersect superset.
 function getSuperset {
@@ -28,4 +24,18 @@ getSuperset U
 
 echo "Superset PI"
 getSuperset PI
+
+## Make combinations.
+cat $RD/HCM-*H-gain.0.6.bed | sort-bed - | bedops --merge - > HCM-U-PI.H-gain.0.6.bed
+cat $RD/HCM-*H-loss.0.6.bed | sort-bed - | bedops --merge - > HCM-U-PI.H-loss.0.6.bed
+cat $RD/HCM-*conserved.0.6.bed | sort-bed - | bedops --merge - > HCM-U-PI.conserved.0.6.bed
+
+cat $RD/HCM-*H-gain.0.8.bed | sort-bed - | bedops --merge - > HCM-U-PI.H-gain.0.8.bed
+cat $RD/HCM-*H-loss.0.8.bed | sort-bed - | bedops --merge - > HCM-U-PI.H-loss.0.8.bed
+cat $RD/HCM-*conserved.0.8.bed | sort-bed - | bedops --merge - > HCM-U-PI.conserved.0.8.bed
+
+cat $RD/HCM-*H-gain.0.9.bed | sort-bed - | bedops --merge - > HCM-U-PI.H-gain.0.9.bed
+cat $RD/HCM-*H-loss.0.9.bed | sort-bed - | bedops --merge - > HCM-U-PI.H-loss.0.9.bed
+cat $RD/HCM-*conserved.0.9.bed | sort-bed - | bedops --merge - > HCM-U-PI.conserved.0.9.bed
+
 

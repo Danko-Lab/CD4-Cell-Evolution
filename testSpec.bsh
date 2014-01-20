@@ -4,7 +4,7 @@
 ##
 
 infPos=H-U.TSS.bedGraph.gz
-dist=1000 #bp
+dist=500 #bp
 
 ## DNAse-1
 dnase=/usr/data/GROseq.parser/hg19/cd4/dnase1fp/dnase1.peaks_peaks.narrowPeak

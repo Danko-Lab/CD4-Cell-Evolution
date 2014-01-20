@@ -3,3 +3,5 @@ run_analysis:
 #	bash testSpec.bsh
 	bash bedGraphToBed.bsh
 	bash getHumanGains.bsh
+	bash runInsight.bsh
+
