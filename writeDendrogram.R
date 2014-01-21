@@ -5,8 +5,7 @@ require(cluster)
 ## Create a dendrogram.
 ## Using more efficient counting/ merging using bedops and bash scripts.						
 source("readData.R")
-ca <- ca[grep("PauseSite", ca[,7], invert=TRUE),] ## Remove pause sites
-ca <- ca[grep("PromEnh", ca[,7], invert=TRUE),] ## Remove TSS
+ca <- ca[grep("gc18", ca[,"annot_type"]),] ## Remove pause sites and TSS for this task...
 
 yb.sig.pal <- function(n, scale=10) {
  ints<- c(0:(n-1))/(n-1)   ## Linear scale from 0:1 x N values.
@@ -26,7 +25,7 @@ yb.sig.pal <- function(n, scale=10) {
 }
 
 drawCor <- function(indx) {
-	rpkm_df <- as.matrix(ca[,indx])/(ca[,9]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
+	rpkm_df <- as.matrix(ca[,indx])/(ca[,"mapSize"]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
 	for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*rpkm_df[,i]/sum(rpkm_df[,i])
 
 	cond <- Condition[indx]
@@ -80,7 +79,7 @@ dev.off()
 
 ## Print correlation matrix w/ hexbin.
 require(hexbin)
-rpkm_df <- as.matrix(ca[,indx.all])/(ca[,9]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
+rpkm_df <- as.matrix(ca[,indx.all])/(ca[,"mapSize"]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
 for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*rpkm_df[,i]/sum(rpkm_df[,i])
 
 bin <- hexbin(x= log(rpkm_df[,2]+1,10), y=log(rpkm_df[,3]+1,10), 50)

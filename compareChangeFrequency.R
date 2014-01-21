@@ -4,7 +4,7 @@
 load("fdr.RData")
 
 ## Re-read data, and restrict search to known genes.
-ca <- read.table("countall.tsv")
+ca <- read.table("countall.tsv") ## HRM.  Re-reading here is ugly.  Correct, however.  No use in changing it.
 gap <- read.table("genes.inGap")[!is.na(ca[,10]),]
 ca <- ca[!is.na(ca[,10]),]
 fdr_df <- fdr_df[1:NROW(ca),]

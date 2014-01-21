@@ -8,12 +8,12 @@ PVAL <- 0.05
 source("readData.R")
 
 ## Use only untreated, and get switch to RPKM
-ca <- ca[!is.na(ca[,10]),c(1:9,indx.unt)]
+ca <- ca[!is.na(ca[,11]),c(1:10,indx.unt)]
 
-rpkm_df <- as.matrix(ca[,c(10:NCOL(ca))])/(ca[,9]) #/ (colSums(ca[,c(10:15)])) ## Normalize counts ... RPKM
+rpkm_df <- as.matrix(ca[,c(11:NCOL(ca))])/(ca[,"mapSize"]) #/ (colSums(ca[,c(10:15)])) ## Normalize counts ... RPKM
 for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*rpkm_df[,i]/sum(rpkm_df[,i])
 
-dge <- DGEList(counts=ca[,c(10:18)], genes=ca[,1:9])
+dge <- DGEList(counts=ca[,c(11:19)], genes=ca[,1:10])
 
 ## Build experimental design matrix
 sampleID <- c("Jurkat", "Human 1", "Human 2", "Human 3", "Chimp 3", "Chimp 4", "R. Macaque 1", "R. Macaque 2", "R. Macaque 3")
@@ -23,7 +23,7 @@ species  <- c("J", "H", "H", "H", "C", "C", "M", "M", "M")
 data.frame(sampleID, prepDay, subject, species)
 
 fitModel <- function(species) {
-  design <- model.matrix(~species+prepDay)
+  design <- model.matrix(~species) #+prepDay)
   rownames(design) <- colnames(dge)
 
   ## Estimate dispersions.
@@ -52,7 +52,7 @@ ms <- fitModel(species)
 topTags(ms)
 
 ## Append tables.  
-if(sum(ca$name == fit$genes$name)/NROW(ca) !=1) print("ERROR!  Sanity check failed")
+#if(sum(ca$name == fit$genes$name)/NROW(ca) !=1) print("ERROR!  Sanity check failed")
 fdr_t <- data.frame(HumanFDR= p.adjust(hs$table$PValue), 
 			ChimpFDR= p.adjust(cs$table$PValue),
 			MacaqueFDR= p.adjust(ms$table$PValue))
