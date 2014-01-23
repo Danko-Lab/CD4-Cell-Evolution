@@ -26,30 +26,33 @@ fractionChanged <- list(
 
 pval <- list(
         "eRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & (fdr_df$type=="PromEnh") & isExpr])), NROW(unique(fdr_df$name[(fdr_df$type=="PromEnh") & isExpr]))),  
-                                c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
+                                c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
+#                                c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
 
 	"LincRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & (fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)])), NROW(unique(fdr_df$name[((fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)]))), 
-				c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
+                                c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
+#				c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
 
 	"Protein Coding"=   fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)]))), 
-				c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
+                                c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
+#				c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
 
 	"Antisense"=  fisher.test(data.frame(c(sum(changeExpr & fdr_df$type=="antisense" & isExpr), sum(fdr_df$type=="antisense" & isExpr)), 
-				c(sum(changeExpr & isExpr), sum(isExpr))))$p.value,
+                                c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
+#				c(sum(changeExpr & isExpr), sum(isExpr))))$p.value,
 
 	"Pseudogene"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="pseudogene" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="pseudogene" & isExpr)]))), 
-                                c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value
-)
+                                c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
+#                                c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
 
-#print(paste("Non-coding RNAs:",fractionChanged$"LincRNA", "p = ", pval$"LincRNA"))
-#print(paste("Protein coding:", fractionChanged$"Protein Coding", "p = ", pval$"Protein Coding"))
-#print(paste("Antisense:", fractionChanged$"Antisense", "p = ", pval$"Antisense"))
-#print(paste("Pseudogene:",fractionChanged$"Pseudogene", "p = ", pval$"Pseudogene"))
-#print(paste("All expressed:", sum(changeExpr & isExpr)/sum(isExpr) ))
+	"All Expressed"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr]))),
+                                c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value
+#                                c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value
+)
 
 require(ggplot2)
 library(reshape2)
-data_df <- data.frame(Type= names(fractionChanged), Changed= as.double(unlist(fractionChanged)))
+data_df <- data.frame(Type= names(fractionChanged), Changed= as.double(unlist(fractionChanged)), Pval= as.double(unlist(pval)))
 data_df$Type <- factor(data_df$Type, levels= data_df$Type[c(1,2,4,5,3,6)])
 data_df
 

@@ -3,7 +3,7 @@
 require(DESeq2)
 
 PVAL <- 0.01
-FOLD <- 3
+FOLD <- log(10,2)
 
 ## Read count data.
 source("readData.R")
@@ -61,8 +61,12 @@ head(ms[order(ms$padj), ])
 fdr_t <- data.frame(HumanFDR= hs$padj, ChimpFDR= cs$padj, MacaqueFDR= ms$padj)
 fc_t  <- data.frame(HumanFC= hs$log2FoldChange, ChimpFC= cs$log2FoldChange, MacaqueFC= ms$log2FoldChange)
 fdr_min<- sapply(c(1:NROW(fdr_t)), function(x) {min(fdr_t[x,])} )
-fc_min <- sapply(c(1:NROW(fdr_t)), function(x) {fc_t[x,which.min(fdr_t[x,])]})
-fdr_df <- (data.frame(ca, fdr_t, fdr_min, fc_min))
+fc_min <- sapply(c(1:NROW(fdr_t)), function(x) {
+	mm<-which.min(fdr_t[x,]); 
+	if(NROW(mm) == 0) {return(NA)}; 
+	return(fc_t[x,which.min(fdr_t[x,])])})
+
+fdr_df <- (data.frame(ca, fdr_t, fdr_min, fc_t, fc_min))
 
 ## Count absolute numbers of changes.
 NROW(unique(ca[fdr_t[,1] < PVAL & abs(hs$log2FoldChange) > FOLD,"mgi"])) # HUMAN
