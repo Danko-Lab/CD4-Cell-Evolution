@@ -6,8 +6,8 @@ load("fdr.RData")
 ##############################################################################
 ## Compare frequency of changes in expression for genes, and non-coding RNAs.
 
-summary(fdr_df$fdr_min < 0.05) ## ~12k transcripts that change expression.
-changeExpr <- fdr_df$fdr_min < 0.05 & !is.na(fdr_df$fdr_min)
+summary(fdr_df$fdr_min < PVAL) ## ~12k transcripts that change expression.
+changeExpr <- fdr_df$fdr_min < PVAL & !is.na(fdr_df$fdr_min) & abs(fdr_df$fc_min) > FOLD
 
 ## Comput RPKM
 isExpr <- rowMeans(rpkm_df) > 1e-4
@@ -72,52 +72,56 @@ ca <- ca[!is.na(ca[,10]),]
 fdr_df <- fdr_df[1:NROW(ca),]
 rpkm_df <- rpkm_df[1:NROW(ca),]
 isExpr <- isExpr[1:NROW(ca)]
+changeExpr <- changeExpr[1:NROW(ca)]
 
 ## Shouldn't have to do this?!
 fdr_df[is.na(fdr_df)] <- 1
 
-summary(gap$V2[fdr_df$ChimpFDR< 0.05])/ summary(gap$V2)
-summary(gap$V4[fdr_df$MacaqueFDR< 0.05])/ summary(gap$V4)
+chimpchange <- fdr_df$ChimpFDR < PVAL & abs(fdr_df$ChimpFC) > FOLD
+macaquechange <- fdr_df$MacaqueFDR < PVAL & abs(fdr_df$MacaqueFC) > FOLD
 
-summary(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr])/ summary(gap$V2[isExpr])
-summary(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr])/ summary(gap$V4[isExpr])
+summary(gap$V2[chimpchange])/ summary(gap$V2)
+summary(gap$V4[macaquechange])/ summary(gap$V4)
 
-fisher.test(data.frame(c(sum(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr] == "nonSyn"), 
+summary(gap$V2[chimpchange & isExpr])/ summary(gap$V2[isExpr])
+summary(gap$V4[macaquechange & isExpr])/ summary(gap$V4[isExpr])
+
+fisher.test(data.frame(c(sum(gap$V2[chimpchange & isExpr] == "nonSyn"), 
 						sum(gap$V2[isExpr] == "nonSyn")), 
-						c(sum(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr] == "NONE"), 
+						c(sum(gap$V2[chimpchange & isExpr] == "NONE"), 
 						sum(gap$V2[isExpr] == "NONE"))))$p.value
 
-fisher.test(data.frame(c(sum(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr] == "nonSyn"), 
+fisher.test(data.frame(c(sum(gap$V4[macaquechange & isExpr] == "nonSyn"), 
 						sum(gap$V4[isExpr] == "nonSyn")), 
-						c(sum(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr] == "NONE"), 
+						c(sum(gap$V4[macaquechange & isExpr] == "NONE"), 
 						sum(gap$V4[isExpr] == "NONE"))))$p.value
 
-fisher.test(data.frame(c(sum(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr] == "inv"), 
+fisher.test(data.frame(c(sum(gap$V2[chimpchange & isExpr] == "inv"), 
 						sum(gap$V2[isExpr] == "inv")), 
-						c(sum(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr] == "NONE"), 
+						c(sum(gap$V2[chimpchange & isExpr] == "NONE"), 
 						sum(gap$V2[isExpr] == "NONE"))))$p.value
 
-fisher.test(data.frame(c(sum(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr] == "inv"), 
+fisher.test(data.frame(c(sum(gap$V4[macaquechange & isExpr] == "inv"), 
 						sum(gap$V4[isExpr] == "inv")), 
-						c(sum(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr] == "NONE"), 
+						c(sum(gap$V4[macaquechange & isExpr] == "NONE"), 
 						sum(gap$V4[isExpr] == "NONE"))))$p.value
 
-fisher.test(data.frame(c(sum(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr] == "syn"), 
+fisher.test(data.frame(c(sum(gap$V2[chimpchange & isExpr] == "syn"), 
 						sum(gap$V2[isExpr] == "syn")), 
-						c(sum(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr] == "NONE"), 
+						c(sum(gap$V2[chimpchange & isExpr] == "NONE"), 
 						sum(gap$V2[isExpr] == "NONE"))))$p.value
 
-fisher.test(data.frame(c(sum(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr] == "syn"), 
+fisher.test(data.frame(c(sum(gap$V4[macaquechange & isExpr] == "syn"), 
 						sum(gap$V4[isExpr] == "syn")), 
-						c(sum(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr] == "NONE"), 
+						c(sum(gap$V4[macaquechange & isExpr] == "NONE"), 
 						sum(gap$V4[isExpr] == "NONE"))))$p.value
 
 						
 
 data_df <- data.frame(Species= factor(c(rep("Chimpanzee", 4), rep("Rhesus Macaque", 4))), 
 				Type= factor(rep(c("Inversion", "None", "Different Chrom", "Same Chrom"), 2), levels=c("Different Chrom", "Same Chrom", "Inversion", "None")), 
-				Value= as.double(c(c(summary(gap$V2[fdr_df$ChimpFDR< 0.05 & isExpr])/ summary(gap$V2[isExpr])), 
-					c(summary(gap$V4[fdr_df$MacaqueFDR< 0.05 & isExpr])/ summary(gap$V4[isExpr])))))
+				Value= as.double(c(c(summary(gap$V2[chimpchange & isExpr])/ summary(gap$V2[isExpr])), 
+					c(summary(gap$V4[macaquechange & isExpr])/ summary(gap$V4[isExpr])))))
 
 b <-  ggplot(data_df, aes(x=Species, y=Value)) + xlab("") + ylab("Fraction of Transcripts Changed") + 
 	geom_bar(aes(fill=Type), stat="identity",position=position_dodge(), colour="black") + scale_fill_brewer(palette = "Set3")
