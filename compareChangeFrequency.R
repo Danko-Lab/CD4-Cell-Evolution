@@ -7,7 +7,7 @@ load("fdr.RData")
 ## Compare frequency of changes in expression for genes, and non-coding RNAs.
 
 summary(fdr_df$fdr_min < PVAL) ## ~12k transcripts that change expression.
-changeExpr <- fdr_df$fdr_min < PVAL & !is.na(fdr_df$fdr_min) & abs(fdr_df$fc_min) > FOLD
+changeExpr <- fdr_df$fdr_min < PVAL & !is.na(fdr_df$fdr_min) & abs(fdr_df$fc_min) > FOLD #1
 
 ## Comput RPKM
 isExpr <- rowMeans(rpkm_df) > 1e-4
@@ -20,7 +20,7 @@ fractionChanged <- list(
 	"LincRNA"= NROW(unique(fdr_df$name[(changeExpr & (fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)]))/ NROW(unique(fdr_df$name[((fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)])),
 	"Protein Coding"=  NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)]))/NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])),
 	"Antisense"=  NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="antisense" & isExpr)]))/NROW(unique(fdr_df$name[(fdr_df$type=="antisense" & isExpr)])),
-	"Pseudogene"=  NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="pseudogene" & isExpr)]))/NROW(unique(fdr_df$name[(fdr_df$type=="pseudogene" & isExpr)])),
+	"Pseudogene"=  NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)]))/NROW(unique(fdr_df$name[(fdr_df$type=="pseudogene" & isExpr)])),
 	"All Expressed"= NROW(unique(fdr_df$name[changeExpr & isExpr]))/NROW(unique(fdr_df$name[isExpr]))
 )
 
@@ -41,7 +41,7 @@ pval <- list(
                                 c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
 #				c(sum(changeExpr & isExpr), sum(isExpr))))$p.value,
 
-	"Pseudogene"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="pseudogene" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="pseudogene" & isExpr)]))), 
+	"Pseudogene"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="pseudogene" & isExpr)]))), 
                                 c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
 #                                c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
 

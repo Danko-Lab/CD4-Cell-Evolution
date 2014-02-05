@@ -22,7 +22,11 @@ function getAnnotations {
 # wget ftp://ftp.sanger.ac.uk/pub/gencode/release_18/gencode.v18.annotation.gtf.gz # 1/14/2014
  zcat gencode.v18.annotation.gtf.gz | \
 	awk 'BEGIN{OFS="\t"}{ if($3 == "transcript") {print $1,$4,$5,"GC."$1"_"$4"_"$5"_"$7,"0",$7,$14,$18,$10,$12} }' | \
-	sed 's/"//g' | sed 's/;//g' | sed '/#.*/d' | uniq | awk '$3 > $2 {print $0}' | sort-bed - > $GENCODE_TSV
+	sed 's/"//g' | sed 's/;//g' | sed '/#.*/d' | uniq | awk '$3 > $2 {print $0}' | sort-bed - > $GENCODE_TSV.tmp
+ cat hg19.pseudogenes.Gerstein.bed | awk 'BEGIN{OFS="\t"} {print $0,"GERST_PG",$4,$4,$4}' >> $GENCODE_TSV.tmp
+ cat $GENCODE_TSV.tmp | sort-bed - > $GENCODE_TSV
+ rm $GENCODE_TSV.tmp
+
  cat $GENCODE_TSV | perl ~/perl/col.stdin.pl 7 | sort | uniq > UNIQUETYPES
 }
 getAnnotations ## Run on 7/23/2013 (v17); 1/14/2014 (v18).
@@ -55,7 +59,7 @@ makeOrthoAnnot
 
 ## Combine gaps.
 bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save > gapMerge
-rm *.save
+#rm *.save
 
 ######################################
 ## Now make increments.
