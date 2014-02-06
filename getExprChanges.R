@@ -26,6 +26,8 @@ fitModel <- function(species) {
   design <- model.matrix(~species) #+prepDay)
   rownames(design) <- colnames(dge)
 
+  rownames(design) <- colnames(dge)
+
   ## Estimate dispersions.
   dge <- estimateGLMCommonDisp(dge, design, verbose=TRUE)
   dge <- estimateGLMTrendedDisp(dge,design)

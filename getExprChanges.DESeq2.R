@@ -77,6 +77,13 @@ NROW(unique(ca[fdr_t[,1] < PVAL & ca[,"annot_type"] == "gc18" & abs(hs$log2FoldC
 NROW(unique(ca[fdr_t[,2] < PVAL & ca[,"annot_type"] == "gc18" & abs(cs$log2FoldChange) > FOLD,"mgi"])) # CHIMP
 NROW(unique(ca[fdr_t[,3] < PVAL & ca[,"annot_type"] == "gc18" & abs(ms$log2FoldChange) > FOLD,"mgi"])) # RHESUS
 
+## Write a MA-plot for GC18.
+png("img/hs.MA.png")
+ plot(hs$baseMean, hs$log2FoldChange, pch=19, log="x")
+ points(hs$baseMean[hs$padj<PVAL], hs$log2FoldChange[hs$padj<PVAL], col="red", pch=19)
+# points(hs$baseMean[hs$padj<PVAL & abs(hs$log2FoldChange) > FOLD], hs$log2FoldChange[hs$padj<PVAL & abs(hs$log2FoldChange) > FOLD], col="red", pch=19)
+dev.off()
+
 ## Compute frequency of changes for 'expressed' genes in each class.
 save.image("fdr.RData")
 
