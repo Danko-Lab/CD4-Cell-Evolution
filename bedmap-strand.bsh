@@ -18,7 +18,7 @@ REFFILE=${!nref}
 
 cat $MAPFILE | awk '$6=="+" {print $0}' > tmp.plus.$MAPFILE.tmp
 cat $MAPFILE | awk '$6=="-" {print $0}' > tmp.minus.$MAPFILE.tmp
-cat tmp.plus.$MAPFILE.tmp tmp.plus.$MAPFILE.tmp | sort-bed - > tmp.both.$MAPFILE.tmp
+cat tmp.plus.$MAPFILE.tmp tmp.minus.$MAPFILE.tmp | sort-bed - > tmp.both.$MAPFILE.tmp
 
 cat $REFFILE | awk '$6=="+" {print $0}' > tmp.plus.$REFFILE.tmp
 cat $REFFILE | awk '$6=="-" {print $0}' > tmp.minus.$REFFILE.tmp

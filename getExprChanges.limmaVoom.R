@@ -89,9 +89,14 @@ NROW(unique(ca[fdr_t[,2] < PVAL & ca[,"annot_type"] == "gc18","mgi"])) # CHIMP
 NROW(unique(ca[fdr_t[,3] < PVAL & ca[,"annot_type"] == "gc18","mgi"])) # RHESUS
 
 ## Write table of genes to use in GO.
-write.table(unique(ca[fdr_t[,1] < PVAL & ca[,"annot_type"] == "gc18","mgi"]), "chage_expr/H.mgi.tsv", quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
-write.table(unique(ca[fdr_t[,2] < PVAL & ca[,"annot_type"] == "gc18","mgi"]), "chage_expr/C.mgi.tsv", quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
-write.table(unique(ca[fdr_t[,3] < PVAL & ca[,"annot_type"] == "gc18","mgi"]), "chage_expr/M.mgi.tsv", quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
+writeExprChange <- function(ss, name, indx) {
+ write.table(unique(ca[fdr_t[,indx] < PVAL & ca[,"annot_type"] == "gc18","mgi"]), paste("chage_expr/",name,".mgi.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
+ write.table(cbind(genes, fdr_t, fc_t)[fdr_t[,indx]<PVAL, ], paste("chage_expr/",name,".change.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
+}
+
+writeExprChange(ss, "H", 1)
+writeExprChange(ss, "C", 2)
+writeExprChange(ss, "M", 3)
 
 isExpr <- rowMeans(rpkm_df[,2:9]) > 1e-4
 write.table(unique(ca[isExpr & ca[,"annot_type"] == "gc18","mgi"]), "chage_expr/exprbg.mgi.tsv", quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")

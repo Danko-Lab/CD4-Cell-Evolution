@@ -11,6 +11,7 @@ changeExpr <- fdr_df$fdr_min < PVAL & !is.na(fdr_df$fdr_min) & abs(fdr_df$fc_min
 
 ## Comput RPKM
 isExpr <- rowMeans(rpkm_df) > 1e-4
+sum(isExpr)/NROW(isExpr)
 
 sum(changeExpr & isExpr)/ sum(isExpr)
 summary(fdr_df$type[changeExpr & isExpr])/summary(fdr_df$type[isExpr])
@@ -20,7 +21,7 @@ fractionChanged <- list(
 	"LincRNA"= NROW(unique(fdr_df$name[(changeExpr & (fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)]))/ NROW(unique(fdr_df$name[((fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)])),
 	"Protein Coding"=  NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)]))/NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])),
 	"Antisense"=  NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="antisense" & isExpr)]))/NROW(unique(fdr_df$name[(fdr_df$type=="antisense" & isExpr)])),
-	"Pseudogene"=  NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)]))/NROW(unique(fdr_df$name[(fdr_df$type=="pseudogene" & isExpr)])),
+	"Pseudogene"=  NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)]))/NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)])),
 	"All Expressed"= NROW(unique(fdr_df$name[changeExpr & isExpr]))/NROW(unique(fdr_df$name[isExpr]))
 )
 
@@ -41,7 +42,7 @@ pval <- list(
                                 c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
 #				c(sum(changeExpr & isExpr), sum(isExpr))))$p.value,
 
-	"Pseudogene"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="pseudogene" & isExpr)]))), 
+	"Pseudogene"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)]))), 
                                 c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
 #                                c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
 
@@ -50,9 +51,32 @@ pval <- list(
 #                                c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value
 )
 
+
+pval.pg <- list(
+        "eRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & (fdr_df$type=="PromEnh") & isExpr])), NROW(unique(fdr_df$name[(fdr_df$type=="PromEnh") & isExpr]))),
+                               c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)]))) ))$p.value,
+
+        "LincRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & (fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)])), NROW(unique(fdr_df$name[((fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)]))),
+                               c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)])))  ))$p.value,
+
+        "Protein Coding"=   fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)]))),
+                               c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)])))  ))$p.value,
+
+        "Antisense"=  fisher.test(data.frame(c(sum(changeExpr & fdr_df$type=="antisense" & isExpr), sum(fdr_df$type=="antisense" & isExpr)),
+                               c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)])))   ))$p.value,
+
+        "Pseudogene"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)]))),
+                               c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)])))  ))$p.value,
+
+        "All Expressed"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr]))),
+                               c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)]))) ))$p.value
+)
+
+
+
 require(ggplot2)
 library(reshape2)
-data_df <- data.frame(Type= names(fractionChanged), Changed= as.double(unlist(fractionChanged)), Pval= as.double(unlist(pval)))
+data_df <- data.frame(Type= names(fractionChanged), Changed= as.double(unlist(fractionChanged)), Pval= as.double(unlist(pval)), Pval.pg= as.double(unlist(pval.pg)))
 data_df$Type <- factor(data_df$Type, levels= data_df$Type[c(1,2,4,5,3,6)])
 data_df
 
