@@ -18,6 +18,7 @@ function runINSIGHT {
 
 inpath=/usr/projects/GROseq/NHP/tss_caller/Results/
 MOTIFS=/usr/data/GROseq.parser/hg19/cd4/dreg/cd4.dreg.tfs263.th6.db.starch
+FOOTPR=/usr/data/GROseq.parser/hg19/cd4/dnase1fp/footprints/dnase1.merge.sort.bam.dnase.peaks.bed.WellingtonFootprints.FDR.0.01.bed
 
 for i in 0.9 0.8 0.6
 do
@@ -75,6 +76,12 @@ inbed=H-U.change.up.bed
 zcat /usr/projects/GROseq/NHP/tss_caller/VeryHighScore/H-U.TSS.bed.gz | sort-bed - | bedops --element-of -1 - $inpath/H-U.change.up.bed > $inpath/H-U.change.hs.bed
 dataID=HCM-U.change.hs
 inbed=H-U.change.hs.bed
+#runINSIGHT &
+
+## Intersect with FP.
+bedops --element-of -1 $FOOTPR $inpath/H-U.change.bed > $inpath/H-U.fp.change.bed
+dataID=H-U.fp.change
+inbed=H-U.fp.change.bed
 runINSIGHT &
 
 ## Intersect with TFBS
