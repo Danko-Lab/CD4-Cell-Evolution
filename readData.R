@@ -1,5 +1,6 @@
 ## 
 ## Read non-human primate count data, for dendrogram and expression analysis.
+rowMax <- function(x) { sapply(1:NROW(x), function(i) {return(max(x[i,], na.rm=TRUE))}) }
 
 ca <- read.table("countall.tsv")
 ca <- cbind(ca[,1:9], "gc18", ca[,10:NCOL(ca)])
@@ -12,7 +13,8 @@ colnames(ps) <- colnames(ca)
 
 ## Get dREG counts.
 ts <- read.table("counttss.tsv")
-ts <- cbind(ts[,1:6], "PromEnh",  ts[,c(4,13:36)])
+ts[,5] <- rowMax(ts[7:12])
+ts <- cbind(ts[,1:6], "PromEnh",  ts[,c(4,13:NCOL(ts))])
 ts <- cbind(ts[,1:9], "tss", ts[,10:NCOL(ts)])
 colnames(ts) <- colnames(ca)
 
