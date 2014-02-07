@@ -20,7 +20,7 @@ export TSSINCR=tss.increments.bed
 function getAnnotations {
 # wget ftp://ftp.sanger.ac.uk/pub/gencode/release_17/gencode.v17.annotation.gtf.gz # 7/23/2013
 # wget ftp://ftp.sanger.ac.uk/pub/gencode/release_18/gencode.v18.annotation.gtf.gz # 1/14/2014
- zcat gencode.v18.annotation.gtf.gz | \
+ zcat gencode.v18.annotation.gtf.gz | awk '{if($26~/1|2/){print $0}}' | \
 	awk 'BEGIN{OFS="\t"}{ if($3 == "transcript") {print $1,$4,$5,"GC."$1"_"$4"_"$5"_"$7,"0",$7,$14,$18,$10,$12} }' | \
 	sed 's/"//g' | sed 's/;//g' | sed '/#.*/d' | uniq | awk '$3 > $2 {print $0}' | sort-bed - > $GENCODE_TSV.tmp
  cat hg19.pseudogenes.Gerstein.bed | awk 'BEGIN{OFS="\t"} {print $0,"GERST_PG",$4,$4,$4}' >> $GENCODE_TSV.tmp
@@ -83,7 +83,8 @@ function makeIncrements {
 
 ####
 ## Make a gene list and partition.
-cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if (($3-$2) > '"$PROM"')
+cat $GENCODE_TSV | awk '(($3-$2) > 5000) {print $0}' | \
+			awk 'BEGIN{OFS="\t"; ORS=""} {if (($3-$2) > '"$PROM"')
                                          {if ($6 == "+") print $1,($2+'"$PROM"'), ($3<($2+'"$MAXLEN"')) ? $3 : ($2+'"$MAXLEN"')
                                          else if ($6 == "-") print $1, ($2>($3-'"$MAXLEN"')) ? $2 : $3-'"$MAXLEN"' ,($3-'"$PROM"')}
                                         else print $1,$2,$3} {print "\t",$4,$5,$6,$7,$8,"\n"}' | uniq | sort-bed - > $GENEBODIES
@@ -92,7 +93,8 @@ makeIncrements $GENEBODIES $INCREMENTS
 
 ####
 ## Get data from pause sites, removing any bits that fall into gaps.
-cat $GENCODE_TSV | awk 'BEGIN{OFS="\t"; ORS=""} {if ($6 == "+") print $1,($2-'"$PROM"'),($2+'"$PROM"')
+cat $GENCODE_TSV | awk '(($3-$2) > 5000) {print $0}' | \
+			awk 'BEGIN{OFS="\t"; ORS=""} {if ($6 == "+") print $1,($2-'"$PROM"'),($2+'"$PROM"')
                                                  else if ($6 == "-") print $1,($3-'"$PROM"'),($3+'"$PROM"') }
                                           {print "\t",$4,$5,$6,$7,$8,"\n"}' | uniq | sort-bed - > $PAUSESITES
 #                                          bedmap --echo --indicator - gapMerge.tmp | grep "0$" | sed "s/|0//g" > $PAUSESITES
