@@ -17,48 +17,71 @@ function runINSIGHT {
 }
 
 inpath=/usr/projects/GROseq/NHP/tss_caller/Results/
+MOTIFS=/usr/data/GROseq.parser/hg19/cd4/dreg/cd4.dreg.tfs263.th6.db.starch
 
-for i in 0.9 #0.8 0.6
+for i in 0.9 0.8 0.6
 do
 ## U
  dataID=HCM-U.$i.conserved
  inbed=HCM-U.dREG.conserved.$i.bed
- runINSIGHT &
+# runINSIGHT &
 
  dataID=HCM-U.$i.H-gain
  inbed=HCM-U.dREG.H-gain.$i.bed
- runINSIGHT &
+# runINSIGHT &
 
  dataID=HCM-U.$i.H-loss
  inbed=HCM-U.dREG.H-loss.$i.bed
- runINSIGHT &
+# runINSIGHT &
 
 ## PI
  dataID=HCM-PI.$i.conserved
  inbed=HCM-PI.dREG.conserved.$i.bed
- runINSIGHT &
+# runINSIGHT &
 
  dataID=HCM-PI.$i.H-gain
  inbed=HCM-PI.dREG.H-gain.$i.bed
- runINSIGHT &
+# runINSIGHT &
 
  dataID=HCM-PI.$i.H-loss
  inbed=HCM-PI.dREG.H-loss.$i.bed
- runINSIGHT &
+# runINSIGHT &
 
 ## Combine U-PI
  dataID=HCM-U-PI.$i.conserved
  inbed=HCM-U-PI.conserved.$i.bed
- runINSIGHT &
+# runINSIGHT &
 
  dataID=HCM-U-PI.$i.H-gain
  inbed=HCM-U-PI.H-gain.$i.bed
- runINSIGHT &
+# runINSIGHT &
 
  dataID=HCM-U-PI.$i.H-loss
  inbed=HCM-U-PI.H-loss.$i.bed
- runINSIGHT &
+# runINSIGHT &
 done
+
+## Changes to dREG elements.
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change.tsv | grep "PromEnh" | sort-bed -  > $inpath/H-U.change.bed
+dataID=HCM-U.change
+inbed=H-U.change.bed
+#runINSIGHT &
+
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change.tsv | grep "PromEnh" | awk '($14>2) {print $0}' | sort-bed -  > $inpath/H-U.change.up.bed 
+dataID=HCM-U.change.up
+inbed=H-U.change.up.bed
+#runINSIGHT &
+
+zcat /usr/projects/GROseq/NHP/tss_caller/VeryHighScore/H-U.TSS.bed.gz | sort-bed - | bedops --element-of -1 - $inpath/H-U.change.up.bed > $inpath/H-U.change.hs.bed
+dataID=HCM-U.change.hs
+inbed=H-U.change.hs.bed
+runINSIGHT &
+
+## Intersect with TFBS
+bedops --element-of -1 $MOTIFS $inpath/H-U.change.hs.bed > $inpath/H-U.motifs.change.hs.bed
+dataID=H-U.motifs.change.hs
+inbed=H-U.motifs.change.hs.bed
+#runINSIGHT &
 
 ## Also run DNAse-1 for comparison!
 dataID=dnase1
@@ -72,3 +95,5 @@ inpath=/usr/projects/GROseq/NHP/tss_caller/Merge/
 zcat $inpath/H-U.TSS.bed.gz > $inpath/H-U.TSS.bed
 inbed=H-U.TSS.bed
 #runINSIGHT & 
+
+

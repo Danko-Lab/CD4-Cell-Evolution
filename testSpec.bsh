@@ -19,7 +19,7 @@ cat $dnase $h3k4me3 $h3k4me1 $h3k9ac $h4k16ac | awk 'BEGIN{OFS="\t"} {print $1,$
 ################################################################
 ## Test sensitivity ...
 
-for th in 0.5 0.6 0.7 0.8 
+for th in 0.5 0.6 0.7 0.8 0.9
 do
  echo $th
 

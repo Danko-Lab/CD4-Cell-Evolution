@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-CLUST_SIZE=1000 ## bp
+CLUST_SIZE=500 ## bp
 
 ## Merge into TSS. 
 function writeBed {
@@ -9,7 +9,7 @@ function writeBed {
    echo $j
  
    ## Merge into peaks.
-   zcat $i | awk 'BEGIN{OFS="\t"} ($4 > '"$TH"') {print $1,$2-50,$3+51}' | sort-bed - | bedops --merge - > $j.no_score.bed
+   zcat $i | grep "chrM\|rRNA" -v | awk 'BEGIN{OFS="\t"} ($4 > '"$TH"') {print $1,$2-50,$3+51}' | sort-bed - | bedops --merge - > $j.no_score.bed
  
    ## Get max score in each peak. 
    zcat $i | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --echo --max $j.no_score.bed - | sed "s/|/\t/g" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | gzip > $j.bed.gz
@@ -19,13 +19,19 @@ function writeBed {
  done
 }
 
-HS=HighScore
+HS=VeryHighScore
 rm -Rf $HS
 mkdir $HS
 TH=0.9
 writeBed
 mv *.bed.gz $HS
 
+MHS=HighScore
+rm -Rf $MHS
+mkdir $MHS
+TH=0.8
+writeBed
+mv *.bed.gz $MHS
 
 MS=MedScore
 rm -Rf $MS
