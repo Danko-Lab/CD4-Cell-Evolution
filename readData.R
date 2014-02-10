@@ -1,6 +1,7 @@
 ## 
 ## Read non-human primate count data, for dendrogram and expression analysis.
 rowMax <- function(x) { sapply(1:NROW(x), function(i) {return(max(x[i,], na.rm=TRUE))}) }
+rowMin <- function(x) { sapply(1:NROW(x), function(i) {return(min(x[i,], na.rm=TRUE))}) }
 
 ca <- read.table("countall.tsv")
 ca <- cbind(ca[,1:9], "gc18", ca[,10:NCOL(ca)])
