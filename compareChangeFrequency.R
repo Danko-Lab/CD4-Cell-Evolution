@@ -10,7 +10,7 @@ summary(fdr_df$fdr_min < PVAL) ## ~12k transcripts that change expression.
 changeExpr <- fdr_df$fdr_min < PVAL & !is.na(fdr_df$fdr_min) & abs(fdr_df$fc_min) > FOLD #1
 
 ## Comput RPKM
-isExpr <- rowMeans(rpkm_df) > 1e-4
+isExpr <- rowMax(rpkm_df[,2:9]) > 1e-4
 sum(isExpr)/NROW(isExpr)
 
 sum(changeExpr & isExpr)/ sum(isExpr)

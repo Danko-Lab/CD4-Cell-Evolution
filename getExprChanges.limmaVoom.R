@@ -146,6 +146,14 @@ NROW(unique(ca[fdr_t[,4] < PVAL & ca[,"annot_type"] == "gc18","mgi"])) # HUMAN
 NROW(unique(ca[fdr_t[,5] < PVAL & ca[,"annot_type"] == "gc18","mgi"])) # CHIMP
 NROW(unique(ca[fdr_t[,6] < PVAL & ca[,"annot_type"] == "gc18","mgi"])) # RHESUS
 
+NROW(unique(ca[fdr_t[,1] < PVAL & fdr_t[,4] < PVAL,"mgi"])) # HUMAN
+NROW(unique(ca[fdr_t[,2] < PVAL & fdr_t[,5] < PVAL,"mgi"])) # CHIMP
+NROW(unique(ca[fdr_t[,3] < PVAL & fdr_t[,6] < PVAL,"mgi"])) # MACAQUE
+
+NROW(unique(ca[fdr_t[,1] < PVAL & fdr_t[,4] < PVAL & ca[,"annot_type"] == "gc18","mgi"])) # HUMAN
+NROW(unique(ca[fdr_t[,2] < PVAL & fdr_t[,5] < PVAL & ca[,"annot_type"] == "gc18","mgi"])) # CHIMP
+NROW(unique(ca[fdr_t[,3] < PVAL & fdr_t[,6] < PVAL & ca[,"annot_type"] == "gc18","mgi"])) # MACAQUE
+
 ## Write table of genes to use in GO.
 writeExprChange <- function(ss, name, indx, indx_pi) {
  write.table(unique(ca[fdr_t[,indx] < PVAL & ca[,"annot_type"] == "gc18","mgi"]), paste("chage_expr/",name,".U.mgi.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
@@ -153,13 +161,16 @@ writeExprChange <- function(ss, name, indx, indx_pi) {
 
  write.table(unique(ca[fdr_t[,indx_pi] < PVAL & ca[,"annot_type"] == "gc18","mgi"]), paste("chage_expr/",name,".PI.mgi.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
  write.table(cbind(genes, fdr_t, fc_t)[fdr_t[,indx_pi]<PVAL, ], paste("chage_expr/",name,".change-PI.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
+
+ write.table(unique(ca[fdr_t[,indx] < PVAL & fdr_t[,indx_pi] < PVAL & ca[,"annot_type"] == "gc18","mgi"]), paste("chage_expr/",name,".U+PI.mgi.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
+ write.table(cbind(genes, fdr_t, fc_t)[fdr_t[,indx] < PVAL & fdr_t[,indx_pi]<PVAL, ], paste("chage_expr/",name,".change-U+PI.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
 }
 
 writeExprChange(ss, "H", 1,4)
 writeExprChange(ss, "C", 2,5)
 writeExprChange(ss, "M", 3,6)
 
-isExpr <- rowMeans(rpkm_df[,2:9]) > 1e-4
+isExpr <- rowMax(rpkm_df[,2:9]) > 1e-4
 write.table(unique(ca[isExpr & ca[,"annot_type"] == "gc18","mgi"]), "chage_expr/exprbg.mgi.tsv", quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
 
 ## Compute frequency of changes for 'expressed' genes in each class.
