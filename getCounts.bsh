@@ -41,7 +41,7 @@ function getCounts {
 # 
 #}
 
-BWPATH=/usr/projects/GROseq/AllData
+BWPATH=/usr/projects/GROseq/NHP/AllData
 
 ## Get counts, and place this in 'score'.
 export COUNTFILE=J.count.bed
