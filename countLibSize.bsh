@@ -1,0 +1,50 @@
+#!/usr/bin/bash
+#
+# Counts library sizes ...
+
+CD4JUR=../../CD4/Alignments
+ALIGN1=../Alignments_1stPrep
+ALIGN2=../Alignments_2ndPrep
+ALIGN3=../Alignments_3rdPrep
+
+function countLib {
+  genome=`zcat $1 | grep "chrM" -v | grep "rRNA" -v -c` ## Get counts of genomic mapping (non-rRNA).
+  riboso=`zcat $1 | grep "chrM" -v | grep "rRNA" -c`    ## Get counts of rRNA.
+  echo "$1 $genome $riboso"
+}
+
+#function countBW {
+#  
+#}
+
+countLib $CD4JUR/H1-U.bed.gz
+countLib $CD4JUR/H1-PI.bed.gz
+
+countLib $ALIGN3/H2.2-U.bed.gz
+zcat $ALIGN2/H2-PI.bed.gz $ALIGN3/H2.2-PI.bed.gz | gzip > H2-PI.bed.gz
+count H2-PI.bed.gz
+rm H2-PI.bed.gz
+
+countLib $ALIGN1/H3-U.bed.gz
+countLib $ALIGN1/H3-PI.bed.gz
+
+## cHIMP
+countLib $ALIGN1/C2-U.bed.gz
+countLib $ALIGN1/C2-PI.bed.gz
+
+countLib $ALIGN2/C3-U.bed.gz
+countLib $ALIGN2/C3-PI.bed.gz
+
+countLib $ALIGN3/H4-U.bed.gz
+countLib $ALIGN3/H4-PI.bed.gz
+
+## rHE. mAC.
+countLib $ALIGN1/M1-U.bed.gz
+countLib $ALIGN1/M1-PI.bed.gz
+
+countLib $ALIGN2/M2-U.bed.gz
+countLib $ALIGN2/M2-PI.bed.gz
+
+countLib $ALIGN3/M3-U.bed.gz
+countLib $ALIGN3/M3-PI.bed.gz
+
