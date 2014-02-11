@@ -41,6 +41,8 @@ function getCounts {
 # 
 #}
 
+BWPATH=/usr/projects/GROseq/AllData
+
 ## Get counts, and place this in 'score'.
 export COUNTFILE=J.count.bed
 export BWPLUS=/usr/projects/GROseq/CD4/Alignments/J-U_plus.bw
@@ -50,64 +52,64 @@ getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=H1.count.bed
-export BWPLUS=/usr/projects/GROseq/CD4/Alignments/H1-U_plus.bw
-export BWMINUS=/usr/projects/GROseq/CD4/Alignments/H1-U_minus.bw
+export BWPLUS=$BWPATH/H1-U_plus.bw
+export BWMINUS=$BWPATH/H1-U_minus.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=H2.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/H2.2-U.bed.gz_plus.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/H2.2-U.bed.gz_minus.bw
+export BWPLUS=$BWPATH/H2-U.bed.gz_plus.bw
+export BWMINUS=$BWPATH/H2-U.bed.gz_minus.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=H3.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/H3-U.bed.gz_plus.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/H3-U.bed.gz_minus.bw
+export BWPLUS=$BWPATH/H3-U.bed.gz_plus.bw
+export BWMINUS=$BWPATH/H3-U.bed.gz_minus.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=C2.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/C2-U.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/C2-U.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/C2-U.bed.gz_plus.hg19.bw
+export BWMINUS=$BWPATH/C2-U.bed.gz_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=C3.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/C3-U.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/C3-U.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/C3-U.bed.gz_plus.hg19.bw
+export BWMINUS=$BWPATH/C3-U.bed.gz_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=C4.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/C4-U.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/C4-U.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/C4-U.bed.gz_plus.hg19.bw
+export BWMINUS=$BWPATH/C4-U.bed.gz_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=M1.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/M1-U.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/M1-U.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/M1-U.bed.gz_plus.hg19.bw
+export BWMINUS=$BWPATH/M1-U.bed.gz_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=M2.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-U.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-U.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/M2-U.bed.gz_plus.hg19.bw
+export BWMINUS=$BWPATH/M2-U.bed.gz_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=M3.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/M3-U.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/M3-U.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/M3-U.bed.gz_plus.hg19.bw
+export BWMINUS=$BWPATH/M3-U.bed.gz_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
@@ -121,64 +123,64 @@ getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=H1.pi.count.bed
-export BWPLUS=/usr/projects/GROseq/CD4/Alignments/H1-PI_plus.bw
-export BWMINUS=/usr/projects/GROseq/CD4/Alignments/H1-PI_minus.bw
+export BWPLUS=$BWPATH/H1-PI_plus.bw
+export BWMINUS=$BWPATH/H1-PI_minus.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=H2.pi.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/H2-PI.bed.gz_plus.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/H2-PI.bed.gz_minus.bw
+export BWPLUS=$BWPATH/H2-PI.bed.gz_plus.bw
+export BWMINUS=$BWPATH/H2-PI.bed.gz_minus.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=H3.pi.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/H3-PI.bed.gz_plus.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/H3-PI.bed.gz_minus.bw
+export BWPLUS=$BWPATH/H3-PI.bed.gz_plus.bw
+export BWMINUS=$BWPATH/H3-PI.bed.gz_minus.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=C2.pi.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/C2-PI.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/C2-PI.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/C2-PI.bed.gz_plus.hg19.bw
+export BWMINUS=$BWPATH/C2-PI.bed.gz_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=C3.pi.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/C3-PI.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/C3-PI.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/C3-PI.bed.gz_plus.hg19.bw
+export BWMINUS=$BWPATH/C3-PI.bed.gz_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=C4.pi.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/C4-PI.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/C4-PI.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/C4-PI.bed.gz_plus.hg19.bw
+export BWMINUS=$BWPATH/C4-PI.bed.gz_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=M1.pi.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/M1-PI.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_1stPrep/M1-PI.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/M1-PI.bed.gz_plus.hg19.bw
+export BWMINUS=$BWPATH/M1-PI.bed.gz_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=M2.pi.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-PI.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_2ndPrep/M2-PI.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/M2-PI.bed.gz_plus.hg19.bw
+export BWMINUS=$BWPATH/M2-PI.bed.gz_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=M3.pi.count.bed
-export BWPLUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/M3-PI.bed.gz_plus.hg19.bw
-export BWMINUS=/usr/projects/GROseq/NHP/Alignments_3rdPrep/M3-PI.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/M3-PI.bed.gz_plus.hg19.bw
+export BWMINUS=$BWPATH/M3-PI.bed.gz_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
