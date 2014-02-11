@@ -1,0 +1,67 @@
+#!/usr/bin/bash
+#
+# Gets data from Alignment directories -- combining where appropriate...
+
+CD4JUR=../../CD4/Alignments
+ALIGN1=../Alignments_1stPrep
+ALIGN2=../Alignments_2ndPrep
+ALIGN3=../Alignments_3rdPrep
+
+twoBitInfo /gbdb/hg19/hg19.2bit chromInfo.hg19
+function makeBigWig {
+for f in $FILES
+ do
+   echo $f
+   g=`echo $f | cut -d \. -f 1`
+
+   ## Remove rRNA and reverse the strand (PRO-seq).
+   zcat $f | grep "rRNA" -v | \
+         awk 'BEGIN{OFS="\t"} {print $1,$2,($2+1),$4,$5,$6=="+"?"-":"+"}' | gzip > $g.nr.rs.bed.gz
+
+   ## Convert to wig
+   bedToWig $g.nr.rs.bed.gz $g
+   gzip $g*.wig
+
+   ## Then to bigWig
+   wigToBigWig $g\_plus.wig.gz $CHINFO $g\_plus.bw
+   wigToBigWig $g\_minus.wig.gz $CHINFO $g\_minus.bw
+
+ done
+}
+
+## H1
+cp $CD4JUR/H1-U_*.bw .
+cp $CD4JUR/H1-PI_*.bw .
+
+## H2 -- Take H2.2-U (H2-U not complex enough).
+cp $ALIGN3/H2.2-U.bed.gz_plus.bw H2-U.bed.gz_plus.bw
+cp $ALIGN3/H2.2-U.bed.gz_minus.bw H2-U.bed.gz_minus.bw
+
+# combine H2 and H2.2 (PI).
+zcat $ALIGN2/H2-PI.bed.gz $ALIGN3/H2.2-PI.bed.gz | sort-bed - | gzip > H2-PI.bed.gz
+FILES=H2-PI.bed.gz
+CHINFO=chromInfo.hg19
+makeBigWig
+rm *.bed.gz *.wig.gz ## CLEANUP
+
+## H3
+cp $ALIGN1/H3*.bw .
+
+## C2
+cp $ALIGN1/C2*.hg19.bw .
+
+## C3
+cp $ALIGN2/C3*.hg19.bw .
+
+## C4
+cp $ALIGN3/C4*.hg19.bw .
+
+## M1
+cp $ALIGN1/M1*.hg19.bw .
+
+## M2
+cp $ALIGN2/M2*.hg19.bw .
+
+## M3
+cp $ALIGN3/M3*.hg19.bw .
+

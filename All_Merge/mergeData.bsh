@@ -1,0 +1,25 @@
+#!/usr/bin/bash
+
+CD4=/usr/projects/GROseq/CD4/Alignments
+PREP1=/usr/projects/GROseq/NHP/Alignments_1stPrep
+PREP2=/usr/projects/GROseq/NHP/Alignments_2ndPrep
+PREP3=/usr/projects/GROseq/NHP/Alignments_3rdPrep
+
+## Merge Human
+zcat $CD4/H1-U.bed.gz $PREP1/H3-U.bed.gz $PREP3/H2.2-U.bed.gz | sort-bed - | gzip > H-U.bed.gz ## Eliminate H2-U
+zcat $CD4/H1-PI.bed.gz $PREP1/H3-PI.bed.gz $PREP2/H2-PI.bed.gz $PREP3/H2.2-PI.bed.gz | sort-bed - | gzip > H-PI.bed.gz
+
+## Merge Chimp
+zcat $PREP2/C3-U.bed.gz $PREP3/C4-U.bed.gz | sort-bed - | gzip > C-U.bed.gz ## Eliminate C2-U
+zcat $PREP2/C3-PI.bed.gz $PREP3/C4-PI.bed.gz | sort-bed - | gzip > C-PI.bed.gz ## Eliminate C2-PI
+
+## Merge Rhesus
+zcat $PREP1/M1-U.bed.gz  $PREP2/M2-U.bed.gz $PREP3/M3-U.bed.gz | sort-bed - | gzip > M-U.bed.gz 
+zcat $PREP2/M2-PI.bed.gz $PREP3/M3-PI.bed.gz | sort-bed - | gzip > M-PI.bed.gz ##Eliminate M1-PI
+
+## Count reads.
+for i in *.bed.gz
+do
+  echo $i
+  zcat $i | grep "" -c 
+done
