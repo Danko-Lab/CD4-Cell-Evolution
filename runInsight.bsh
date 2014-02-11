@@ -1,23 +1,8 @@
 #!/usr/bin/bash
-cd /usr/projects/INSIGHT
-
-function runINSIGHT {
- outpath=/usr/projects/GROseq/NHP/tss_caller/insight/${dataID}
- setupfile=/usr/projects/INSIGHT/preprocessedHumanData/humanSetupFile-10KB-uniformPriors-general.txt
-
- ## Run INSIGHT
- bash scripts/runINSIGHT.sh ${inpath}/${inbed} ${dataID} ${outpath} 100 ${setupfile} 15 0
-
- ## Summary plot.
- R --vanilla < ./scripts/executeEM/plotResults-INSIGHT.r --args \
-         ${outpath}/${dataID}.insight.results.txt ${outpath}/${dataID}.insight.results.pdf
-
- ## Then get poly-div stats.
- sh ./scripts/executeEM/getPolyDivStats.sh ${outpath}/emInput/${dataID}.ins ${outpath}/emInput/${dataID}.flankPoly.forBetas.ins ${outpath}/${dataID}.polyDiv.summary 15 PolyDiv
-}
+. runInsightFunction.bsh
 
 inpath=/usr/projects/GROseq/NHP/tss_caller/Results/
-MOTIFS=/usr/data/GROseq.parser/hg19/cd4/dreg/cd4.dreg.tfs263.th6.db.starch
+MOTIFS=/usr/data/GROseq.parser/hg19/cd4/dreg/cd4.dreg.tfs500.noNeph.th6.db.starch  # cd4.dreg.tfs341.th6.db.starch
 FOOTPR=/usr/data/GROseq.parser/hg19/cd4/dnase1fp/footprints/dnase1.merge.sort.bam.dnase.peaks.bed.WellingtonFootprints.FDR.0.01.bed
 
 for i in 0.9 0.8 0.6
@@ -25,75 +10,88 @@ do
 ## U
  dataID=HCM-U.$i.conserved
  inbed=HCM-U.dREG.conserved.$i.bed
-# runINSIGHT &
+# runINSIGHT $dataID $inbed &
 
  dataID=HCM-U.$i.H-gain
  inbed=HCM-U.dREG.H-gain.$i.bed
-# runINSIGHT &
+# runINSIGHT $dataID $inbed &
 
  dataID=HCM-U.$i.H-loss
  inbed=HCM-U.dREG.H-loss.$i.bed
-# runINSIGHT &
+# runINSIGHT $dataID $inbed &
 
 ## PI
  dataID=HCM-PI.$i.conserved
  inbed=HCM-PI.dREG.conserved.$i.bed
-# runINSIGHT &
+# runINSIGHT $dataID $inbed &
 
  dataID=HCM-PI.$i.H-gain
  inbed=HCM-PI.dREG.H-gain.$i.bed
-# runINSIGHT &
+# runINSIGHT $dataID $inbed &
 
  dataID=HCM-PI.$i.H-loss
  inbed=HCM-PI.dREG.H-loss.$i.bed
-# runINSIGHT &
+# runINSIGHT $dataID $inbed &
 
 ## Combine U-PI
  dataID=HCM-U-PI.$i.conserved
  inbed=HCM-U-PI.conserved.$i.bed
-# runINSIGHT &
+# runINSIGHT $dataID $inbed &
 
  dataID=HCM-U-PI.$i.H-gain
  inbed=HCM-U-PI.H-gain.$i.bed
-# runINSIGHT &
+# runINSIGHT $dataID $inbed &
 
  dataID=HCM-U-PI.$i.H-loss
  inbed=HCM-U-PI.H-loss.$i.bed
-# runINSIGHT &
+# runINSIGHT $dataID $inbed &
 done
 
 ## Changes to dREG elements.
-cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change.tsv | grep "PromEnh" | sort-bed -  > $inpath/H-U.change.bed
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep "PromEnh" | sort-bed -  > $inpath/H-U.change.bed
 dataID=H-U.change
 inbed=H-U.change.bed
-#runINSIGHT &
+#runINSIGHT $dataID $inbed &
 
-cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change.tsv | grep "PromEnh" | awk '($14>2) {print $0}' | sort-bed -  > $inpath/H-U.change.up.bed 
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep "PromEnh" | awk '($21>2) {print $0}' | sort-bed -  > $inpath/H-U.change.up.bed 
 dataID=H-U.change.up
 inbed=H-U.change.up.bed
-#runINSIGHT &
+#runINSIGHT $dataID $inbed &
 
-zcat /usr/projects/GROseq/NHP/tss_caller/VeryHighScore/H-U.TSS.bed.gz | sort-bed - | bedops --element-of -1 - $inpath/H-U.change.bed > $inpath/H-U.change.hs.bed
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep "PromEnh" | awk '($21<-2) {print $0}' | sort-bed -  > $inpath/H-U.change.dn.bed
+dataID=H-U.change.dn
+inbed=H-U.change.dn.bed
+#runINSIGHT $dataID $inbed &
+
+zcat /usr/projects/GROseq/NHP/tss_caller/HighScore/H-U.TSS.bed.gz | sort-bed - | bedops --element-of -1 - $inpath/H-U.change.bed > $inpath/H-U.change.hs.bed
 dataID=H-U.change.hs
 inbed=H-U.change.hs.bed
-#runINSIGHT &
+#runINSIGHT $dataID $inbed &
+
+####
+## Intersect with TFBS
+cat $inpath/H-U.change.bed | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/H-U.motifs7.change.bed
+dataID=H-U.motifs7.change
+inbed=H-U.motifs7.change.bed
+runINSIGHT $dataID $inbed &
+
+cat $inpath/H-U.change.up.bed | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/H-U.motifs7.change.up.bed
+dataID=H-U.motifs7.change.up
+inbed=H-U.motifs7.change.up.bed
+runINSIGHT $dataID $inbed &
+
+cat $inpath/H-U.change.dn.bed | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/H-U.motifs7.change.dn.bed
+dataID=H-U.motifs7.change.dn
+inbed=H-U.motifs7.change.dn.bed
+runINSIGHT $dataID $inbed &
+
 
 ## Intersect with FP.
 bedops --element-of -1 $FOOTPR $inpath/H-U.change.bed > $inpath/H-U.fp.change.bed
 dataID=H-U.fp.change
 inbed=H-U.fp.change.bed
-#runINSIGHT &
+#runINSIGHT $dataID $inbed &
 
-## Intersect with TFBS
-bedops --element-of -1 $MOTIFS $inpath/H-U.change.bed > $inpath/H-U.motifs.change.bed
-dataID=H-U.motifs.change
-inbed=H-U.motifs.change.bed
-#runINSIGHT &
-
-bedops --element-of -1 $MOTIFS $inpath/H-U.change.up.bed > $inpath/H-U.motifs.change.up.bed
-dataID=H-U.motifs.change.up
-inbed=H-U.motifs.change.up.bed
-runINSIGHT &
 
 ###############################################################################################
 ##
@@ -101,13 +99,13 @@ runINSIGHT &
 dataID=dnase1
 inpath=/usr/data/GROseq.parser/hg19/cd4/dnase1fp/
 inbed=dnase1.peaks_peaks.narrowPeak
-#runINSIGHT &
+#runINSIGHT $dataID $inbed &
 
 ## And the general data.
 dataID=dreg
 inpath=/usr/projects/GROseq/NHP/tss_caller/Merge/
 zcat $inpath/H-U.TSS.bed.gz > $inpath/H-U.TSS.bed
 inbed=H-U.TSS.bed
-#runINSIGHT & 
+#runINSIGHT $dataID $inbed & 
 
 
