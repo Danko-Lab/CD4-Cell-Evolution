@@ -22,7 +22,7 @@ countLib $CD4JUR/H1-PI.bed.gz
 
 countLib $ALIGN3/H2.2-U.bed.gz
 zcat $ALIGN2/H2-PI.bed.gz $ALIGN3/H2.2-PI.bed.gz | gzip > H2-PI.bed.gz
-count H2-PI.bed.gz
+countLib H2-PI.bed.gz
 rm H2-PI.bed.gz
 
 countLib $ALIGN1/H3-U.bed.gz
@@ -35,8 +35,8 @@ countLib $ALIGN1/C2-PI.bed.gz
 countLib $ALIGN2/C3-U.bed.gz
 countLib $ALIGN2/C3-PI.bed.gz
 
-countLib $ALIGN3/H4-U.bed.gz
-countLib $ALIGN3/H4-PI.bed.gz
+countLib $ALIGN3/C4-U.bed.gz
+countLib $ALIGN3/C4-PI.bed.gz
 
 ## rHE. mAC.
 countLib $ALIGN1/M1-U.bed.gz
