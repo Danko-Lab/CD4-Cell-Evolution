@@ -28,6 +28,9 @@ treatment<- c(rep("U",8), rep("PI",7))
 Design   <- data.frame(sampleID, prepDay, subject, species, treatment)
 colnames(counts) <- sampleID
 
+lib.size <- c(H1U= 37609124, H2U= 38413904, H3U= 20356701, C2U= 11613548, C3U= 22784541, C4U= 43539929, M1U= 11395858, M2U= 21926503, M3U= 35784519,
+                H1PI= 39231203, H2PI= 51228809, H3PI= 4774117, C2PI= 3040431, C3PI= 23702213, C4PI= 35190892, M1PI= 127687, M2PI= 15569212, M3PI= 32421627)[c(1:3,5:12,14:15,17:18)]
+
 ## Indices for different combinations of data.
 dindx_u  <- c(1:8)
 dindx_pi <- c(9:15)
@@ -36,14 +39,14 @@ dindx_c  <- c(4:5,12:13)
 dindx_m  <- c(6:8,14:15)
 
 ## Fit the model spearately for each species comparison, treating 'outgroups' as 'other'.
-fitModel <- function(Design, counts) {
+fitModel <- function(Design, counts, lib.size) {
   dge <- DGEList(counts=counts, genes=genes)
   dge <- calcNormFactors(dge)
 
   design <- model.matrix(~condition, Design)
   rownames(design) <- colnames(dge)
 
-  voom_obj <- voom(dge, design, plot=FALSE)
+  voom_obj <- voom(dge, design, lib.size= lib.size, plot=FALSE)
 
 #  plotMDS(dge,top=500,labels=species,gene.selection="common")
 
@@ -64,22 +67,22 @@ condition <- species
 condition[species == "H"] <- "SS"
 condition[species != "H"] <- "SO"
 Design <- data.frame(sampleID, prepDay, subject, condition)
-hs    <- fitModel(Design[dindx_u,], counts[,dindx_u])
-hs_pi <- fitModel(Design[dindx_pi,], counts[,dindx_pi])
+hs    <- fitModel(Design[dindx_u,], counts[,dindx_u], lib.size[dindx_u])
+hs_pi <- fitModel(Design[dindx_pi,], counts[,dindx_pi], lib.size[dindx_pi])
 
 condition <- species
 condition[species == "C"] <- "SS"
 condition[species != "C"] <- "SO"
 Design <- data.frame(sampleID, prepDay, subject, condition)
-cs <- fitModel(Design[dindx_u,], counts[,dindx_u])
-cs_pi <- fitModel(Design[dindx_pi,], counts[,dindx_pi])
+cs <- fitModel(Design[dindx_u,], counts[,dindx_u], lib.size[dindx_u])
+cs_pi <- fitModel(Design[dindx_pi,], counts[,dindx_pi], lib.size[dindx_pi])
 
 condition <- species
 condition[species == "M"] <- "SS"
 condition[species != "M"] <- "SO"
 Design <- data.frame(sampleID, prepDay, subject, condition)
-ms <- fitModel(Design[dindx_u,], counts[,dindx_u])
-ms_pi <- fitModel(Design[dindx_pi,], counts[,dindx_pi])
+ms <- fitModel(Design[dindx_u,], counts[,dindx_u], lib.size[dindx_u])
+ms_pi <- fitModel(Design[dindx_pi,], counts[,dindx_pi], lib.size[dindx_pi])
 
 modelCondition <- function() {
   Design <- data.frame(sampleID, prepDay, subject, species, treatment)
@@ -102,14 +105,20 @@ modelCondition <- function() {
 
 condition <- treatment
 Design <- data.frame(sampleID, prepDay, subject, condition)
-hs_tfc <- fitModel(Design[dindx_h,], counts[,dindx_h])
-cs_tfc <- fitModel(Design[dindx_c,], counts[,dindx_c])
-ms_tfc <- fitModel(Design[dindx_m,], counts[,dindx_m])
-tfc    <- fitModel(Design, counts)
+hs_tfc <- fitModel(Design[dindx_h,], counts[,dindx_h], lib.size[dindx_h])
+cs_tfc <- fitModel(Design[dindx_c,], counts[,dindx_c], lib.size[dindx_c])
+ms_tfc <- fitModel(Design[dindx_m,], counts[,dindx_m], lib.size[dindx_m])
+tfc    <- fitModel(Design, counts, lib.size)
 
 ## Append tables.  
-fdr_t <- matrix(p.adjust(c(hs$p.value[,2], cs$p.value[,2], ms$p.value[,2], hs_pi$p.value[,2], cs_pi$p.value[,2], ms_pi$p.value[,2], 
-				hs_tfc$p.value[,2], cs_tfc$p.value[,2], ms_tfc$p.value[,2], tfc$p.value[,2]), method="fdr"), ncol=10)
+#fdr_t <- matrix(p.adjust(c(hs$p.value[,2], cs$p.value[,2], ms$p.value[,2], hs_pi$p.value[,2], cs_pi$p.value[,2], ms_pi$p.value[,2], 
+#				hs_tfc$p.value[,2], cs_tfc$p.value[,2], ms_tfc$p.value[,2], tfc$p.value[,2]), method="fdr"), ncol=10)
+
+fdr_t <- cbind(p.adjust(hs$p.value[,2], method="fdr"), p.adjust(cs$p.value[,2], method="fdr"), p.adjust(ms$p.value[,2], method="fdr"), 
+		p.adjust(hs_pi$p.value[,2], method="fdr"), p.adjust(cs_pi$p.value[,2], method="fdr"), p.adjust(ms_pi$p.value[,2], method="fdr"), 
+                p.adjust(hs_tfc$p.value[,2], method="fdr"), p.adjust(cs_tfc$p.value[,2], method="fdr"), p.adjust(ms_tfc$p.value[,2], method="fdr"), 
+		p.adjust(tfc$p.value[,2], method="fdr")) ## Each dataset should have a 1% FDR (within the dataset).
+
 colnames(fdr_t) <- c("HumanFDR", "ChimpFDR", "MacaqueFDR", "HumanFDR_PI", "ChimpFDR_PI", "MacaqueFDR_PI", "U2PI_H", "U2PI_C", "U2PI_M", "U2PI")
 
 fc_t  <- data.frame(HumanFC= hs$coefficients[,2], ChimpFC= cs$coefficients[,2], MacaqueFC= ms$coefficients[,2], 
