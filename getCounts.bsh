@@ -38,7 +38,12 @@ function getCounts {
 #}
 
 #function getTSSCounts {
-# 
+# ## Get plus counts.
+# R --no-save --args $2 $COUNTFILE $BWPLUS $BWMINUS < getCounts.R
+# bash bedmap-strand.bsh $1 $COUNTFILE | sed s/^.*\|//g | sed "s/NAN/NA/g" > $COUNTFILE.sum
+#  
+# ## Get minus counts.
+#
 #}
 
 BWPATH=/usr/projects/GROseq/NHP/AllData

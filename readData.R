@@ -15,7 +15,7 @@ colnames(ps) <- colnames(ca)
 ## Get dREG counts.
 ts <- read.table("counttss.tsv")
 ts[,5] <- rowMax(ts[7:12])
-ts <- cbind(ts[,1:6], "PromEnh",  ts[,c(4,13:NCOL(ts))])
+ts <- cbind(ts[,1:6], ts[,13],  ts[,c(4,14:NCOL(ts))])
 ts <- cbind(ts[,1:9], "tss", ts[,10:NCOL(ts)])
 colnames(ts) <- colnames(ca)
 

@@ -10,14 +10,14 @@ summary(fdr_df$fdr_min < PVAL) ## ~12k transcripts that change expression.
 changeExpr <- fdr_df$fdr_min < PVAL & !is.na(fdr_df$fdr_min) & abs(fdr_df$fc_min) > FOLD #1
 
 ## Comput RPKM
-isExpr <- rowMax(rpkm_df[,2:9]) > 5e-4
+isExpr <- rowMax(rpkm_df[,2:9]) > 5e-5
 sum(isExpr)/NROW(isExpr)
 
 sum(changeExpr & isExpr)/ sum(isExpr)
 summary(fdr_df$type[changeExpr & isExpr])/summary(fdr_df$type[isExpr])
 
 fractionChanged <- list(
-	"eRNA"= NROW(unique(fdr_df$name[changeExpr & (fdr_df$type=="PromEnh") & isExpr]))/NROW(unique(fdr_df$name[(fdr_df$type=="PromEnh") & isExpr])),
+	"eRNA"= NROW(unique(fdr_df$name[changeExpr & (fdr_df$type=="dREG_ENH") & isExpr]))/NROW(unique(fdr_df$name[(fdr_df$type=="dREG_ENH") & isExpr])),
 	"LincRNA"= NROW(unique(fdr_df$name[(changeExpr & (fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)]))/ NROW(unique(fdr_df$name[((fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)])),
 	"Protein Coding"=  NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)]))/NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])),
 	"Antisense"=  NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="antisense" & isExpr)]))/NROW(unique(fdr_df$name[(fdr_df$type=="antisense" & isExpr)])),
@@ -26,7 +26,7 @@ fractionChanged <- list(
 )
 
 pval <- list(
-        "eRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & (fdr_df$type=="PromEnh") & isExpr])), NROW(unique(fdr_df$name[(fdr_df$type=="PromEnh") & isExpr]))),  
+        "eRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & (fdr_df$type=="dREG_ENH") & isExpr])), NROW(unique(fdr_df$name[(fdr_df$type=="dREG_ENH") & isExpr]))),  
                                 c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
 #                                c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
 
@@ -53,7 +53,7 @@ pval <- list(
 
 
 pval.pg <- list(
-        "eRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & (fdr_df$type=="PromEnh") & isExpr])), NROW(unique(fdr_df$name[(fdr_df$type=="PromEnh") & isExpr]))),
+        "eRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & (fdr_df$type=="dREG_ENH") & isExpr])), NROW(unique(fdr_df$name[(fdr_df$type=="dREG_ENH") & isExpr]))),
                                c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)]))) ))$p.value,
 
         "LincRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & (fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)])), NROW(unique(fdr_df$name[((fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)]))),
