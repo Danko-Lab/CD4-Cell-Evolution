@@ -19,10 +19,12 @@ out_file <- args[2]
 bw_plus_file <- args[3]
 bw_minus_file <- args[4]
 
-## Get counts using bigWig
+## Load the bed and bigWigs. 
 bed <- read.table(bed_file)
 bw_plus <- load.bigWig(bw_plus_file)
 bw_minus<- load.bigWig(bw_minus_file)
+
+## Get the start position of 100bp window with the max counts inside each dREG site.
 startPlus <- integer()
 startMinus <- integer()
 
@@ -45,4 +47,5 @@ for(i in 1:NROW(bed)) {
 data <- rbind(data.frame(chrom= bed[,1], start= startPlus, end= startPlus+size, name= bed[,4], score= bed[,5], strand= "+"),
 		data.frame(chrom= bed[,1], start= startMinus, end= startMinus+size, name= bed[,4], score= bed[,5], strand= "-"))
 
+options("scipen"=100, "digits"=4)
 write.table(data, pipe(paste("sort-bed - >", out_file)), sep="\t", col.names=FALSE, row.names=FALSE, quote=FALSE)
