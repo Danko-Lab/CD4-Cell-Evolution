@@ -91,24 +91,27 @@ cat $GENCODE_TSV | awk '(($3-$2) > 5000) {print $0}' | \
 
 makeIncrements $GENEBODIES $INCREMENTS 
 
-####
-## Now get data from TSS defined by dREG.
-TSS_FUDGE=1
-cat $GENCODE_TSV | awk '(($3-$2) > 5000) {print $0}' | grep "protein_coding" | \
+######################################
+## Make TSS/ Enhancer data file.
+
+## Get the position of annotated TSS (used to classify dREG sites as proximal).
+function writeAnnotTss {
+ TSS_FUDGE=$1
+ cat $GENCODE_TSV | awk '(($3-$2) > 5000) {print $0}' | grep "protein_coding" | \
 			awk 'BEGIN{OFS="\t"; ORS=""} {if ($6 == "+") print $1,($2-'"$TSS_FUDGE"'),($2+'"$TSS_FUDGE"')
                                                  else if ($6 == "-") print $1,($3-'"$TSS_FUDGE"'),($3+'"$TSS_FUDGE"') }
                                           {print "\t",$4,$5,$6,$7,$8,"\n"}' | uniq | sort-bed - > annottss.tsv
+}
 
 
-####
 ## Now get data from TSS defined by dREG.
-#cat /usr/projects/GROseq/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.tsv > $TSSSITES
 INTSS=/usr/projects/GROseq/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.tsv
-bedops --element-of -1 $INTSS annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_TSS"}' | sort-bed - > tss.tmp ## Identify intersection with TSS at the 5' end of annotated genes.
+writeAnnotTss 1
+bedops --element-of -1 $INTSS annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_TSS"}' | sort-bed - > dreg.tss ## Identify intersection with TSS at the 5' end of annotated genes.
 cat $GENEBODIES | grep "protein_coding" | bedops --element-of -1 $INTSS - | bedops --not-element-of -1 - annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_INGENE"}' | sort-bed - > ingene.tmp ## Also pull out those that are in gene annotations.
 bedops --not-element-of -1 $INTSS annottss.tsv | bedops --not-element-of -1 - $GENEBODIES | awk 'BEGIN{OFS="\t"} {print $0,"dREG_ENH"}' | sort-bed - > enh.tmp ## Assume the remaining sites are enhancers.
-cat tss.tmp enh.tmp ingene.tmp | sort-bed - > $TSSSITES
-rm annottss.tsv enh.tmp ingene.tmp
+cat dreg.tss enh.tmp ingene.tmp | sort-bed - > $TSSSITES
+rm enh.tmp ingene.tmp
 makeIncrements $TSSSITES $TSSINCR
 
 ## Do we want to subtract out counts in a window upstream?  Might help ID changes at in-gene enhancers.  
@@ -116,26 +119,28 @@ makeIncrements $TSSSITES $TSSINCR
 #cat $TSSSITES | awk 'BEGIN{OFS="\t"} {print $1,$3,$3+5000,$4,$5,"+"}' | sort-bed - | less
 #cat $TSSSITES | awk 'BEGIN{OFS="\t"} {print $1,$2-5000,$2,$4,$5,"-"}' | sort-bed - | less
 
-####
+######################################
+## Now get pause sites.
 ## Identify the peak 100 bp of txn in each dREG site.  That should be the pause site!
+
 MERGEDIR=/usr/projects/GROseq/NHP/AllData/All_Merge
 
 for i in H-U H-PI C-U C-PI M-U M-PI
 do
 #  echo $i
-  R --no-save tss.tmp pauseSites.new.tmp ${i}_plus.bw ${i}_minus.bw < getPauseSites.R
+  R --no-save --args dreg.tss pauseSites.new.tmp $MERGEDIR/${i}_plus.bw $MERGEDIR/${i}_minus.bw < getPauseSites.R
   cat pauseSites.new.tmp pauseSites.tmp | sort-bed - > pauseSites3.tmp
   mv pauseSites3.tmp pauseSites.tmp
 done
-mv pauseSites.tmp $PAUSESITES
-rm tss.tmp pauseSites.new.tmp
+#mv pauseSites.tmp $PAUSESITES
+rm dreg.tss pauseSites.new.tmp
 
-#cat $GENCODE_TSV | awk '(($3-$2) > 5000) {print $0}' | \
-#                        awk 'BEGIN{OFS="\t"; ORS=""} {if ($6 == "+") print $1,($2-'"$PROM"'),($2+'"$PROM"')
-#                                                 else if ($6 == "-") print $1,($3-'"$PROM"'),($3+'"$PROM"') }
-#                                          {print "\t",$4,$5,$6,$7,$8,"\n"}' | uniq | sort-bed - > $PAUSESITES
-#                                          bedmap --echo --indicator - gapMerge.tmp | grep "0$" | sed "s/|0//g" > $PAUSESITES
-#
+## Now merge pause sites ... and associate each annotation in annottss.tsv with the nearest pause site (within 1kb).
+bedtools merge -s -i pauseSites.tmp | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0",$4}' > $PAUSESITES.merge
+#bedtools closest -t "all" -s -d -a $PAUSESITES.merge -b annottss.tsv | awk 'BEGIN{OFS="\t"} ($15 < 1000) {print $1,$2,$3,$10,$5,$6}' | sort-bed - > $PAUSESITES
+bedtools window -w 1000 -sm -a $PAUSESITES.merge -b annottss.tsv | awk 'BEGIN{OFS="\t"} ($15 < 1000) {print $1,$2,$3,$10,$5,$6}' | sort-bed - > $PAUSESITES
+rm $PAUSESITES.merge pauseSites.tmp annottss.tsv
+
 #makeIncrements $PAUSESITES $PAUSEINCR
 
 
