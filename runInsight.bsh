@@ -5,6 +5,56 @@ inpath=/usr/projects/GROseq/NHP/tss_caller/Results/
 MOTIFS=/usr/data/GROseq.parser/hg19/cd4/dreg/cd4.dreg.tfs500.noNeph.th6.db.starch  # cd4.dreg.tfs341.th6.db.starch
 FOOTPR=/usr/data/GROseq.parser/hg19/cd4/dnase1fp/footprints/dnase1.merge.sort.bam.dnase.peaks.bed.WellingtonFootprints.FDR.0.01.bed
 
+## Changes to dREG elements.
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep "dREG" | sort-bed -  > $inpath/H-U.change.bed
+dataID=H-U.change
+inbed=H-U.change.bed
+runINSIGHT $dataID $inbed &
+
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep "dREG" | awk '($5 > 0.65) {print $0}' | awk '($21>1.58) {print $0}' | sort-bed -  > $inpath/H-U.change.up.bed 
+dataID=H-U.change.up
+inbed=H-U.change.up.bed
+runINSIGHT $dataID $inbed &
+
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep "dREG" | awk '($5 > 0.65) {print $0}' | awk '($21<-1.58) {print $0}' | sort-bed -  > $inpath/H-U.change.dn.bed
+dataID=H-U.change.dn
+inbed=H-U.change.dn.bed
+runINSIGHT $dataID $inbed &
+
+####
+## Intersect with TFBS
+cat $inpath/H-U.change.bed | bedops --element-of -1 $MOTIFS - | awk '($5>8) {print $0}' > $inpath/H-U.motifs8.change.bed
+dataID=H-U.motifs8.change
+inbed=H-U.motifs8.change.bed
+runINSIGHT $dataID $inbed &
+
+cat $inpath/H-U.change.up.bed | bedops --element-of -1 $MOTIFS - | awk '($5>8) {print $0}' > $inpath/H-U.motifs8.change.up.bed
+dataID=H-U.motifs8.change.up
+inbed=H-U.motifs8.change.up.bed
+runINSIGHT $dataID $inbed &
+
+cat $inpath/H-U.change.dn.bed | bedops --element-of -1 $MOTIFS - | awk '($5>8) {print $0}' > $inpath/H-U.motifs8.change.dn.bed
+dataID=H-U.motifs8.change.dn
+inbed=H-U.motifs8.change.dn.bed
+runINSIGHT $dataID $inbed &
+
+####
+## Intersect with FP.
+bedops --element-of -1 $FOOTPR $inpath/H-U.change.up.bed > $inpath/H-U.fp.change.up.bed
+dataID=H-U.fp.change.up
+inbed=H-U.fp.change.up.bed
+runINSIGHT $dataID $inbed &
+
+####
+## Intersect with motifs in FP.
+bedops --element-of -1 $MOTIFS $inpath/H-U.motifs8.change.up.bed > $inpath/H-U.FPmotifs.change.up.bed
+dataID=H-U.FPmotifs.change.up
+inbed=H-U.FPmotifs.change.up.bed
+runINSIGHT $dataID $inbed &
+
+###############################################################################################
+##
+## Run on RAW dREG elements ... overall changes to tss usage.
 for i in 0.9 0.8 0.6
 do
 ## U
@@ -46,52 +96,6 @@ do
  inbed=HCM-U-PI.H-loss.$i.bed
 # runINSIGHT $dataID $inbed &
 done
-
-## Changes to dREG elements.
-cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep "PromEnh" | sort-bed -  > $inpath/H-U.change.bed
-dataID=H-U.change
-inbed=H-U.change.bed
-#runINSIGHT $dataID $inbed &
-
-cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep "PromEnh" | awk '($21>2) {print $0}' | sort-bed -  > $inpath/H-U.change.up.bed 
-dataID=H-U.change.up
-inbed=H-U.change.up.bed
-#runINSIGHT $dataID $inbed &
-
-cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep "PromEnh" | awk '($21<-2) {print $0}' | sort-bed -  > $inpath/H-U.change.dn.bed
-dataID=H-U.change.dn
-inbed=H-U.change.dn.bed
-#runINSIGHT $dataID $inbed &
-
-zcat /usr/projects/GROseq/NHP/tss_caller/HighScore/H-U.TSS.bed.gz | sort-bed - | bedops --element-of -1 - $inpath/H-U.change.bed > $inpath/H-U.change.hs.bed
-dataID=H-U.change.hs
-inbed=H-U.change.hs.bed
-#runINSIGHT $dataID $inbed &
-
-####
-## Intersect with TFBS
-cat $inpath/H-U.change.bed | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/H-U.motifs7.change.bed
-dataID=H-U.motifs7.change
-inbed=H-U.motifs7.change.bed
-runINSIGHT $dataID $inbed &
-
-cat $inpath/H-U.change.up.bed | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/H-U.motifs7.change.up.bed
-dataID=H-U.motifs7.change.up
-inbed=H-U.motifs7.change.up.bed
-runINSIGHT $dataID $inbed &
-
-cat $inpath/H-U.change.dn.bed | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/H-U.motifs7.change.dn.bed
-dataID=H-U.motifs7.change.dn
-inbed=H-U.motifs7.change.dn.bed
-runINSIGHT $dataID $inbed &
-
-
-## Intersect with FP.
-bedops --element-of -1 $FOOTPR $inpath/H-U.change.bed > $inpath/H-U.fp.change.bed
-dataID=H-U.fp.change
-inbed=H-U.fp.change.bed
-#runINSIGHT $dataID $inbed &
-
 
 ###############################################################################################
 ##
