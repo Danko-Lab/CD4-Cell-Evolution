@@ -1,22 +1,25 @@
 #!/usr/bin/bash
 . runInsightFunction.bsh
+FC_TH=2 # 1.58
+PVAL_TH=0.01 #  0.05
+PATTERN="dREG_INGENE\|dREG_ENH" #"dREG_TSS" "dREG" "dREG_ENH" "dREG_INGENE"
 
 inpath=/usr/projects/GROseq/NHP/tss_caller/Results/
 MOTIFS=/usr/data/GROseq.parser/hg19/cd4/dreg/cd4.dreg.tfs500.noNeph.th6.db.starch  # cd4.dreg.tfs341.th6.db.starch
 FOOTPR=/usr/data/GROseq.parser/hg19/cd4/dnase1fp/footprints/dnase1.merge.sort.bam.dnase.peaks.bed.WellingtonFootprints.FDR.0.01.bed
 
 ## Changes to dREG elements.
-cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep "dREG" | sort-bed -  > $inpath/H-U.change.bed
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep $PATTERN | sort-bed -  > $inpath/H-U.change.bed
 dataID=H-U.change
 inbed=H-U.change.bed
 runINSIGHT $dataID $inbed &
 
-cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep "dREG" | awk '($5 > 0.65) {print $0}' | awk '($21>1.58) {print $0}' | sort-bed -  > $inpath/H-U.change.up.bed 
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep $PATTERN | awk '($5 > 0.7 && $11 < '"$PVAL_TH"') {print $0}' | awk '($21>'"$FC_TH"') {print $0}' | sort-bed -  > $inpath/H-U.change.up.bed 
 dataID=H-U.change.up
 inbed=H-U.change.up.bed
 runINSIGHT $dataID $inbed &
 
-cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep "dREG" | awk '($5 > 0.65) {print $0}' | awk '($21<-1.58) {print $0}' | sort-bed -  > $inpath/H-U.change.dn.bed
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep $PATTERN | awk '($5 > 0.7 && $11 < '"$PVAL_TH"') {print $0}' | awk '($21<-'"$FC_TH"') {print $0}' | sort-bed -  > $inpath/H-U.change.dn.bed
 dataID=H-U.change.dn
 inbed=H-U.change.dn.bed
 runINSIGHT $dataID $inbed &
