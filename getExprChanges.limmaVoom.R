@@ -3,7 +3,7 @@
 require(limma)
 require(edgeR)
 
-PVAL <- 0.01
+PVAL <- 0.05
 FOLD <- 0 #log(10,2)
 
 ## Read count data.

@@ -1,8 +1,7 @@
 ##
 ##
-
 load("fdr.RData")
-
+PVAL <- 0.01
 ##############################################################################
 ## Compare frequency of changes in expression for genes, and non-coding RNAs.
 
