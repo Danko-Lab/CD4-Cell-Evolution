@@ -15,15 +15,15 @@ dataID=H-U.change
 inbed=H-U.change.bed
 #runINSIGHT $dataID $inbed &
 
-cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep $PATTERN | awk '($5 > 0.7 && $11 < '"$PVAL_TH"') {print $0}' | awk '($21>'"$FC_TH"') {print $0}' | sort-bed -  > $inpath/H-U.change.up.bed 
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep $PATTERN | awk '(($3-$2) < 2000 && $5 > 0.7 && $11 < '"$PVAL_TH"') {print $0}' | awk '($21>'"$FC_TH"') {print $0}' | sort-bed -  > $inpath/H-U.change.up.bed 
 dataID=H-U.change.up
 inbed=H-U.change.up.bed
-#runINSIGHT $dataID $inbed &
+runINSIGHT $dataID $inbed &
 
-cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep $PATTERN | awk '($5 > 0.7 && $11 < '"$PVAL_TH"') {print $0}' | awk '($21<-'"$FC_TH"') {print $0}' | sort-bed -  > $inpath/H-U.change.dn.bed
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change-U.tsv | grep $PATTERN | awk '(($3-$2) < 2000 && $5 > 0.7 && $11 < '"$PVAL_TH"') {print $0}' | awk '($21<-'"$FC_TH"') {print $0}' | sort-bed -  > $inpath/H-U.change.dn.bed
 dataID=H-U.change.dn
 inbed=H-U.change.dn.bed
-#runINSIGHT $dataID $inbed &
+runINSIGHT $dataID $inbed &
 
 ####
 ## Intersect with DNAse-1 (sanity check).

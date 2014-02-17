@@ -13,8 +13,8 @@ function runINSIGHT {
  bash scripts/runINSIGHT.sh ${inpath}/${inbed} ${dataID} ${outpath} 100 ${setupfile} 15 0
 
  ## Summary plot.
- R --vanilla < ./scripts/executeEM/plotResults-INSIGHT.r --args \
-         ${outpath}/${dataID}.insight.results.txt ${outpath}/${dataID}.insight.results.pdf
+ R --vanilla < /usr/projects/GROseq/NHP/tss_caller/plotResults-INSIGHT.r --args \
+         ${outpath}/${dataID}.insight.results.txt ${outpath}/${dataID}.insight.results.pdf 0.05
 
  ## Then get poly-div stats.
  sh ./scripts/executeEM/getPolyDivStats.sh ${outpath}/emInput/${dataID}.ins ${outpath}/emInput/${dataID}.flankPoly.forBetas.ins ${outpath}/${dataID}.polyDiv.summary 15 PolyDiv
