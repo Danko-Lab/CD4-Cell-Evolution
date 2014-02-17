@@ -52,7 +52,7 @@ inbed=H-U.motifs7.change.bed
 cat $inpath/H-U.change.up.bed | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/H-U.motifs7.change.up.bed
 dataID=H-U.motifs7.change.up
 inbed=H-U.motifs7.change.up.bed
-#runINSIGHT $dataID $inbed &
+runINSIGHT $dataID $inbed &
 
 cat $inpath/H-U.change.dn.bed | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/H-U.motifs7.change.dn.bed
 dataID=H-U.motifs7.change.dn
@@ -64,14 +64,19 @@ inbed=H-U.motifs7.change.dn.bed
 bedops --element-of -1 $inpath/H-U.motifs7.change.up.bed $DNASEP > $inpath/H-U.DNmotifs.change.up.bed
 dataID=H-U.DNmotifs.change.up
 inbed=H-U.DNmotifs.change.up.bed
-#runINSIGHT $dataID $inbed &
+runINSIGHT $dataID $inbed &
 
 ####
 ## Intersect with FP.
-bedops --element-of -1 $FOOTPR $inpath/H-U.change.up.bed > $inpath/H-U.fp.change.up.bed
-dataID=H-U.fp.change.up
-inbed=H-U.fp.change.up.bed
-#runINSIGHT $dataID $inbed &
+bedops --element-of -1 $FOOTPR $inpath/H-U.change.up.bed > $inpath/H-U.FP.change.up.bed
+dataID=H-U.FP.change.up
+inbed=H-U.FP.change.up.bed
+runINSIGHT $dataID $inbed &
+
+bedops --element-of -1 $inpath/H-U.motifs7.change.up.bed $FOOTPR > $inpath/H-U.FPmotifs.change.up.bed
+dataID=H-U.FPmotifs.change.up
+inbed=H-U.FPmotifs.change.up.bed
+runINSIGHT $dataID $inbed &
 
 ###############################################################################################
 ##
