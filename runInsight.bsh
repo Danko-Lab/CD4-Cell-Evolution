@@ -3,7 +3,7 @@
 FC_TH=2 # 1.58
 PVAL_TH=0.01 #  0.05 0.01
 DREG_TH=0.7
-PATTERN="dREG_ENH\|dREG_INGENE" #"dREG_TSS" "dREG" "dREG_ENH" "dREG_INGENE"
+PATTERN="dREG" # "dREG_ENH\|dREG_INGENE" #"dREG_TSS" "dREG" "dREG_ENH" "dREG_INGENE"
 
 inpath=/usr/projects/GROseq/NHP/tss_caller/Results/
 MOTIFS=/usr/data/GROseq.parser/hg19/cd4/dreg/cd4.dreg.tfs500.noNeph.th6.db.starch  # cd4.dreg.tfs341.th6.db.starch
