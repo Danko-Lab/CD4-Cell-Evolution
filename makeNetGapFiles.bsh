@@ -6,6 +6,7 @@ export RHESUS_NET=rheMac3_net_rbest    # netRheMac3
 
 export PROM=250 ## 1000
 export MAXLEN=60000 ## Max length in base pairs.
+export MINLEN=5000
 
 export GENEBODIES=genebodies.tsv
 export INCREMENTS=gene.increments.bed
@@ -23,7 +24,8 @@ function getAnnotations {
  zcat gencode.v18.annotation.gtf.gz | awk '{if($26~/1|2/){print $0}}' | \
 	awk 'BEGIN{OFS="\t"}{ if($3 == "transcript") {print $1,$4,$5,"GC."$1"_"$4"_"$5"_"$7,"0",$7,$14,$18,$10,$12} }' | \
 	sed 's/"//g' | sed 's/;//g' | sed '/#.*/d' | uniq | awk '$3 > $2 {print $0}' | sort-bed - > $GENCODE_TSV.tmp
- cat hg19.pseudogenes.Gerstein.bed | awk 'BEGIN{OFS="\t"} {print $0,"GERST_PG",$4,$4,$4}' >> $GENCODE_TSV.tmp
+ cat h_duppse.txt | grep "Chromosome" -v | awk 'BEGIN{OFS="\t"} {print "chr"$2,$3,$4,$9,0,$5,"GERST_PG",$1}' >> $GENCODE_TSV.tmp
+# cat hg19.pseudogenes.Gerstein.bed | awk 'BEGIN{OFS="\t"} {print $0,"GERST_PG",$4,$4,$4}' >> $GENCODE_TSV.tmp
  cat $GENCODE_TSV.tmp | sort-bed - > $GENCODE_TSV
  rm $GENCODE_TSV.tmp
 
@@ -83,7 +85,7 @@ function makeIncrements {
 
 ####
 ## Make a gene list and partition.
-cat $GENCODE_TSV | awk '(($3-$2) > 5000) {print $0}' | \
+cat $GENCODE_TSV | awk '(($3-$2) > '"$MINLEN"') {print $0}' | \
 			awk 'BEGIN{OFS="\t"; ORS=""} {if (($3-$2) > '"$PROM"')
                                          {if ($6 == "+") print $1,($2+'"$PROM"'), ($3<($2+'"$MAXLEN"')) ? $3 : ($2+'"$MAXLEN"')
                                          else if ($6 == "-") print $1, ($2>($3-'"$MAXLEN"')) ? $2 : $3-'"$MAXLEN"' ,($3-'"$PROM"')}
@@ -97,7 +99,7 @@ makeIncrements $GENEBODIES $INCREMENTS
 ## Get the position of annotated TSS (used to classify dREG sites as proximal).
 function writeAnnotTss {
  TSS_FUDGE=$1
- cat $GENCODE_TSV | awk '(($3-$2) > 5000) {print $0}' | grep "protein_coding" | \
+ cat $GENCODE_TSV | awk '(($3-$2) > '"$MINLEN"') {print $0}' | grep "protein_coding" | \
 			awk 'BEGIN{OFS="\t"; ORS=""} {if ($6 == "+") print $1,($2-'"$TSS_FUDGE"'),($2+'"$TSS_FUDGE"')
                                                  else if ($6 == "-") print $1,($3-'"$TSS_FUDGE"'),($3+'"$TSS_FUDGE"') }
                                           {print "\t",$4,$5,$6,$7,$8,"\n"}' | uniq | sort-bed - > annottss.tsv
