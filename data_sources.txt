@@ -1,0 +1,5 @@
+/home/ji72/pseudogene/h_duppse.txt: This is a list of human duplicated pseudogenes that I believe Charles used for his analysis (2500~ genes). I noticed that the Gerstein lab actually did not put out any information about whether each one of them is transcribed or not, so I think Lenore you will have to test expression yourself. The closest thing I found was this but they have different ID numbers.
+
+/home/ji72/pseudogene/hc_raw_list_h_only.bed: A list of human duplicated pseudogenes that overlap with chimp pseudogenes when chimp pseudogenes were liftOver-ed to hg19. I checked these overlaps by bedmap. This list only contains chromosome, pseudogene ID number and the coordinates of the most far-end exons (the first coordinate of the first exon and followed by the last coordinate of the last exon).
+
+gencode.v18.annotation.gtf.gz: Gencode v18 annotations

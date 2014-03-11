@@ -5,6 +5,8 @@ rowMin <- function(x) { sapply(1:NROW(x), function(i) {return(min(x[i,], na.rm=T
 
 ca <- read.table("countall.tsv")
 ca <- cbind(ca[,1:9], "gc18", ca[,10:NCOL(ca)])
+gap <- read.table("genes.inGap")[!is.na(ca[,11]),] ## Read gap data.
+ca <- ca[!is.na(ca[,11]),]
 
 ## Get pause counts.
 ps <- read.table("countpause.tsv")

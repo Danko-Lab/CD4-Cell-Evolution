@@ -5,4 +5,5 @@ run_analysis:
 	bash getCounts.bsh
 	R --no-save < writeDendrogram.R 
 	R --no-save < getExprChanges.limmaVoom.R
-	R --no-save < compareChangeFrequency.R
+	R --no-save < analyzeTuTypes.R
+	R --no-save < analyzeRearrangements.R

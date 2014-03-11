@@ -9,6 +9,7 @@ export MAXLEN=60000 ## Max length in base pairs.
 export MINLEN=5000
 
 export GENEBODIES=genebodies.tsv
+export GENESFULL=genebodies-full.tsv
 export INCREMENTS=gene.increments.bed
 
 export PAUSESITES=pausesites.tsv
@@ -25,7 +26,7 @@ function getAnnotations {
 	awk 'BEGIN{OFS="\t"}{ if($3 == "transcript") {print $1,$4,$5,"GC."$1"_"$4"_"$5"_"$7,"0",$7,$14,$18,$10,$12} }' | \
 	sed 's/"//g' | sed 's/;//g' | sed '/#.*/d' | uniq | awk '$3 > $2 {print $0}' | sort-bed - > $GENCODE_TSV.tmp
  cat h_duppse.txt | grep "Chromosome" -v | awk 'BEGIN{OFS="\t"} {print "chr"$2,$3,$4,$9,0,$5,"GERST_PG",$1}' >> $GENCODE_TSV.tmp
-# cat hg19.pseudogenes.Gerstein.bed | awk 'BEGIN{OFS="\t"} {print $0,"GERST_PG",$4,$4,$4}' >> $GENCODE_TSV.tmp
+ cat hg19.pseudogenes.Gerstein.bed | awk 'BEGIN{OFS="\t"} {print $0,"GERST_PG_hc",$4,$4,$4}' >> $GENCODE_TSV.tmp
  cat $GENCODE_TSV.tmp | sort-bed - > $GENCODE_TSV
  rm $GENCODE_TSV.tmp
 
@@ -96,6 +97,9 @@ makeIncrements $GENEBODIES $INCREMENTS
 ######################################
 ## Make TSS/ Enhancer data file.
 
+## Get positions of full gene bodies to classify dREG sites as 'internal'.  
+cat $GENCODE_TSV | awk '(($3-$2) > '"$MINLEN"') {print $0}' | uniq | sort-bed - > cat $GENESFULL
+
 ## Get the position of annotated TSS (used to classify dREG sites as proximal).
 function writeAnnotTss {
  TSS_FUDGE=$1
@@ -110,8 +114,8 @@ function writeAnnotTss {
 INTSS=/usr/projects/GROseq/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.tsv
 writeAnnotTss 1
 bedops --element-of -1 $INTSS annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_TSS"}' | sort-bed - > dreg.tss ## Identify intersection with TSS at the 5' end of annotated genes.
-cat $GENEBODIES | grep "protein_coding" | bedops --element-of -1 $INTSS - | bedops --not-element-of -1 - annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_INGENE"}' | sort-bed - > ingene.tmp ## Also pull out those that are in gene annotations.
-bedops --not-element-of -1 $INTSS annottss.tsv | bedops --not-element-of -1 - $GENEBODIES | awk 'BEGIN{OFS="\t"} {print $0,"dREG_ENH"}' | sort-bed - > enh.tmp ## Assume the remaining sites are enhancers.
+cat $GENESFULL | grep "protein_coding" | bedops --element-of -1 $INTSS - | bedops --not-element-of -1 - annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_INGENE"}' | sort-bed - > ingene.tmp ## Also pull out those that are in gene annotations.
+bedops --not-element-of -1 $INTSS annottss.tsv | bedops --not-element-of -1 - $GENESFULL | awk 'BEGIN{OFS="\t"} {print $0,"dREG_ENH"}' | sort-bed - > enh.tmp ## Assume the remaining sites are enhancers.
 cat dreg.tss enh.tmp ingene.tmp | sort-bed - > $TSSSITES
 rm enh.tmp ingene.tmp
 makeIncrements $TSSSITES $TSSINCR
