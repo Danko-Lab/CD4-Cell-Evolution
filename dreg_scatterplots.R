@@ -15,14 +15,16 @@ densScatterplot <- function(x1, x2, ...) {
   df$dens <- col2rgb(x)[1,] + 1L
  
   ## Map densities to colors
-#  cols <-  colorRampPalette(c("#000099", "#00FEFF", "#45FE4F", 
-#                              "#FCFF00", "#FF9400", "#FF3100"))(256)
-  cols <- colorRampPallette(c("dark gray", "#00FEFF", "#45FE4F",
-                              "#FCFF00", "#FF9400", "#FF3100"))(512)
+#  cols <-  colorRampPalette(c("#000099", "#00FEFF", "#45FE4F", "#FCFF00", "#FF9400", "#FF3100"))(256)
+  cols <- colorRampPalette(c("light gray", "#000099", "#45FE4F", "#FCFF00", "#FF9400", "#FF3100"))(128)
   df$col <- cols[df$dens]
 
   ## Plot it, reordering rows so that densest points are plotted on top
   plot(x2~x1, data=df[order(df$dens),], pch=20, col=col, cex=2, ...) 
 }
 
-densScatterplot(a$V7, a$V8, xlab="Human Unt.", ylab="Chimpanzee Unt.", main="dREG Scores") ## H-U, C-U
+densScatterplot(a$V7, a$V8, xlab="Human Unt.", ylab="Chimpanzee Unt.", main="dREG Scores")
+densScatterplot(a$V7, a$V9, xlab="Human Unt.", ylab="Rhesus Macaque Unt.", main="dREG Scores") 
+
+densScatterplot(a$V7, a$V10, xlab="Human Unt.", ylab="Human P/I", main="dREG Scores") 
+
