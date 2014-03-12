@@ -13,7 +13,7 @@ extra_enrich_bed <- read.table("GencodeMerge.IntersectOpStrand.bed")
 allow_bed <- read.table("CD4.chromHMM.Ernst2010.hg19.Prom.Enh.bed")
 
 ## Train the SVM.
-inf_positions <- lapply(c(1:NROW(ps_plus_path)), function(x) {get_informative_positions(ps_plus_path, ps_minus_path, depth= 0, step=50, use_ANDOR=TRUE, use_OR=FALSE)}) ## Get informative positions.
+inf_positions <- get_informative_positions(ps_plus_path, ps_minus_path, depth= 0, step=50, use_ANDOR=TRUE, use_OR=FALSE)
 print(paste("Number of inf. positions: ", NROW(inf_positions)))
 
 gdm <- genomic_data_model(window_sizes= c(10, 25, 50, 500, 5000), half_nWindows= c(10, 10, 30, 20, 20))
