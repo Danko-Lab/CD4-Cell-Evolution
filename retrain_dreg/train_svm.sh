@@ -16,6 +16,7 @@ mkdir $SCRATCH
 cd $SCRATCH
 
 cp ~/nextgen/projects/GROseq/NHP/tss_caller/retrain_dreg/train_svm.R $SCRATCH ## 
+cp /home/cgd24/projects/tss_detector/data/GencodeMerge.IntersectOpStrand.bed $SCRATCH ## Gene overlap files
 
 ## CD4
 cp /home/cgd24/nextgen/data/GROseq.parser/hg19/cd4/dnase1fp/dnase1.peaks_peaks.narrowPeak $SCRATCH ## DNAse-1
