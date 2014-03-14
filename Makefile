@@ -1,5 +1,5 @@
 run_analysis:
-	#rm chage_expr/*
+	rm chage_expr/*
 	bash makeNetGapFiles.bsh
 	bash getGenesInBreaks.bsh 
 	bash getCounts.bsh

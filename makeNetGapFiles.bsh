@@ -98,7 +98,7 @@ makeIncrements $GENEBODIES $INCREMENTS
 ## Make TSS/ Enhancer data file.
 
 ## Get positions of full gene bodies to classify dREG sites as 'internal'.  
-cat $GENCODE_TSV | awk '(($3-$2) > '"$MINLEN"') {print $0}' | uniq | sort-bed - > cat $GENESFULL
+cat $GENCODE_TSV | awk '(($3-$2) > '"$MINLEN"') {print $0}' | uniq | sort-bed - > $GENESFULL
 
 ## Get the position of annotated TSS (used to classify dREG sites as proximal).
 function writeAnnotTss {
