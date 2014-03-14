@@ -1,5 +1,8 @@
 ##
 ##
+require(ggplot2)
+library(reshape2)
+
 load("fdr.RData")
 PVAL <- 0.01
 

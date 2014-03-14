@@ -2,6 +2,7 @@
 ##
 load("fdr.RData")
 PVAL <- 0.01
+EXPR <- 5e-5
 
 getDifferences <- function(changeExpr, isExpr) {
   sum(changeExpr & isExpr)/ sum(isExpr)
@@ -83,10 +84,10 @@ summary(fdr_df$fdr_min < PVAL) ## ~12k transcripts that change expression.
 changeExpr <- fdr_df$fdr_min < PVAL & !is.na(fdr_df$fdr_min) & abs(fdr_df$fc_min) > FOLD #1
 
 ## Comput RPKM
-isExpr <- rowMax(rpkm_df[,2:9]) > 5e-4
+isExpr <- rowMax(rpkm_df[,2:9]) > EXPR
 sum(isExpr)/NROW(isExpr)
 
-isExprPI<-rowMax(rpkm_df[,11:17]) > 5e-4
+isExprPI<-rowMax(rpkm_df[,11:17]) > EXPR
 sum(isExprPI)/NROW(isExprPI)
 
 getDifferences(changeExpr, isExpr)
@@ -100,6 +101,11 @@ mu <- getDifferences(fdr_t[,3]<PVAL, isExpr) # MACAQUE
 hp <- getDifferences(fdr_t[,4]<PVAL, isExprPI) # HUMAN
 cp <- getDifferences(fdr_t[,5]<PVAL, isExprPI) # CHIMP
 mp <- getDifferences(fdr_t[,6]<PVAL, isExprPI) # MACAQUE
+
+
+## Now actually writes out barplots.
+require(ggplot2)
+library(reshape2)
 
 pdf("tuTypeChanges.pdf")
 font_size <- 16
