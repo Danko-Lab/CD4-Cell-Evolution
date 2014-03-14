@@ -44,9 +44,35 @@ cmpPauseBody("Human 1", "R. Macaque 3")
 cmpPauseBody("Human 1", "R. Macaque 2")
 cmpPauseBody("Human 1", "R. Macaque 1")
 
+## Compute some sort of RMSD for changes in pausing levels.
+## Be sure to quantile normalize.
+
+############################################################
+##
 ## Get pausing indices.
 
 indxPause <- ca$type=="protein_coding_PauseSite"
 indxBody  <- ca$type=="protein_coding"
 
-match(ca[indxPause,"name"], ca[indxBody,"name"])
+body <- ca[indxBody,][ca[indxBody,"name"] %in% ca[indxPause,"name"],]
+pause <- pause <- ca[indxPause,][match(as.character(body[,"name"]), as.character(ca[indxPause,"name"])),]  #ca[indxPause,][match(as.character(ca[indxPause,"name"]),as.character(body[,"name"])),]
+
+stopifnot(sum(body$name == pause$name) == NROW(pause)) ## SANTIY CHECK.
+
+PI <- ((pause[,c(11:NCOL(pause))]+1)/pause[,"mapSize"]) / ((body[,c(11:NCOL(body))]+1)/body[,"mapSize"])
+
+cor.test(PI[,"Human 1"], PI[,"Human 2"], method="spearman")
+cor.test(PI[,"Human 1"], PI[,"Chimp 4"], method="spearman")
+cor.test(PI[,"Human 1"], PI[,"R. Macaque 3"], method="spearman")
+
+## Plot...
+par(mfrow=c(1,3))
+densScatterplot(PI[,"Human 1"], PI[,"Human 2"], xlab="Human 1", ylab="Human 2")
+densScatterplot(PI[,"Human 1"], PI[,"Chimp 4"], xlab="Human 1", ylab="Human 2")
+densScatterplot(PI[,"Human 1"], PI[,"R. Macaque 3"], xlab="Human 1", ylab="Human 2")
+
+
+
+
+
+
