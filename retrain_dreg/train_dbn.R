@@ -21,10 +21,10 @@ gdm <- genomic_data_model(window_sizes= c(10, 25, 50, 500, 5000), half_nWindows=
 adbn <- dbn(layer_sizes= c(360,300,300,500), batch_size=100, cd_n=1, momentum_decay= 0.9, weight_cost= 1e-5, learning_rate=0.1)
 
 ## Learn features basd on all species.
-adbn <- regulatory_dbn(gdm, adbn, ps_plus_path, ps_minus_path, inf_positions, dnase, n_train=10000, n_eval=0, extra_enrich_bed= extra_enrich_bed, allow= allow_bed, training_mode="pretrain")
+adbn <- regulatory_dbn(gdm, adbn, ps_plus_path, ps_minus_path, inf_positions, dnase, n_train=15000, n_eval=0, extra_enrich_bed= extra_enrich_bed, allow= allow_bed, training_mode="pretrain")
 
 ## Refine based on H-U through backprop.
-adbn <- regulatory_dbn(gdm, adbn, ps_plus_path[[1]], ps_minus_path[[1]], inf_positions[[1]], dnase[[1]], n_train=100000, n_eval=0, extra_enrich_bed= extra_enrich_bed[[1]], allow= allow_bed[[1]], training_mode="refine")
+adbn <- regulatory_dbn(gdm, adbn, ps_plus_path[[1]], ps_minus_path[[1]], inf_positions[[1]], dnase[[1]], n_train=150000, n_eval=0, extra_enrich_bed= extra_enrich_bed[[1]], allow= allow_bed[[1]], training_mode="refine")
 
 remove(inf_positions, ps_plus_path, ps_minus_path, extra_enrich_bed, allow_bed)
 save.image("cd4.dnase1.adbn.RData")
