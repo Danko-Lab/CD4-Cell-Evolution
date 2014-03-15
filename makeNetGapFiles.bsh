@@ -146,6 +146,6 @@ bedtools merge -s -i pauseSites.tmp | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","
 bedtools window -w 1000 -sm -a $PAUSESITES.merge -b annottss.tsv | awk 'BEGIN{OFS="\t"} ($15 < 1000) {print $1,$2,$3,$10,$5,$6,$13,$14}' | sort-bed - > $PAUSESITES
 rm $PAUSESITES.merge pauseSites.tmp annottss.tsv
 
-#makeIncrements $PAUSESITES $PAUSEINCR
+makeIncrements $PAUSESITES $PAUSEINCR ## So many falling outside of align-able regions.  Seems safest to treat them comparabally.
 
 

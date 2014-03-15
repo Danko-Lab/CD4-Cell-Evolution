@@ -6,7 +6,7 @@ EXPR <- 5e-5
 
 getDifferences <- function(changeExpr, isExpr) {
   sum(changeExpr & isExpr)/ sum(isExpr)
-  summary(fdr_df$type[changeExpr & isExpr])/summary(fdr_df$type[isExpr])
+  print(summary(fdr_df$type[changeExpr & isExpr])/summary(fdr_df$type[isExpr]))
 
   fractionChanged <- list(
     "eRNA"= NROW(unique(fdr_df$name[changeExpr & (fdr_df$type=="dREG_ENH") & isExpr]))/NROW(unique(fdr_df$name[(fdr_df$type=="dREG_ENH") & isExpr])),
@@ -93,14 +93,14 @@ sum(isExprPI)/NROW(isExprPI)
 getDifferences(changeExpr, isExpr)
 
 ## Untreated
-hu <- getDifferences(fdr_t[,1]<PVAL, isExpr) # HUMAN
-cu <- getDifferences(fdr_t[,2]<PVAL, isExpr) # CHIMP
-mu <- getDifferences(fdr_t[,3]<PVAL, isExpr) # MACAQUE
+hu <- getDifferences(fdr_t[,1]<PVAL, isExpr); hu # HUMAN
+cu <- getDifferences(fdr_t[,2]<PVAL, isExpr); cu # CHIMP
+mu <- getDifferences(fdr_t[,3]<PVAL, isExpr); mu # MACAQUE
 
 ## P/I
-hp <- getDifferences(fdr_t[,4]<PVAL, isExprPI) # HUMAN
-cp <- getDifferences(fdr_t[,5]<PVAL, isExprPI) # CHIMP
-mp <- getDifferences(fdr_t[,6]<PVAL, isExprPI) # MACAQUE
+hp <- getDifferences(fdr_t[,4]<PVAL, isExprPI); hp # HUMAN
+cp <- getDifferences(fdr_t[,5]<PVAL, isExprPI); cp # CHIMP
+mp <- getDifferences(fdr_t[,6]<PVAL, isExprPI); mp # MACAQUE
 
 
 ## Now actually writes out barplots.

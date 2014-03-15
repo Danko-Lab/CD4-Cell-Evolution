@@ -46,7 +46,7 @@ fitModel <- function(Design, counts, lib.size) {
   design <- model.matrix(~condition, Design)
   rownames(design) <- colnames(dge)
 
-  voom_obj <- voom(dge, design, lib.size= lib.size, plot=FALSE)
+  voom_obj <- voom(dge, design, normalize.method = "quantile", lib.size= lib.size, plot=FALSE)
 
 #  plotMDS(dge,top=500,labels=species,gene.selection="common")
 
