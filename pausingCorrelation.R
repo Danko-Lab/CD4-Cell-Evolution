@@ -55,11 +55,11 @@ indxPause <- ca$type=="protein_coding_PauseSite"
 indxBody  <- ca$type=="protein_coding"
 
 body <- ca[indxBody,][ca[indxBody,"name"] %in% ca[indxPause,"name"],]
-pause <- pause <- ca[indxPause,][match(as.character(body[,"name"]), as.character(ca[indxPause,"name"])),]  #ca[indxPause,][match(as.character(ca[indxPause,"name"]),as.character(body[,"name"])),]
-
+pause <- pause <- ca[indxPause,][match(as.character(body[,"name"]), as.character(ca[indxPause,"name"])),] 
 stopifnot(sum(body$name == pause$name) == NROW(pause)) ## SANTIY CHECK.
 
-PI <- ((pause[,c(11:NCOL(pause))]+1)/pause[,"mapSize"]) / ((body[,c(11:NCOL(body))]+1)/body[,"mapSize"])
+indx <- pause[,"Human 1"]>0 & pause[,"Chimp 4"]>0 & pause[,"R. Macaque 3"]>0 ## Unnecesarily conservative.
+PI <- (((pause[,c(11:NCOL(pause))]+1)/pause[,"mapSize"]) / ((body[,c(11:NCOL(body))]+1)/body[,"mapSize"]))[indx,]
 
 cor.test(PI[,"Human 1"], PI[,"Human 2"], method="spearman")
 cor.test(PI[,"Human 1"], PI[,"Chimp 4"], method="spearman")
@@ -67,12 +67,11 @@ cor.test(PI[,"Human 1"], PI[,"R. Macaque 3"], method="spearman")
 
 ## Plot...
 par(mfrow=c(1,3))
-densScatterplot(PI[,"Human 1"], PI[,"Human 2"], xlab="Human 1", ylab="Human 2")
-densScatterplot(PI[,"Human 1"], PI[,"Chimp 4"], xlab="Human 1", ylab="Human 2")
-densScatterplot(PI[,"Human 1"], PI[,"R. Macaque 3"], xlab="Human 1", ylab="Human 2")
+densScatterplot(log(PI[,"Human 1"]), log(PI[,"Human 2"]), xlab="Human 1", ylab="Human 2")
+densScatterplot(log(PI[,"Human 1"]), log(PI[,"Chimp 4"]), xlab="Human 1", ylab="Chimp 4")
+densScatterplot(log(PI[,"Human 1"]), log(PI[,"R. Macaque 3"]), xlab="Human 1", ylab="R. Macaque 3")
 
-
-
+############################################################
 
 
 
