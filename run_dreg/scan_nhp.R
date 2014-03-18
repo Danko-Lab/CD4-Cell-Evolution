@@ -10,14 +10,14 @@ gs_minus_path <- paste(prefix, c("-U_minus.bw","-PI_minus.bw"),sep="") #-U.bed.g
 
 outnames <- paste(prefix, c("-U.TSS.bedGraph.gz", "-PI.TSS.bedGraph.gz"), sep="")
 
-load("asvm.RData")
+load("cd4.dnase1.adbn.RData")#asvm.RData")
 gdm <- genomic_data_model(window_sizes= c(10, 25, 50, 500, 5000), half_nWindows= c(10, 10, 30, 20, 20)) 
 
 for(i in 1:length(gs_plus_path)) {
 	## Now scan all positions in the genome ...
 	inf_positions <- get_informative_positions(gs_plus_path[i], gs_minus_path[i], depth= 0, step=50, use_ANDOR=TRUE, use_OR=FALSE) ## Get informative positions.
 
-	pred_val<- eval_reg_svm(gdm, asvm, inf_positions, gs_plus_path[i], gs_minus_path[i], batch_size= 10000, ncores=62)
+	pred_val<- eval_reg_dbn(gdm, adbn, inf_positions, gs_plus_path[i], gs_minus_path[i], batch_size= 20000, ncores=62)
 
 	final_data <- data.frame(inf_positions, pred_val)
 	options("scipen"=100, "digits"=4)

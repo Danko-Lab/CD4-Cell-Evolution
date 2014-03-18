@@ -10,18 +10,19 @@
 
 PREFIX=H
 DATADIR=All_Merge
-TH=0.83
+TH=0.8
 
 ## Copy files to scratch space (/workdir and /SSD).
 STARTDIR=`pwd`
 SCRATCH=/SSD/cgd24_tssDetector_$PREFIX
 mkdir $SCRATCH
-cp $STARTDIR/scan_nhp.R $SCRATCH ## 
-cp /home/cgd24/projects/tss_detector/train_svm/asvm.RData $SCRATCH ## 
+cp ~/nextgen/projects/GROseq/NHP/tss_caller/run_dreg/scan_nhp.R $SCRATCH ## 
+cp /home/cgd24/projects/tss_detector/train_svm_nhp/cd4.dnase1.adbn.RData $SCRATCH
+#cp /home/cgd24/projects/tss_detector/train_svm/asvm.RData $SCRATCH ## 
 cp ~/nextgen/projects/GROseq/NHP/$DATADIR/$PREFIX*.bw $SCRATCH
 cd $SCRATCH
 
-## Run R.
+## Run R. 
 R --no-save --args $PREFIX < scan_nhp.R
 
 ## Merge into TSS. 
