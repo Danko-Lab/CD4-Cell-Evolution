@@ -9,8 +9,8 @@
 #$ -l h_rt=24:00:00
 
 PREFIX=H
-DATADIR=All_Merge
-TH=0.8
+DATADIR=AllData/All_Merge
+TH=0.95
 
 ## Copy files to scratch space (/workdir and /SSD).
 STARTDIR=`pwd`
