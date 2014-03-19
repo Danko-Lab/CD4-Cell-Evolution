@@ -56,17 +56,19 @@ tfc    <- runLimmaQuantile(counts, condition, genes, condA="U", condB="PI", q.cu
 #fdr_t <- matrix(p.adjust(c(hs$p.value[,2], cs$p.value[,2], ms$p.value[,2], hs_pi$p.value[,2], cs_pi$p.value[,2], ms_pi$p.value[,2], 
 #				hs_tfc$p.value[,2], cs_tfc$p.value[,2], ms_tfc$p.value[,2], tfc$p.value[,2]), method="fdr"), ncol=10)
 
-fdr_t <- cbind(hs$tab$adj.P.Value, cs$tab$adj.P.Value, ms$tab$adj.P.Value, 
-		hs_pi$tab$adj.P.Value, cs_pi$tab$adj.P.Value, ms_pi$tab$adj.P.Value, 
-                hs_tfc$tab$adj.P.Value, cs_tfc$tab$adj.P.Value, ms_tfc$tab$adj.P.Value, 
-		tfc$tab$adj.P.Value) ## Each dataset should have a 1% FDR (within the dataset).
+fdr_t <- cbind(hs$tab$adj.P.Val, cs$tab$adj.P.Val, ms$tab$adj.P.Val, 
+		hs_pi$tab$adj.P.Val, cs_pi$tab$adj.P.Val, ms_pi$tab$adj.P.Val, 
+                hs_tfc$tab$adj.P.Val, cs_tfc$tab$adj.P.Val, ms_tfc$tab$adj.P.Val, 
+		tfc$tab$adj.P.Val) ## Each dataset should have a 1% FDR (within the dataset).
 
-colnames(fdr_t) <- c("HumanFDR", "ChimpFDR", "MacaqueFDR", "HumanFDR_PI", "ChimpFDR_PI", "MacaqueFDR_PI", "U2PI_H", "U2PI_C", "U2PI_M", "U2PI")
+colnames(fdr_t) <- c("HumanFDR", "ChimpFDR", "MacaqueFDR", "HumanFDR_PI", "ChimpFDR_PI", "MacaqueFDR_PI", "U2PIFDR_H", "U2PIFDDR_C", "U2PIFDR_M", "U2PIFDR")
 
 fc_t  <- cbind(hs$tab$logFC, cs$tab$logFC, ms$tab$logFC,  
                 hs_pi$tab$logFC, cs_pi$tab$logFC, ms_pi$tab$logFC,  
                 hs_tfc$tab$logFC, cs_tfc$tab$logFC, ms_tfc$tab$logFC,
                 tfc$tab$logFC) 
+
+colnames(fc_t) <- c("HumanFC", "ChimpFC", "MacaqueFC", "HumanFC_PI", "ChimpFC_PI", "MacaqueFC_PI", "U2PIFC_H", "U2PIFC_C", "U2PIFC_M", "U2PIFC")
 
 fdr_min<- rowMin(fdr_t[,1:3]) # sapply(c(1:NROW(fdr_t)), function(x) {min(fdr_t[x,])} )
 fdr_min_pi <- rowMin(fdr_t[,4:6])
