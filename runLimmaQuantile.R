@@ -8,7 +8,7 @@
 ## 
 
 runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB, 
-                             q.cut=0.01, lfc=0.0,
+                             q.cut=0.01, lfc=0.0, lib.size=colSums(count.dat),
                              useVoom=FALSE){
   require(limma)
   ## updated limma from 3.12.1 to 3.12.3 to 3.14.1 CGD: Now to 3.18.13
@@ -23,7 +23,7 @@ runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB,
   if(useVoom){ ### THIS PART REQUIRES UPDATING!
     require(edgeR)
     nf <- calcNormFactors(count.dat)
-    dat <- voom(count.dat, design, plot=FALSE, lib.size=colSums(count.dat) * nf)
+    dat <- voom(count.dat, design, plot=FALSE, lib.size=lib.size * nf)
   } else{
     counts.log.dat=as.matrix(log2(count.dat+1)) ## CGD: Cast appears to be required in Limma 3.18.13
     counts.log.norm.dat=normalizeBetweenArrays(counts.log.dat,method='quantile')
@@ -37,7 +37,7 @@ runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB,
   fit2 <- contrasts.fit(fit, contrast.matrix) 
   fit2 <- eBayes(fit2)
   res=decideTests(fit2,p.value=q.cut,lfc=lfc)
-  tab<-topTable(fit2, adjust = "BH", number=nrow(fit2), sort.by='logFC')
+  tab<-topTable(fit2, adjust = "BH", number=nrow(fit2), sort.by='none')
 #  rownames(tab)=tab[,1]
   if(useVoom){
     counts.limma=2^dat$E[match(rownames(tab), rownames(dat$E)),] ## CGD: Changed to re-order using rownames ...
