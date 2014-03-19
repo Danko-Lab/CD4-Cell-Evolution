@@ -7,13 +7,13 @@
 ##  Genome Biology, 14(9), R95. doi:10.1186/gb-2013-14-9-r95
 ## 
 
-runLimmaQuantile <- function(count.dat, conditions, genes,
-                             useVoom=FALSE,
-                             q.cut=0.05, lfc=0.0, condA='condA', condB='condB'){
+runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB, 
+                             q.cut=0.01, lfc=0.0,
+                             useVoom=FALSE){
   require(limma)
   ## updated limma from 3.12.1 to 3.12.3 to 3.14.1 CGD: Now to 3.18.13
   if(! packageDescription("limma")$Version == "3.18.13"){
-    stop("Wrong version of limma package. This script requires  limma-3.14.1")
+    stop("Wrong version of limma package. This script requires  limma-3.18.3")
   }
 
   groups=as.factor(conditions)
@@ -30,14 +30,10 @@ runLimmaQuantile <- function(count.dat, conditions, genes,
 
     dat=counts.log.norm.dat
 #    plotDensities(dat)
-
-  ## design <- model.matrix(~0+groups)
-  ## colnames(design) = levels(groups)
-  }
+  } 
   
   fit=lmFit(dat,design)
-
-  contrast.matrix <- makeContrasts("condB - condA", levels=design)
+  contrast.matrix <- makeContrasts(contrasts= paste(condA,"-",condB), levels=design)
   fit2 <- contrasts.fit(fit, contrast.matrix) 
   fit2 <- eBayes(fit2)
   res=decideTests(fit2,p.value=q.cut,lfc=lfc)
@@ -46,8 +42,9 @@ runLimmaQuantile <- function(count.dat, conditions, genes,
   if(useVoom){
     counts.limma=2^dat$E[match(rownames(tab), rownames(dat$E)),] ## CGD: Changed to re-order using rownames ...
   }else{
-    counts.limma=2^dat[match(rownames(tab), rownames(dat$E)),]
+    counts.limma=2^dat[match(rownames(tab), rownames(dat)),]
   }
+  genes= genes[match(rownames(tab), rownames(genes)),]
   val1=apply(counts.limma[,which(conditions==condA)],1,mean)
   val2=apply(counts.limma[,which(conditions==condB)],1,mean)
 
@@ -57,6 +54,7 @@ runLimmaQuantile <- function(count.dat, conditions, genes,
   nam2=paste("mean_",condB,sep="")
   colnames(tab)[4]=nam1
   colnames(tab)[5]=nam2
+  tab= cbind(genes, tab)
 
   return(list(tab=tab,res=res,counts=counts.limma))
 }
