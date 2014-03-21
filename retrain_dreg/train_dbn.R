@@ -24,7 +24,7 @@ adbn <- dbn(layer_sizes= c(360,300,300,500), batch_size=100, cd_n=1, momentum_de
 adbn <- regulatory_dbn(gdm, adbn, ps_plus_path, ps_minus_path, inf_positions, dnase, n_train=15000, n_eval=0, extra_enrich_bed= extra_enrich_bed, training_mode="pretrain")
 
 ## Refine based on H-U through backprop.
-adbn <- regulatory_dbn(gdm, adbn, ps_plus_path[[1]], ps_minus_path[[1]], inf_positions[[1]], dnase[[1]], n_train=150000, n_eval=0, extra_enrich_bed= extra_enrich_bed[[1]], training_mode="refine")
+adbn <- regulatory_dbn(gdm, adbn, ps_plus_path[[1]], ps_minus_path[[1]], inf_positions[[1]], dnase[[1]], n_train=150000, n_eval=2000, extra_enrich_bed= extra_enrich_bed[[1]], training_mode="refine")
 
 remove(inf_positions, ps_plus_path, ps_minus_path, extra_enrich_bed)
 save.image("cd4.dnase1.adbn.RData")
