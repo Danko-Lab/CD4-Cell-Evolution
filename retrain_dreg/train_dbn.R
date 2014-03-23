@@ -10,7 +10,7 @@ ps_minus_path <- list("H-U_minus.bw", "H-PI_minus.bw", "C-U_minus.bw", "C-PI_min
 ## Get positive regions.
 dnase <- lapply(rep("dnase1.peaks_peaks.narrowPeak",6), function(x) { read.table(x)})
 extra_enrich_bed <- lapply(rep("GencodeMerge.IntersectOpStrand.bed",6), function(x) {read.table(x)})
-#allow_bed <- lapply(rep("CD4.chromHMM.Ernst2010.hg19.Prom.Enh.bed",6), function(x) {read.table(x)})
+allow_bed <- lapply(rep("CD4.chromHMM.Ernst2010.hg19.Prom.Enh.bed",6), function(x) {read.table(x)})
 
 ## Train the SVM.
 inf_positions <- lapply(1:length(ps_plus_path), function(x) {get_informative_positions(ps_plus_path[[x]], ps_minus_path[[x]], depth= 0, step=50, use_ANDOR=TRUE, use_OR=FALSE)})
@@ -24,8 +24,8 @@ adbn <- dbn(layer_sizes= c(360,300,300,500), batch_size=100, cd_n=1, momentum_de
 adbn <- regulatory_dbn(gdm, adbn, ps_plus_path, ps_minus_path, inf_positions, dnase, n_train=15000, n_eval=0, extra_enrich_bed= extra_enrich_bed, training_mode="pretrain")
 
 ## Refine based on H-U through backprop.
-adbn <- regulatory_dbn(gdm, adbn, ps_plus_path[[1]], ps_minus_path[[1]], inf_positions[[1]], dnase[[1]], n_train=150000, n_eval=2000, extra_enrich_bed= extra_enrich_bed[[1]], training_mode="refine")
+adbn <- regulatory_dbn(gdm, adbn, ps_plus_path[[1]], ps_minus_path[[1]], inf_positions[[1]], dnase[[1]], n_train=150000, n_eval=2000, allow= allow_bed[[1]], extra_enrich_bed= extra_enrich_bed[[1]], training_mode="refine")
 
-remove(inf_positions, ps_plus_path, ps_minus_path, extra_enrich_bed)
+remove(inf_positions, ps_plus_path, ps_minus_path, extra_enrich_bed, allow_bed)
 save.image("cd4.dnase1.adbn.RData")
 

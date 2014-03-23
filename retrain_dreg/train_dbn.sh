@@ -28,6 +28,7 @@ R --no-save < train_dbn.R
 ## Copy data files back.
 cp *.bedGraph $STARTDIR
 cp *.RData $STARTDIR
+cp *.pdf $STARTDIR
 
 ## Cleanup
 rm -Rf $SCRATCH
