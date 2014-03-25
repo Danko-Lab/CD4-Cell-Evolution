@@ -15,7 +15,7 @@ function getSuperset {
  paste tmp.bed H.tmp C.tmp M.tmp | sed "s/NAN/NA/g" > all.tmp
  R --no-save --args all.tmp $RD/HCM-$1.dREG 0.9 < sortRatios.R
  R --no-save --args all.tmp $RD/HCM-$1.dREG 0.8 < sortRatios.R 
- R --no-save --args all.tmp $RD/HCM-$1.dREG 0.6 < sortRatios.R
+ R --no-save --args all.tmp $RD/HCM-$1.dREG 0.7 < sortRatios.R
  rm tmp.bed *.tmp
 }
 
@@ -26,9 +26,9 @@ echo "Superset PI"
 getSuperset PI
 
 ## Make combinations.
-cat $RD/HCM-*H-gain.0.6.bed | sort-bed - | bedops --merge - > $RD/HCM-U-PI.H-gain.0.6.bed
-cat $RD/HCM-*H-loss.0.6.bed | sort-bed - | bedops --merge - > $RD/HCM-U-PI.H-loss.0.6.bed
-cat $RD/HCM-*conserved.0.6.bed | sort-bed - | bedops --merge - > $RD/HCM-U-PI.conserved.0.6.bed
+cat $RD/HCM-*H-gain.0.7.bed | sort-bed - | bedops --merge - > $RD/HCM-U-PI.H-gain.0.7.bed
+cat $RD/HCM-*H-loss.0.7.bed | sort-bed - | bedops --merge - > $RD/HCM-U-PI.H-loss.0.7.bed
+cat $RD/HCM-*conserved.0.7.bed | sort-bed - | bedops --merge - > $RD/HCM-U-PI.conserved.0.7.bed
 
 cat $RD/HCM-*H-gain.0.8.bed | sort-bed - | bedops --merge - > $RD/HCM-U-PI.H-gain.0.8.bed
 cat $RD/HCM-*H-loss.0.8.bed | sort-bed - | bedops --merge - > $RD/HCM-U-PI.H-loss.0.8.bed

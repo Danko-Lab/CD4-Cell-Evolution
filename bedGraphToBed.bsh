@@ -56,7 +56,7 @@ rm -Rf $MERGE
 mkdir $MERGE
 cp $HS/*.bed.gz $MERGE
 
-for TH in 0.8 0.7 0.6 0.5
+for TH in 0.9 0.8 0.7 # 0.6 0.5
 do
   echo $TH
   writeBed
