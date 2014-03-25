@@ -36,7 +36,7 @@ mv *.bed.gz $MHS
 MS=MedScore
 rm -Rf $MS
 mkdir $MS
-TH=0.6
+TH=0.7
 writeBed
 mv *.bed.gz $MS
 
