@@ -21,7 +21,7 @@ cp /home/cgd24/projects/tss_detector/data/GencodeMerge.IntersectOpStrand.bed $SC
 ## CD4
 cp /home/cgd24/nextgen/data/GROseq.parser/hg19/cd4/dnase1fp/dnase1.peaks_peaks.narrowPeak $SCRATCH ## DNAse-1
 cp ~/nextgen/projects/GROseq/NHP/AllData/All_Merge/*.bw $SCRATCH ## PRO-seq
-cp /home/cgd24/nextgen/data/GROseq.parser/hg19/cd4/chromhmm/CD4.chromHMM.Ernst2010.hg19.Prom.Enh.bed $SCRATCH ## Chromatin marks.
+cp /home/cgd24/nextgen/data/GROseq.parser/hg19/cd4/chromhmm/CD4.chromHMM.Ernst2010.hg19.Prom.bed $SCRATCH #CD4.chromHMM.Ernst2010.hg19.Prom.Enh.bed $SCRATCH ## Chromatin marks.
 ## Run R.
 R --no-save < train_dbn.R
 

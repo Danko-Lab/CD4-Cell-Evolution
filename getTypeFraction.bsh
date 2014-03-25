@@ -22,7 +22,8 @@ do
 
  ## Compute SENS/ SPEC.
  PROnum=`cat tmp.mergepred.bed | bedops --element-of -1 - $pro | grep "" -c`
- ENHnum=`cat tmp.mergepred.bed | bedops --not-element-of -1 - $pro | bedops --element-of -1 - $enh | grep "" -c`
+ #ENHnum=`cat tmp.mergepred.bed | bedops --not-element-of -1 - $pro | bedops --element-of -1 - $enh | grep "" -c`
+ ENHnum=`cat tmp.mergepred.bed | bedops --element-of -1 - $enh | grep "" -c`
  ALLnum=`cat tmp.mergepred.bed | grep "" -c` ## Specificity
  echo "Promoters: $[($PROnum*100)/$ALLnum]"
  echo "Enhancers: $[($ENHnum*100)/$ALLnum]"
