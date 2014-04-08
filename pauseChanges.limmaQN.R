@@ -14,6 +14,13 @@ gb <- gb[gb$V7 == "protein_coding" & !is.na(gb[,10]),]
 
 ###
 ## Fancy-shmancy selection of gb to be similar in coutns to ps.
+par(mfrow=c(2,1))
+hist(log(gb_Sums+1), 50)
+hist(log(ps_Sums+1), 50)
+
+
+gb_Sums <- rowSums(gb[,c(12:14,16:20)-1])
+ps_Sums <- rowSums(ps[,c(12:14,16:20)-1])
 
 
 ## Quantile normalize each independently.
@@ -31,9 +38,18 @@ body <-  hg$tab[hg$tab[,4] %in% hp$tab[,4],] # gb[gb[,4] %in% ps[,4],]
 pause <- hp$tab[match(as.character(body[,4]), as.character(hp$tab[,4])),] # ps[match(as.character(body[,4]), as.character(ps[,4])),]
 stopifnot(sum(body[,4] == as.character(pause[,4])) == NROW(pause)) ## SANTIY CHECK.
 
+source("../lib/densScatterplot.R")
+#boxplot(body$logFC, pause$logFC, ylim=c(-3,3))
+cor.test(body$logFC, pause$logFC, method="spearman")
+#plot(body$logFC, pause$logFC)
+densScatterplot(body$logFC, pause$logFC, xlab="Body", ylab="Pause")
+abline(v=c(3,-3), h=c(3,-3))
+
+## Human changes in pausing >3
+hv <- 3; lv <- 0.5
+## # Pause / # Body
+sum(abs(pause$logFC)>hv & abs(body$logFC)<lv)/ sum(abs(body$logFC)>hv & abs(pause$logFC)<lv)
 
 
-indx <- pause[,"Human 1"]>0 & pause[,"Chimp 4"]>0 & pause[,"R. Macaque 3"]>0 ## Unnecesarily conservative.
-PI <- (((pause[,c(11:NCOL(pause))]+1)/pause[,"mapSize"]) / ((body[,c(11:NCOL(body))]+1)/body[,"mapSize"]))[indx,]
 
 
