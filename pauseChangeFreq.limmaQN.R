@@ -6,11 +6,11 @@
 
 ## Read pause sites.
 ps <- read.table("../annotations/countpause.tsv")
-ps <- ps[!is.na(ps[,10]),]
+ps <- ps[!is.na(ps[,10]) & rowSums(ps[,c(12:14,16:20)-1])>0,]
 
 ## Read gene bodies.
 gb <- read.table("../annotations/countall.tsv")
-gb <- gb[gb$V7 == "protein_coding" & !is.na(gb[,10]),]
+gb <- gb[gb$V7 == "protein_coding" & !is.na(gb[,10]) & rowSums(gb[,c(12:14,16:20)-1])>0,]
 
 ###
 ## Fancy-shmancy selection of gb to be similar in coutns to ps.
@@ -29,27 +29,19 @@ hg <- runLimmaQuantile(gb[idx$s1,c(12:14,16:20)-1], conditions, gb[idx$s1,1:8], 
 hp <- runLimmaQuantile(ps[idx$s2,c(12:14,16:20)-1], conditions, ps[idx$s2,1:8], condA="Human", condB="NHP", q.cut=0.05)
 
 ## Use ...
- 
+pv <- 0.01
+sum(hg$tab$P.Value < pv) ## Do NOT use adjusted p-values here.
+sum(hp$tab$P.Value < pv)
 
-q("no")
+boxplot(hg$tab$logFC, hp$tab$logFC, ylim=c(-3,3), names=c("body", "pause"))
 
-## Get ps and gb into the same indices, for the same genes ...
-body <-  hg$tab[hg$tab[,4] %in% hp$tab[,4],] 
-pause <- hp$tab[match(as.character(body[,4]), as.character(hp$tab[,4])),] 
-stopifnot(sum(body[,4] == as.character(pause[,4])) == NROW(pause)) ## SANTIY CHECK.
-
+## Plot out actual numbers...
 source("../lib/densScatterplot.R")
-#boxplot(body$logFC, pause$logFC, ylim=c(-3,3))
-cor.test(body$logFC, pause$logFC, method="spearman")
-#plot(body$logFC, pause$logFC)
-densScatterplot(body$logFC, pause$logFC, xlab="Body", ylab="Pause")
-abline(v=c(3,-3), h=c(3,-3))
+cor.test(log(hg$tab$mean_Human), log(hg$tab$mean_NHP), method="spearman")
+cor.test(log(hp$tab$mean_Human), log(hp$tab$mean_NHP), method="spearman")
 
-## Human changes in pausing >3
-hv <- 3; lv <- 0.5
-## # Pause / # Body
-sum(abs(pause$logFC)>hv & abs(body$logFC)<lv)/ sum(abs(body$logFC)>hv & abs(pause$logFC)<lv)
-
-
+par(mfrow=c(1,2))
+densScatterplot(log(hg$tab$mean_Human), log(hg$tab$mean_NHP), main="body", xlab="Human", ylab="Mean NHP")
+densScatterplot(log(hp$tab$mean_Human), log(hp$tab$mean_NHP), main="pause", xlab="Human", ylab="Mean NHP")
 
 
