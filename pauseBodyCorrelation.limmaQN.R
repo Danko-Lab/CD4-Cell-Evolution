@@ -1,11 +1,17 @@
 ##
-## pauseChanges.limmaQN.R -- 
+## pauseBodyCorrelation.limmaQN.R -- 
 ## GOAL: Compare official changes in pause sites to changes in protein-coding genes.
 ##
 ##
 indxH <- c(11:13) #21:23 #12:13 -> Remove H1 (outlier for pause)
+indxHpi<-c(21:23)
+
 indxC <- c(15:16) #25:26
+indxCpi<-c(25:26)
+
 indxM <- c(17:19) #28:29
+indxMpi<-c(28:29)
+
 indxHCM <- c(indxH, indxC, indxM)
 
 ## Read pause sites.
@@ -48,9 +54,14 @@ makePBPlot <- function(indx1, indx2, name1, name2, hv=3, lv=hv) {
  print(paste("Fraction Pause_Q(2,8)/ Body_Q(4,6):", pc,"/",bc,"=", pc/ bc, "P=", pv))
 }
 
-makePBPlot(indxH, indxC, "Human", "Chimp", hv=5, lv=3)
-makePBPlot(indxH, indxM, "Human", "Macaque", hv=5, lv=3)
-makePBPlot(indxC, indxM, "Chimp", "Macaque", hv=5, lv=3)
+makePBPlot(indxH, indxC, "Human", "Chimp", hv=3, lv=3)
+makePBPlot(indxH, indxM, "Human", "Macaque", hv=3, lv=3)
+makePBPlot(indxC, indxM, "Chimp", "Macaque", hv=3, lv=3)
+
+
+makePBPlot(indxH, indxHpi, "Human_U", "Human_PI", hv=3, lv=3)
+makePBPlot(indxC, indxCpi, "Chimp_U", "Chimp_PI", hv=3, lv=3)
+makePBPlot(indxM, indxMpi, "Macaque_U", "Macaque_PI", hv=3, lv=3)
 
 
 

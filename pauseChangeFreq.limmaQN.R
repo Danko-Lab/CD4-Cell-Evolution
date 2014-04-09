@@ -13,8 +13,8 @@ gb <- read.table("../annotations/countall.tsv") ## Read gene bodies.
 
 makeNormPlots <- function(indx1, indx2, name1, name2, pv=0.01, nsamp=50000) { 
  indx <- c(indx1, indx2)
- ps <- ps[!is.na(ps[,10]) & rowSums(ps[,indx1])>0,]
- gb <- gb[gb$V7 == "protein_coding" & !is.na(gb[,10]) & rowSums(gb[,indx1])>0,]
+ ps <- ps[!is.na(ps[,10]),]# & rowSums(ps[,indx])>0,]
+ gb <- gb[gb$V7 == "protein_coding" & !is.na(gb[,10]),]# & rowSums(gb[,indx])>0,]
 
  ###
  ## Fancy-shmancy selection of gb to be similar in coutns to ps.
