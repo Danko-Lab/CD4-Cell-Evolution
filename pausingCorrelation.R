@@ -5,6 +5,8 @@
 source("../lib/densScatterplot.R")
 #example: densScatterplot(a$V7, a$V8, xlab="Human Unt.", ylab="Chimpanzee Unt.", main="dREG Scores")
 
+source("../lib/normalizeSubsample.R")
+
 load("../annotations/fdr.RData")
 
 ## Sanity check ... use Amean?!
