@@ -3,4 +3,9 @@
 #
 # Gets a set of TU to analyze for cross-species data.
 
+# Start with output of ancestralTU.bsh ... (A.wGain.bed.gz)
+
+
+# Get a set of gene contiguous gene annotations (refGene?!).
+
 

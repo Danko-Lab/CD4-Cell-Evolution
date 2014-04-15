@@ -53,6 +53,6 @@ cat $dir/A.wGain.bed | sort-bed - | gzip > $dir/A.wGain.bed.gz
 
 #######
 ## Cleanup...
-rm $dir/A*.bed
+rm $dir/*.bed
 
  
