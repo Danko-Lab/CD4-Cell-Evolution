@@ -2,4 +2,38 @@
 #
 # Infers ancestral TU from Andre's HMM species-specific predictions.
 
+dir=alm_tu
+
+function makeBeds {
+ zcat $dir/$1-U.preds$2.bed.gz | awk '($6 == "+") {print $0 }' | sort-bed - > $dir/$1.plus.bed 
+ zcat $dir/$1-U.preds$2.bed.gz | awk '($6 == "-") {print $0 }' | sort-bed - > $dir/$1.minus.bed 
+}
+
+makeBeds H
+makeBeds C .hg19
+makeBeds M .hg19
+
+## Make ancestral TU.
+## Using: (H I C) U (H I M) U (C I M) where I === Intersection
+
+# Get intersection between all pairs of species.
+function Intersect {
+ bedops --intersect $dir/$1.plus.bed $dir/$2.plus.bed > $dir/$1.$2.plus.bed
+ bedops --intersect $dir/$1.minus.bed $dir/$2.minus.bed > $dir/$1.$2.minus.bed
+}
+
+Intersect H C
+Intersect H M
+Intersect C M
+
+# Get union.
+bedops --merge $dir/H.C.plus.bed $dir/H.M.plus.bed $dir/C.M.plus.bed > $dir/A.plus.bed
+bedops --merge $dir/H.C.minus.bed $dir/H.M.minus.bed $dir/C.M.minus.bed > $dir/A.minus.bed
+
+# Combine plus and minus strand.
+cat $dir/A.plus.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0","+"}' > $dir/A.bed
+cat $dir/A.minus.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0","-"}' >> $dir/A.bed
+gzip $dir/A.bed
+
+rm $dir/A*.bed
 
