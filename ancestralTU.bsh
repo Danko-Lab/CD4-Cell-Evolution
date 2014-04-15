@@ -27,13 +27,32 @@ Intersect H M
 Intersect C M
 
 # Get union.
-bedops --merge $dir/H.C.plus.bed $dir/H.M.plus.bed $dir/C.M.plus.bed > $dir/A.plus.bed
-bedops --merge $dir/H.C.minus.bed $dir/H.M.minus.bed $dir/C.M.minus.bed > $dir/A.minus.bed
+bedops --merge $dir/H.C.plus.bed $dir/H.M.plus.bed $dir/C.M.plus.bed | sort-bed - > $dir/A.plus.bed
+bedops --merge $dir/H.C.minus.bed $dir/H.M.minus.bed $dir/C.M.minus.bed | sort-bed - > $dir/A.minus.bed
 
 # Combine plus and minus strand.
 cat $dir/A.plus.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0","+"}' > $dir/A.bed
 cat $dir/A.minus.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0","-"}' >> $dir/A.bed
-gzip $dir/A.bed
+cat $dir/A.bed | sort-bed - | gzip > $dir/A.bed.gz
 
+########
+## Now, look for cases in which TU in one species are completely independent of the ancestral TU.  
+## Add these branch-specific gains back to a set which we will scan for expression. 
+function getGains {
+ bedops --not-element-of -1 $dir/$1.plus.bed $dir/A.plus.bed > $dir/$1.gain.plus.bed
+ bedops --not-element-of -1 $dir/$1.minus.bed $dir/A.minus.bed > $dir/$1.gain.minus.bed
+}
+
+getGains H
+getGains C
+getGains M
+
+cat $dir/*.gain.plus.bed $dir/A.plus.bed | sort-bed - | bedops --merge - | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0","+"}' > $dir/A.wGain.bed
+cat $dir/*.gain.minus.bed $dir/A.minus.bed | sort-bed - | bedops --merge - | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0","-"}' >> $dir/A.wGain.bed
+cat $dir/A.wGain.bed | sort-bed - | gzip > $dir/A.wGain.bed.gz
+
+#######
+## Cleanup...
 rm $dir/A*.bed
 
+ 
