@@ -41,9 +41,9 @@ bedops --not-element-of -1 annot/g.minus.operon.bed annot/fpm.minus.bed > annot/
 bufSize=1000
 dreg=../tss_caller/HCM-U-PI.dREG-tss-clusters.tsv
 cat annot/brk.plus.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$2+1}' | sort-bed - | closestBed -t first -d -a stdin -b $dreg | \
-	awk 'BEGIN{OFS="\t"} ($17<'"$bufSize"') {print $4,$5-1,$5}' |  sort-bed - > annot/brk.plus.dreg.tss.bed
+	awk 'BEGIN{OFS="\t"} ($16<'"$bufSize"') {print $4,$5-1,$5}' |  sort-bed - > annot/brk.plus.dreg.tss.bed
 cat annot/brk.minus.bed | awk 'BEGIN{OFS="\t"} {print $1,$3,$3+1}' | sort-bed - | closestBed -t last -d -a stdin -b $dreg | \
-	awk 'BEGIN{OFS="\t"} ($17<'"$bufSize"') {print $4,$6-1,$6}' | sort-bed - > annot/brk.minus.dreg.tss.bed
+	awk 'BEGIN{OFS="\t"} ($16<'"$bufSize"') {print $4,$6-1,$6}' | sort-bed - > annot/brk.minus.dreg.tss.bed
 
 # Break TU at each of these sites.  Use all TU, and break/ merge in just one step!
 bedops --difference annot/A.plus.bed annot/brk.plus.dreg.tss.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$1"_"$2"_"$3,"0","+"}' > annot/A.brk.bed
