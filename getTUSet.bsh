@@ -3,9 +3,36 @@
 #
 # Gets a set of TU to analyze for cross-species data.
 
+########
 # Start with output of ancestralTU.bsh ... (A.wGain.bed.gz)
 
+########
+# Break up TU boundaries.
 
-# Get a set of gene contiguous gene annotations (refGene?!).
+# Get a flattened set of gene annotations.
+# Keep this to high quality annotations in refGene.
+featureBits -or -where="strand = '+'" hg19 refGene:exon refGene:intron -bed="annot/fb.plus.refG.bed"
+featureBits -or -where="strand = '-'" hg19 refGene:exon refGene:intron -bed="annot/fb.minus.refG.bed"
+cat annot/fb.plus.refG.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,"0","+"}'  > annot/fb.refG.bed
+cat annot/fb.minus.refG.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,"0","-"}' >> annot/fb.refG.bed
+cat annot/fb.refG.bed | sort-bed - > annot/fb.refG.bed.tmp
+mv annot/fb.refG.bed.tmp annot/fb.refG.bed  
+
+# Get start sites which overlap dREG (0.7).
+bufSize=1000
+dreg=../tss_caller/HCM-U-PI.dREG-tss-clusters.tsv
+cat annot/fb.plus.refG.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$2+1}' | sort-bed - | closestBed -d -a annot/fb.plus.refG.bed -b $dreg | \
+	awk 'BEGIN{OFS="\t"} ($17<'"$bufSize"') {print $5,$6,$7}' | grep "chr" | grep -v "hap\|random" |  sort-bed - > annot/fb.plus.refG.dreg.tss.bed
+cat annot/fb.minus.refG.bed | awk 'BEGIN{OFS="\t"} {print $1,$3,$3+1}' | sort-bed - | closestBed -d -a annot/fb.minus.refG.bed -b $dreg | \
+	awk 'BEGIN{OFS="\t"} ($17<'"$bufSize"') {print $5,$6,$7}' | grep "chr" | grep -v "hap\|random" | sort-bed - > annot/fb.minus.refG.dreg.tss.bed
+
+# Get the set of these sites which are in the center of TU. 
+
+
+# Break TU at each of these sites.
+
+########
+# Add back annotated genes with low expression level (sensitivity issue).
+# 
 
 
