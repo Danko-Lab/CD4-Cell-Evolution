@@ -3,5 +3,5 @@
 # the 5' end has a dREG site, and the 3' end has substantial
 #  expression.
 
-
+a <- read.table("annot/gc.tss.tsv.gz")
 
