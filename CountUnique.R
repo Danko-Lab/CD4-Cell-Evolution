@@ -5,24 +5,21 @@
 ##  4/25/10 -- Should be all set!  They agree with one another, and pass all of the DUH tests.
 ##
 
-require()
-
 ## ... 
 isIn <- function(f, p) {
-  
+  stopifnot(NROW(f) == 1)
+  chrom<- f[1,1]
+  chromStart <- f[1,2]
+  chromEnd   <- f[1,3]
+  strand<- f[1,6]
+  indx <- as.character(p[,1]) == chrom & p[,6] == strand
+  sum(p[indx,3] > chromStart & p[indx,2] < chromEnd)
 }
 
 
 ## Counts the number of unique transcripts in a mixture, using the GROseq packages' AssociateWithInterval.
 countUnique <- function(UP) {
- UPFirstUnique <- UP
- NUM <- 1
- while( NROW(UPFirstUnique) > 1 ) {
-   ## Each time, this removes index=1, and any overlaps.
-   UPFirstUnique <- UPFirstUnique[is.na(associateWithInterval(UPFirstUnique[1,], UPFirstUnique)),]
-   NUM<- NUM+1  ## Increment each time it removes.
- }
- print(NUM)
+  return(sum(is.firstUniue(UP)))
 }
 
 ## Returns a vector, the same size as G, which represents whether each G is the first of a unique genomic region.
@@ -30,7 +27,7 @@ is.firstUnique <- function(G) {
   fu <- rep(FALSE, NROW(G))
   fu[1] <- TRUE
   for(i in 2:NROW(G)) {
-    fu[i] <- (sum(!is.na(associateWithInterval(f=G[i,], p=G[c(1:(i-1)),]))) == 0)
+    fu[i] <- isIn(G[i,], G[c(1:(i-1)),]) == 0
   }
   return(fu)
 }
