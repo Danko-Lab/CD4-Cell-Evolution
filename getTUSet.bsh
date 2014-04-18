@@ -74,6 +74,6 @@ paste annot/gc.minus.tsv annot/tssdist.minus.tsv >> annot/gc.tss.tsv
 cat annot/gc.tss.tsv | sort-bed - | gzip > annot/gc.tss.tsv.gz
 
 # Test each annotaiton for 3' end expression, and get longest -- 5' -> 3'.
-#R ... 
+R --no-save < getBestAnnotation.R  
 
-
+## Now merge all TU, and write a final set.
