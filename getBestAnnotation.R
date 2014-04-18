@@ -41,14 +41,15 @@ tss5p <- a$V14<startWindow
 ## TU that can be added back!
 sum(tss5p & expr3p) # 837 (4-17-2014)
 
-## Now 
+## Now get the longest incarnation of a TU that can be added back.
 addBack <- a[tss5p & expr3p, ]
 addBack$length <- addBack[,3]-addBack[,2]
 addBack <- addBack[order(addBack$length, decreasing=TRUE),]
 
 source("/usr/projects/GROseq/NHP/lib/CountUnique.R")
-addBack <- addBack[is.firstUnique(addBack)]
-
+addBack <- addBack[is.firstUnique(addBack),]
+NROW(addBack)
+write.table(addBack, "annot/addBack.bed", row.names=FALSE, col.names=FALSE, sep="\t", quote=FALSE)
 
 
 
