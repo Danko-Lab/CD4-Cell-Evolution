@@ -42,9 +42,9 @@ sum(TYPE == "RNA")
 divTrans <- read.table(paste(PATH,"divergent.Overlap.bed", sep=""))
 iRG <- match(E2[[4]], divTrans[[4]])
 if(sum(TYPE[!is.na(iRG)] == "NA") != sum(!is.na(iRG))) print("POSSIBLE ERROR!") ## ERROR CHECK!
-TYPE[!is.na(iRG)] <- "DIVERGENT"
+TYPE[!is.na(iRG)] <- "UPS_ANTISENSE" ## Upstream antisense (seems to be the prefered term).
 CLASS[!is.na(iRG)] <- as.character(divTrans[iRG[!is.na(iRG)],10])
-sum(TYPE == "DIVERGENT")
+sum(TYPE == "UPS_ANTISENSE")
 
 ## Antisense Transc.
 ansTrans <- read.table(paste(PATH,"as-refGene.Overlap.bed", sep=""))
@@ -87,7 +87,7 @@ CLASS[!is.na(iRG)] <- as.character(othTrans[iRG[!is.na(iRG)],4])
 sum(TYPE == "INTERGENIC")
 
 AN <- cbind(E2, TYPE= as.character(TYPE), CLASS= as.character(CLASS))
-write.table(AN, outfile, sep="\t", row.names=FALSE, col.names=T, quote=FALSE)
+write.table(AN, outfile, sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 
 ###########
 # Genes coated with rna...
@@ -128,5 +128,5 @@ for(i in c(1:NROW(iRG))) {
 }
 
 AN <- cbind(Eout, TYPE= as.character(TYPE), CLASS= as.character(CLASS))
-write.table(AN, paste(outfile,".RNA", sep=""), sep="\t", row.names=FALSE, col.names=T, quote=FALSE)
+write.table(AN, paste(outfile,".RNA", sep=""), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 
