@@ -51,6 +51,14 @@ bedops --difference annot/A.minus.bed annot/brk.minus.dreg.tss.bed | awk 'BEGIN{
 cat annot/A.brk.bed | sort-bed - > annot/A.brk.bed
 
 ########
+# Classify TU. 
+# 
+cd AnnotatePredictions
+bash annotationPipeline.gencode.bsh
+R --no-save --args ../annot/A.brk.bed ../annot/A.brk.annot.tsv  < AnnotateTrans.R
+cd ..
+
+########
 # Add back annotated genes with low expression level (sensitivity issue).
 # 
 
@@ -77,13 +85,7 @@ cat annot/gc.tss.tsv | sort-bed - | gzip > annot/gc.tss.tsv.gz
 R --no-save < getBestAnnotation.R  
 
 ## Now merge all TU, and write a final set.
-cat annot/A.brk.bed | awk 'BEGIN{OFS="\t";ORS=""} {print $0,"TU_Prediction","TUP","\n"}' > annot/TU.final.bed  
-
-## Before merging these ... classify TU.
-cd AnnotatePredictions
-bash annotationPipeline.gencode.bsh
-R --no-save --args ../annot/A.brk.bed ../annot/A.brk.annot.tsv  < AnnotateTrans.R
-cd ..
+cat annot/A.brk.annot.bed | awk 'BEGIN{OFS="\t";ORS=""} {print $0,"TU_Prediction","TUP","\n"}' > annot/TU.final.bed  
 
 cat annot/addBack.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,$5,$6,$7,$8}' >> annot/TU.final.bed
 #cat annot/TU.final.bed | sort-bed - | gzip > annot/TU.final.bed.gz

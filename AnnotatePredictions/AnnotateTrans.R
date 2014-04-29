@@ -14,21 +14,21 @@ PATH <- "/usr/projects/GROseq/NHP/tu_caller/AnnotatePredictions/GENCODE/"
 refGenes <- read.table(paste(PATH,"GENCODE.Overlap.bed", sep=""))
 iRG <- match(E2[[4]], refGenes[grep("protein_coding|_gene",refGenes$V15),4])
 if(sum(TYPE[!is.na(iRG)] == "NA") != sum(!is.na(iRG))) print("POSSIBLE ERROR!") ## ERROR CHECK!
-TYPE[!is.na(iRG)] <- "PROTEIN_CODING"
+TYPE[!is.na(iRG)] <- "protein_coding"
 CLASS[!is.na(iRG)] <- as.character(refGenes[grep("protein_coding|_gene",refGenes$V15),][iRG[!is.na(iRG)],12])
-sum(TYPE == "PROTEIN_CODING")
+sum(TYPE == "protein_coding")
 
 iRG <- match(E2[[4]], refGenes[grep("RNA|processed_transcript|sense_overlapping|sense_intronic|3prime_overlapping_ncrna",refGenes$V15),4])
 if(sum(TYPE[!is.na(iRG)] == "NA") != sum(!is.na(iRG))) print("POSSIBLE ERROR!") ## ERROR CHECK!
-TYPE[!is.na(iRG)] <- "RNA"
+TYPE[!is.na(iRG)] <- "lincRNA"
 CLASS[!is.na(iRG)] <- as.character(refGenes[grep("RNA|processed_transcript|sense_overlapping|sense_intronic|3prime_overlapping_ncrna",refGenes$V15),][iRG[!is.na(iRG)],12])
-sum(TYPE == "RNA")
+sum(TYPE == "lincRNA")
 
 iRG <- match(E2[[4]], refGenes[grep("antisense",refGenes$V15),4])
 if(sum(TYPE[!is.na(iRG)] == "NA") != sum(!is.na(iRG))) print("POSSIBLE ERROR!") ## ERROR CHECK!
-TYPE[!is.na(iRG)] <- "ANTISENSE"
+TYPE[!is.na(iRG)] <- "antisense"
 CLASS[!is.na(iRG)] <- as.character(refGenes[grep("antisense",refGenes$V15),][iRG[!is.na(iRG)],12])
-sum(TYPE == "ANTISENSE")
+sum(TYPE == "antisense")
 
 iRG <- match(E2[[4]], refGenes[grep("pseudogene|GERST_PG",refGenes$V15),4])
 if(sum(TYPE[!is.na(iRG)] == "NA") != sum(!is.na(iRG))) print("POSSIBLE ERROR!") ## ERROR CHECK!
@@ -40,25 +40,25 @@ sum(TYPE == "PSEUDOGENE+REP")
 rnaGenes <- read.table(paste(PATH,"rnaGene.Overlap.bed", sep=""))
 iRG <- match(E2[[4]], rnaGenes[[4]])
 if(sum(TYPE[!is.na(iRG)] == "NA") != sum(!is.na(iRG))) print("POSSIBLE ERROR!") ## ERROR CHECK!
-TYPE[!is.na(iRG)] <- "RNA"
+TYPE[!is.na(iRG)] <- "sRNA"
 CLASS[!is.na(iRG)] <- as.character(rnaGenes[iRG[!is.na(iRG)],10])
-sum(TYPE == "RNA")
+sum(TYPE == "sRNA")
 
 ## Divergent transcripts
 divTrans <- read.table(paste(PATH,"divergent.Overlap.bed", sep=""))
 iRG <- match(E2[[4]], divTrans[[4]])
 if(sum(TYPE[!is.na(iRG)] == "NA") != sum(!is.na(iRG))) print("POSSIBLE ERROR!") ## ERROR CHECK!
-TYPE[!is.na(iRG)] <- "UPS_ANTISENSE" ## Upstream antisense (seems to be the prefered term).
+TYPE[!is.na(iRG)] <- "ups_antisense" ## Upstream antisense (seems to be the prefered term).
 CLASS[!is.na(iRG)] <- as.character(divTrans[iRG[!is.na(iRG)],10])
-sum(TYPE == "UPS_ANTISENSE")
+sum(TYPE == "ups_antisense")
 
 ## Antisense Transc.
 ansTrans <- read.table(paste(PATH,"as-refGene.Overlap.bed", sep=""))
 iRG <- match(E2[[4]], ansTrans[[4]])
 if(sum(TYPE[!is.na(iRG)] == "NA") != sum(!is.na(iRG))) print("POSSIBLE ERROR!") ## ERROR CHECK!
-TYPE[!is.na(iRG)] <- "ANTISENSE"
+TYPE[!is.na(iRG)] <- "antisense"
 CLASS[!is.na(iRG)] <- as.character(ansTrans[iRG[!is.na(iRG)],11])
-sum(TYPE == "ANTISENSE")
+sum(TYPE == "antisense")
 
 ## Repeat Transcription.
 repTrans <- read.table(paste(PATH,"repeat.Overlap.bed", sep=""))
