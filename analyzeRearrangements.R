@@ -14,7 +14,6 @@ isExpr <- rowMax(rpkm_df[,2:9]) > 5e-5
 sum(isExpr)/NROW(isExpr)
 
 sum(changeExpr & isExpr)/ sum(isExpr)
-summary(fdr_df$type[changeExpr & isExpr])/summary(fdr_df$type[isExpr])
 
 
 ##############################################################################

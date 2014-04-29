@@ -25,7 +25,7 @@ function getAnnotations {
  zcat gencode.v18.annotation.gtf.gz | awk '{if($26~/1|2/){print $0}}' | \
 	awk 'BEGIN{OFS="\t"}{ if($3 == "transcript") {print $1,$4,$5,"GC."$1"_"$4"_"$5"_"$7,"0",$7,$14,$18,$10,$12} }' | \
 	sed 's/"//g' | sed 's/;//g' | sed '/#.*/d' | uniq | awk '$3 > $2 {print $0}' | sort-bed - > $GENCODE_TSV.tmp
- cat h_duppse.txt | grep "Chromosome" -v | awk 'BEGIN{OFS="\t"} {print "chr"$2,$3,$4,$9,0,$5,"GERST_PG",$1}' >> $GENCODE_TSV.tmp
+ cat h_duppse.txt | grep "Chromosome" -v | awk 'BEGIN{OFS="\t"} {print "chr"$2,$3,$4,$9,0,$5,"GERST_PG","N",$1,$1}' >> $GENCODE_TSV.tmp
  cat hg19.pseudogenes.Gerstein.bed | awk 'BEGIN{OFS="\t"} {print $0,"GERST_PG_hc",$4,$4,$4}' >> $GENCODE_TSV.tmp
  cat $GENCODE_TSV.tmp | sort-bed - > $GENCODE_TSV
  rm $GENCODE_TSV.tmp
