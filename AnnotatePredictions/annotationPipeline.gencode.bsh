@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 TMP="GENCODE"
 FILE="../annot/A.brk.bed"
-ols=0.20
-olsRep=0.50
+ols=0.5
+olsRep=0.90
 ## Remove previous annotations.
 rm $TMP/*.bed
 
