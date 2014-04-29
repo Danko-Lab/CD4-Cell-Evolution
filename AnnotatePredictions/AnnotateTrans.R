@@ -18,16 +18,22 @@ TYPE[!is.na(iRG)] <- "PROTEIN_CODING"
 CLASS[!is.na(iRG)] <- as.character(refGenes[grep("protein_coding|_gene",refGenes$V15),][iRG[!is.na(iRG)],12])
 sum(TYPE == "PROTEIN_CODING")
 
-iRG <- match(E2[[4]], refGenes[grep("RNA|processed_transcript",refGenes$V15),4])
+iRG <- match(E2[[4]], refGenes[grep("RNA|processed_transcript|sense_overlapping|sense_intronic|3prime_overlapping_ncrna",refGenes$V15),4])
 if(sum(TYPE[!is.na(iRG)] == "NA") != sum(!is.na(iRG))) print("POSSIBLE ERROR!") ## ERROR CHECK!
 TYPE[!is.na(iRG)] <- "RNA"
-CLASS[!is.na(iRG)] <- as.character(refGenes[grep("RNA|processed_transcript|sense_overlapping",refGenes$V15),][iRG[!is.na(iRG)],12])
+CLASS[!is.na(iRG)] <- as.character(refGenes[grep("RNA|processed_transcript|sense_overlapping|sense_intronic|3prime_overlapping_ncrna",refGenes$V15),][iRG[!is.na(iRG)],12])
 sum(TYPE == "RNA")
 
-iRG <- match(E2[[4]], refGenes[grep("pseudogene",refGenes$V15),4])
+iRG <- match(E2[[4]], refGenes[grep("antisense",refGenes$V15),4])
+if(sum(TYPE[!is.na(iRG)] == "NA") != sum(!is.na(iRG))) print("POSSIBLE ERROR!") ## ERROR CHECK!
+TYPE[!is.na(iRG)] <- "ANTISENSE"
+CLASS[!is.na(iRG)] <- as.character(refGenes[grep("antisense",refGenes$V15),][iRG[!is.na(iRG)],12])
+sum(TYPE == "ANTISENSE")
+
+iRG <- match(E2[[4]], refGenes[grep("pseudogene|GERST_PG",refGenes$V15),4])
 if(sum(TYPE[!is.na(iRG)] == "NA") != sum(!is.na(iRG))) print("POSSIBLE ERROR!") ## ERROR CHECK!
 TYPE[!is.na(iRG)] <- "PSEUDOGENE+REP"
-CLASS[!is.na(iRG)] <- as.character(refGenes[grep("pseudogene",refGenes$V15),][iRG[!is.na(iRG)],12])
+CLASS[!is.na(iRG)] <- as.character(refGenes[grep("pseudogene|GERST_PG",refGenes$V15),][iRG[!is.na(iRG)],12])
 sum(TYPE == "PSEUDOGENE+REP")
 
 ## RNA Genes
