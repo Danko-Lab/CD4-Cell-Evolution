@@ -55,7 +55,7 @@ cat annot/A.brk.bed | sort-bed - > annot/A.brk.bed
 # 
 cd AnnotatePredictions
 bash annotationPipeline.gencode.bsh
-R --no-save --args ../annot/A.brk.bed ../annot/A.brk.annot.tsv  < AnnotateTrans.R
+R --no-save --args ../annot/A.brk.bed ../annot/A.brk.annot.bed  < AnnotateTrans.R
 cd ..
 
 ########
@@ -84,10 +84,12 @@ cat annot/gc.tss.tsv | sort-bed - | gzip > annot/gc.tss.tsv.gz
 # Test each annotaiton for 3' end expression, and get longest -- 5' -> 3'.
 R --no-save < getBestAnnotation.R  
 
-## Now merge all TU, and write a final set.
-cat annot/A.brk.annot.bed | awk 'BEGIN{OFS="\t";ORS=""} {print $0,"TU_Prediction","TUP","\n"}' > annot/TU.final.bed  
+###########
+# Now merge all TU, and write a final set.
+#
 
+cat annot/A.brk.annot.bed > annot/TU.final.bed  
 cat annot/addBack.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,$5,$6,$7,$8}' >> annot/TU.final.bed
-#cat annot/TU.final.bed | sort-bed - | gzip > annot/TU.final.bed.gz
-#rm annot/*.bed
+cat annot/TU.final.bed | sort-bed - | gzip > annot/TU.final.bed.gz
+rm annot/*.bed
 
