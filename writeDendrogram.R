@@ -44,7 +44,7 @@ drawCor <- function(indx) {
 	 library(latticeExtra)
 	# hc1 <- agnes(1-cc, diss=TRUE, method="ward")
 	# hc1 <- hclust(dist(t(rpkm_df), method = "canberra"))
-	 hc1 <- hclust(dist(cc, method = "canberra"))
+	 hc1 <- hclust(dist(cc, method = "minkowski"))
 	 hc1 <- as.dendrogram(hc1)
 	 ord.hc1 <- order.dendrogram(hc1)
 	 hc2 <- reorder(hc1, cond[ord.hc1])
@@ -87,7 +87,7 @@ bin <- hexbin(x= log(rpkm_df[,2]+1,10), y=log(rpkm_df[,3]+1,10), 50)
 indx <- rowSums(rpkm_df) > 0
  
 png("scatterplots.png", width = 10000, height = 10000)
- hexplom(log(rpkm_df[indx,]+min(rpkm_df[rpkm_df>0]),10), xbins=25, colramp = magent)
+ hexplom(log(rpkm_df[indx,indx.unt-10]+min(rpkm_df[rpkm_df>0]),10), xbins=25, colramp = magent)
  #pairs(log(rpkm_df,10), pch=19)
 dev.off()
 
