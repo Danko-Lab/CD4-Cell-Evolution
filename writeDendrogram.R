@@ -5,7 +5,9 @@ require(cluster)
 ## Create a dendrogram.
 ## Using more efficient counting/ merging using bedops and bash scripts.						
 source("readData.R")
-ca <- ca[grep("gc18", ca[,"annot_type"]),] ## Remove pause sites and TSS for this task...
+#ca <- ca[grep("gc18", ca[,"annot_type"]),] ## Remove pause sites and TSS for this task...
+ca <- ca[grep("protein_coding", ca[,"type"]),]
+ca <- ca[(ca[,3]-ca[,2]) > 5000,]
 
 yb.sig.pal <- function(n, scale=10) {
  ints<- c(0:(n-1))/(n-1)   ## Linear scale from 0:1 x N values.
@@ -44,7 +46,7 @@ drawCor <- function(indx) {
 	 library(latticeExtra)
 	# hc1 <- agnes(1-cc, diss=TRUE, method="ward")
 	# hc1 <- hclust(dist(t(rpkm_df), method = "canberra"))
-	 hc1 <- hclust(dist(cc, method = "minkowski"))
+	 hc1 <- hclust(dist(cc, method = "euclidean"),  method="centroid")
 	 hc1 <- as.dendrogram(hc1)
 	 ord.hc1 <- order.dendrogram(hc1)
 	 hc2 <- reorder(hc1, cond[ord.hc1])
