@@ -8,59 +8,83 @@ getDifferences <- function(changeExpr, isExpr) {
   sum(changeExpr & isExpr)/ sum(isExpr)
   print(summary(fdr_df$type[changeExpr & isExpr])/summary(fdr_df$type[isExpr]))
 
+  indx.eRNA <- grepl("dREG_ENH", fdr_df$type)
+  indx.lincRNA <- grepl("lincRNA|processed_transcript|sense_intronic|sense_overlapping", fdr_df$type)
+  indx.unannot <- grepl("INTERGENIC|GENE_BadMatch|AS_BadMatch", fdr_df$type)
+  indx.pseudogene.rep <- grepl("pseudogene|GERST_PG|PSEUDOGENE+REP", fdr_df$type)
+  indx.protein_coding <- grepl("protein_coding", fdr_df$type)
+  indx.antisense <- grepl("antisense", fdr_df$type)
+  indx.uas <- grepl("ups_antisense", fdr_df$type)
+  indx.srna<- grepl("sRNA", fdr_df$type)
+
   fractionChanged <- list(
-    "eRNA"= NROW(unique(fdr_df$name[changeExpr & (fdr_df$type=="dREG_ENH") & isExpr]))/NROW(unique(fdr_df$name[(fdr_df$type=="dREG_ENH") & isExpr])),
-    "LincRNA"= NROW(unique(fdr_df$name[(changeExpr & (fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)]))/ NROW(unique(fdr_df$name[((fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)])),
-    "Protein Coding"=  NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)]))/NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])),
-    "Antisense"=  NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="antisense" & isExpr)]))/NROW(unique(fdr_df$name[(fdr_df$type=="antisense" & isExpr)])),
-    "Pseudogene"=  NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)]))/NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)])),
+    "eRNA"= NROW(unique(fdr_df$name[changeExpr & indx.eRNA & isExpr]))/NROW(unique(fdr_df$name[indx.eRNA & isExpr])),
+    "LincRNA"= NROW(unique(fdr_df$name[changeExpr & indx.lincRNA & isExpr]))/ NROW(unique(fdr_df$name[indx.lincRNA & isExpr])),
+    "Unannot"= NROW(unique(fdr_df$name[changeExpr & indx.unannot & isExpr]))/ NROW(unique(fdr_df$name[indx.unannot & isExpr])),
+    "sRNA"= NROW(unique(fdr_df$name[changeExpr & indx.srna & isExpr]))/ NROW(unique(fdr_df$name[indx.srna & isExpr])),
+    "Protein Coding"=  NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr]))/NROW(unique(fdr_df$name[indx.protein_coding & isExpr])),
+    "Antisense"=  NROW(unique(fdr_df$name[changeExpr & indx.antisense & isExpr]))/NROW(unique(fdr_df$name[indx.antisense & isExpr])),
+    "ups_Antis"= NROW(unique(fdr_df$name[changeExpr & indx.uas & isExpr]))/NROW(unique(fdr_df$name[indx.uas & isExpr])),
+    "Pseudogene"=  NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr]))/NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr])),
     "All Expressed"= NROW(unique(fdr_df$name[changeExpr & isExpr]))/NROW(unique(fdr_df$name[isExpr]))
   )
 
   pval <- list(
-    "eRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & (fdr_df$type=="dREG_ENH") & isExpr])), NROW(unique(fdr_df$name[(fdr_df$type=="dREG_ENH") & isExpr]))),
-      c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
-      # c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
+    "eRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.eRNA & isExpr])), NROW(unique(fdr_df$name[indx.eRNA & isExpr]))),
+      c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr])))))$p.value,
 
-    "LincRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & (fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)])), NROW(unique(fdr_df$name[((fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)]))), 
-      c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
-      #	c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
+    "LincRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.lincRNA & isExpr])), NROW(unique(fdr_df$name[indx.lincRNA & isExpr]))), 
+      c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr])))))$p.value,
 
-    "Protein Coding"=   fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)]))), 
-      c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
-      #	c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
+    "Unannot"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.unannot & isExpr])), NROW(unique(fdr_df$name[indx.unannot & isExpr]))), 
+      c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr])))))$p.value,
 
-    "Antisense"=  fisher.test(data.frame(c(sum(changeExpr & fdr_df$type=="antisense" & isExpr), sum(fdr_df$type=="antisense" & isExpr)), 
-      c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
-      # c(sum(changeExpr & isExpr), sum(isExpr))))$p.value,
+    "sRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.srna & isExpr])), NROW(unique(fdr_df$name[indx.srna & isExpr]))), 
+      c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr])))))$p.value,
 
-    "Pseudogene"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)]))), 
-      c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value,
-      # c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value,
+    "Protein Coding"=   fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr]))), 
+      c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr])))))$p.value,
+
+    "Antisense"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.antisense & isExpr])), NROW(unique(fdr_df$name[indx.antisense & isExpr]))), 
+      c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr])))))$p.value,
+
+    "ups_Antis"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.uas & isExpr])), NROW(unique(fdr_df$name[indx.uas & isExpr]))), 
+      c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr])))))$p.value,
+
+    "Pseudogene"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))), 
+      c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr])))))$p.value,
 
     "All Expressed"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr]))),
-      c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)])))))$p.value
-      # c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr])))))$p.value
+      c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr])))))$p.value
   )
 
   pval.pg <- list(
-    "eRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & (fdr_df$type=="dREG_ENH") & isExpr])), NROW(unique(fdr_df$name[(fdr_df$type=="dREG_ENH") & isExpr]))),
-      c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)]))) ))$p.value,
+    "eRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.eRNA & isExpr])), NROW(unique(fdr_df$name[indx.eRNA & isExpr]))),
+      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,
 
-    "LincRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & (fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)])), NROW(unique(fdr_df$name[((fdr_df$type=="processed_transcript" | fdr_df$type=="lincRNA") & isExpr)]))),
-      c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)])))  ))$p.value,
+    "LincRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.lincRNA & isExpr])), NROW(unique(fdr_df$name[indx.lincRNA & isExpr]))),
+      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,
 
-    "Protein Coding"=   fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="protein_coding" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="protein_coding" & isExpr)]))),
-      c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)])))  ))$p.value,
+    "Unannot"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.unannot & isExpr])), NROW(unique(fdr_df$name[indx.unannot & isExpr]))),       
+      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,  
 
-    "Antisense"=  fisher.test(data.frame(c(sum(changeExpr & fdr_df$type=="antisense" & isExpr), sum(fdr_df$type=="antisense" & isExpr)),
-      c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)])))   ))$p.value,
+    "sRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.srna & isExpr])), NROW(unique(fdr_df$name[indx.srna & isExpr]))),
+      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,  
 
-    "Pseudogene"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)]))),
-      c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)])))  ))$p.value,
+    "Protein Coding"=   fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr]))),
+      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,
+
+    "Antisense"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.antisense & isExpr])), NROW(unique(fdr_df$name[indx.antisense & isExpr]))),
+      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,
+
+    "ups_Antis"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.uas & isExpr])), NROW(unique(fdr_df$name[indx.uas & isExpr]))),                
+      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,   
+
+    "Pseudogene"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))),
+      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,
 
     "All Expressed"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr]))),
-      c(NROW(unique(fdr_df$name[(changeExpr & fdr_df$type=="GERST_PG" & isExpr)])), NROW(unique(fdr_df$name[(fdr_df$type=="GERST_PG" & isExpr)]))) ))$p.value
+      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value
   )
 
   require(ggplot2)
