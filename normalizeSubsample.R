@@ -55,7 +55,35 @@ norm.subsample.n <- function(l, nBins=100, nsamp=1000, boot.replace=TRUE, plot.c
  binMids <- seq(rs[1]-binInc,rs[2]+binInc,binInc)
 
  ## Get a combined distribution over all of the classes.
- binFreq <- sapply()
+ ne <- NROW(unlist(l))
+ binFreq <- sapply(binMids, function(x) { (sum( sapply(l, function(y) {sum(y<(x+binInc/2) & y>(x-binInc/2))}) )/ ne)  })
  
+ ## Compute the probabilities for each element in each list.
+ sweight <- l
+ for(i in 1:NROW(binMids)) {
+   bM <- binMids[i]
+   for(j in 1:NROW(l)) {
+     incl <- l[[j]]<(bM+binInc/2) & l[[j]]>(bM-binInc/2)
+     sweight[[j]][incl] <- binFreq[i]/sum(incl)
+   }
+ }
+
+ ## Subsample with a probability proposrtional to the combination of all elements of l.
+ sIndx <- l
+ for(j in 1:NROW(l)) {
+  sIndx[[j]] <- sample(c(1:NROW(l[[j]])), nsamp, prob=sweight[[l]], replace=boot.replace)
+ }
+
+ ## Sanity check that subsampling worked ...
+ if(plot.cdf) {
+   plot(ecdf(l[[1]]), xlim=rs, main="CDF before and after subsampling", col="gray")
+   plot(ecdf(l[[1]][sIndx[1]]), add=TRUE, col="black")
+   for(j in 2:NROW(l)) {
+     plot(ecdf(l[[j]]), col="gray", add=TRUE)
+     plot(ecdf(l[[j]][sIndx[j]]), add=TRUE, col="black")
+   }
+ }
+
+ return(sIndx)
 }
 
