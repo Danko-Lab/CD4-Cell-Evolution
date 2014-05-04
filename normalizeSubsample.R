@@ -47,13 +47,14 @@ norm.subsample <- function(a, b, nBins=100, nsamp=10000, boot.replace=TRUE, plot
 
 ## Generalizes norm.subsample for an arbitrary number of classes.
 ## l is a list of vectors.  Each represents a distinct class.
+## dist is a target distribution; if specified it will use that distribution.
 
 ## Test: 
 #    l <- list(x= rnorm(1000, mean=1.5), y= rnorm(1000, mean=2), z= rnorm(1000, mean=2.5))
 #    norm.subsample.n(l, plot.cdf=TRUE)
 ## Seems to work correctly...
 
-norm.subsample.n <- function(l, nBins=100, nsamp=1000, boot.replace=TRUE, plot.cdf=FALSE) {
+norm.subsample.n <- function(l, dist= NA, nBins=100, nsamp=1000, boot.replace=TRUE, plot.cdf=FALSE) {
 
  ## Descritise DS.
  rs <- range(unlist(l))
@@ -61,8 +62,13 @@ norm.subsample.n <- function(l, nBins=100, nsamp=1000, boot.replace=TRUE, plot.c
  binMids <- seq(rs[1]-binInc,rs[2]+binInc,binInc)
 
  ## Get a combined distribution over all of the classes.
- ne <- NROW(unlist(l))
- binFreq <- sapply(binMids, function(x) { (sum( sapply(l, function(y) {sum(y<(x+binInc/2) & y>(x-binInc/2))}) )/ ne)  })
+ if(is.na(dist)) {
+   ne <- NROW(unlist(l))
+   binFreq <- sapply(binMids, function(x) { (sum( sapply(l, function(y) {sum(y<(x+binInc/2) & y>(x-binInc/2))}) )/ ne)  })
+ }
+ else {
+   binFreq <- sapply(binMids, function(x) { sum(dist<(x+binInc/2) & dist>(x-binInc/2))/ NROW(dist) })
+ }
  
  ## Compute the probabilities for each element in each list.
  sweight <- l
