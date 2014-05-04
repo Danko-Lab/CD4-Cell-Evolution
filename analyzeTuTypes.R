@@ -2,12 +2,15 @@
 ##
 load("fdr.RData")
 PVAL <- 0.01
-EXPR <- 5e-5
+EXPR <- 0 #5e-5
 
-getDifferences <- function(changeExpr, isExpr) {
-  sum(changeExpr & isExpr)/ sum(isExpr)
-  print(summary(fdr_df$type[changeExpr & isExpr])/summary(fdr_df$type[isExpr]))
+toLogical <- function(indx, expLength) {
+  var <- rep(FALSE, expLength)
+  var[indx] <- TRUE
+  return(var)
+}
 
+## Define TU types.
   indx.eRNA <- grepl("dREG_ENH", fdr_df$type)
   indx.lincRNA <- grepl("lincRNA|processed_transcript|sense_intronic|sense_overlapping", fdr_df$type)
   indx.unannot <- grepl("INTERGENIC|GENE_BadMatch|AS_BadMatch", fdr_df$type)
@@ -16,6 +19,37 @@ getDifferences <- function(changeExpr, isExpr) {
   indx.antisense <- grepl("antisense", fdr_df$type)
   indx.uas <- grepl("ups_antisense", fdr_df$type)
   indx.srna<- grepl("sRNA", fdr_df$type)
+
+  ## Adjust data to normalize for expression levels ...
+  source("../lib/normalizeSubsample.R")
+  indx.good.df <- c(12:19,21:27)
+  #head(fdr_df[,indx.good.df])
+  data_sums <- log(rowSums(fdr_df[,indx.good.df])+1)
+  lnorm <- list(indx.eRNA= data_sums[indx.eRNA], 
+		indx.lincRNA= data_sums[indx.lincRNA], 
+		indx.unannot= data_sums[indx.unannot], 
+		indx.pseudogene.rep= data_sums[indx.pseudogene.rep], 
+		indx.protein_coding= data_sums[indx.protein_coding],
+		indx.antisense= data_sums[indx.antisense],
+		indx.uas= data_sums[indx.uas],
+		indx.srna= data_sums[indx.srna])
+  ns <- norm.subsample.n(lnorm, plot.cdf=TRUE)
+  indx.eRNA <- toLogical(which(indx.eRNA)[ns[[1]]])
+  indx.lincRNA <- toLogical(which(indx.lincRNA)[ns[[2]]])
+  indx.unannot <- toLogical(which(indx.unannot)[ns[[3]]])
+  indx.pseudogene.rep <- toLogical(which(indx.pseudogene.rep)[ns[[4]]])
+  indx.protein_coding <- toLogical(which(indx.protein_coding)[ns[[5]]])
+  indx.antisense <- toLogical(which(indx.antisense)[ns[[6]]])
+  indx.uas <- toLogical(which(indx.uas)[ns[[7]]])
+  indx.srna <- toLogical(which(indx.srna)[ns[[8]]])
+
+## UNDO THIS ONE!
+  indx.pseudogene.rep <- grepl("pseudogene|GERST_PG|PSEUDOGENE+REP", fdr_df$type)
+
+
+getDifferences <- function(changeExpr, isExpr) {
+  sum(changeExpr & isExpr)/ sum(isExpr)
+  print(summary(fdr_df$type[changeExpr & isExpr])/summary(fdr_df$type[isExpr]))
 
   fractionChanged <- list(
     "eRNA"= NROW(unique(fdr_df$name[changeExpr & indx.eRNA & isExpr]))/NROW(unique(fdr_df$name[indx.eRNA & isExpr])),
@@ -90,7 +124,7 @@ getDifferences <- function(changeExpr, isExpr) {
   require(ggplot2)
   library(reshape2)
   data_df <- data.frame(Type= names(fractionChanged), Changed= as.double(unlist(fractionChanged)), Pval= as.double(unlist(pval)), Pval.pg= as.double(unlist(pval.pg)))
-  data_df$Type <- factor(data_df$Type, levels= data_df$Type[c(1,2,4,5,3,6)])
+#  data_df$Type <- factor(data_df$Type, levels= data_df$Type[c(1,2,4,5,3,6)])
 
   # http://learnr.wordpress.com/2009/03/17/ggplot2-barplots/
   # http://stackoverflow.com/questions/10352894/barplot-using-ggplot2

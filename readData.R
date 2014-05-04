@@ -26,9 +26,9 @@ ca <- rbind(ca, ps, ts)
 
 ## Rename.
 names(ca) <- c("chrom", "chromStart", "chromEnd", "name", "score", "strand", "type", "mgi", "mapSize", "annot_type",
-                                                "Jurkat", "Human 1", "Human 2", "Human 3", "Chimp 2", "Chimp 3", "Chimp 4", "R. Macaque 1", "R. Macaque 2", "R. Macaque 3",
-                                                "PI Jurkat ", "PI Human 1", "PI Human 2", "PI Human 3", "PI Chimp 2", "PI Chimp 3", "PI Chimp 4", "PI R. Macaque 1", "PI R. Macaque 2", "PI R. Macaque 3",
-                                                "K562", "GM12878", "IMR90")
+                        "Jurkat", "Human 1", "Human 2", "Human 3", "Chimp 2", "Chimp 3", "Chimp 4", "R. Macaque 1", "R. Macaque 2", "R. Macaque 3",
+                        "PI Jurkat ", "PI Human 1", "PI Human 2", "PI Human 3", "PI Chimp 2", "PI Chimp 3", "PI Chimp 4", "PI R. Macaque 1", "PI R. Macaque 2", "PI R. Macaque 3",
+                        "K562", "GM12878", "IMR90")
 Condition <- as.factor(c("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", 
                                                 "U", "U", "U", "U", "U", "U", "U", "U", "U", "U",
                                                 "PI", "PI", "PI", "PI", "PI", "PI", "PI", "PI", "PI", "PI", "U", "U", "U"))
