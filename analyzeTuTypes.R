@@ -33,7 +33,7 @@ toLogical <- function(indx, expLength) {
 		indx.antisense= data_sums[indx.antisense],
 		indx.uas= data_sums[indx.uas],
 		indx.srna= data_sums[indx.srna])
-  ns <- norm.subsample.n(lnorm, plot.cdf=TRUE)
+  ns <- norm.subsample.n(lnorm, plot.cdf=TRUE, dist=data_sums[indx.eRNA])
   indx.eRNA <- toLogical(which(indx.eRNA)[ns[[1]]])
   indx.lincRNA <- toLogical(which(indx.lincRNA)[ns[[2]]])
   indx.unannot <- toLogical(which(indx.unannot)[ns[[3]]])
