@@ -45,3 +45,17 @@ norm.subsample <- function(a, b, nBins=100, nsamp=10000, boot.replace=TRUE, plot
 
 }
 
+## Generalizes norm.subsample for an arbitrary number of classes.
+## l is a list of vectors.  Each represents a distinct class.
+norm.subsample.n <- function(l, nBins=100, nsamp=1000, boot.replace=TRUE, plot.cdf=FALSE) {
+
+ ## Descritise DS.
+ rs <- range(unlist(l))
+ binInc  <- (rs[2]-rs[1])/nBins
+ binMids <- seq(rs[1]-binInc,rs[2]+binInc,binInc)
+
+ ## Get a combined distribution over all of the classes.
+ binFreq <- sapply()
+ 
+}
+

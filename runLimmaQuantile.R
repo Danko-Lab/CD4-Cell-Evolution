@@ -12,7 +12,7 @@ runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB,
                              useVoom=FALSE){
   require(limma)
   ## updated limma from 3.12.1 to 3.12.3 to 3.14.1 CGD: Now to 3.18.13
-  if(! packageDescription("limma")$Version == "3.18.13"){
+  if(! packageDescription("limma")$Version >= "3.18.13"){
     stop("Wrong version of limma package. This script requires  limma-3.18.3")
   }
 
