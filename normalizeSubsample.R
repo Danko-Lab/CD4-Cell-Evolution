@@ -47,6 +47,12 @@ norm.subsample <- function(a, b, nBins=100, nsamp=10000, boot.replace=TRUE, plot
 
 ## Generalizes norm.subsample for an arbitrary number of classes.
 ## l is a list of vectors.  Each represents a distinct class.
+
+## Test: 
+#    l <- list(x= rnorm(1000, mean=1.5), y= rnorm(1000, mean=2), z= rnorm(1000, mean=2.5))
+#    norm.subsample.n(l, plot.cdf=TRUE)
+## Seems to work correctly...
+
 norm.subsample.n <- function(l, nBins=100, nsamp=1000, boot.replace=TRUE, plot.cdf=FALSE) {
 
  ## Descritise DS.
@@ -69,18 +75,18 @@ norm.subsample.n <- function(l, nBins=100, nsamp=1000, boot.replace=TRUE, plot.c
  }
 
  ## Subsample with a probability proposrtional to the combination of all elements of l.
- sIndx <- l
+ sIndx <- list()
  for(j in 1:NROW(l)) {
-  sIndx[[j]] <- sample(c(1:NROW(l[[j]])), nsamp, prob=sweight[[l]], replace=boot.replace)
+  sIndx[[j]] <- sample(c(1:NROW(l[[j]])), nsamp, prob=sweight[[j]], replace=boot.replace)
  }
 
  ## Sanity check that subsampling worked ...
  if(plot.cdf) {
    plot(ecdf(l[[1]]), xlim=rs, main="CDF before and after subsampling", col="gray")
-   plot(ecdf(l[[1]][sIndx[1]]), add=TRUE, col="black")
+   plot(ecdf(l[[1]][sIndx[[1]]]), add=TRUE, col="black")
    for(j in 2:NROW(l)) {
      plot(ecdf(l[[j]]), col="gray", add=TRUE)
-     plot(ecdf(l[[j]][sIndx[j]]), add=TRUE, col="black")
+     plot(ecdf(l[[j]][sIndx[[j]]]), add=TRUE, col="black")
    }
  }
 
