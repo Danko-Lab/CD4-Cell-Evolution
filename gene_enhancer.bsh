@@ -8,7 +8,7 @@ function makeSimFile {
  indir=../annotations/chage_expr/
  infile=$1.change-U
  fudge=250 ## Currently BED files are written WITHOUT the TSS area.
- dist=30000
+ dist=50000
 
  ## Focus on protein-coding genes.  Get TSS.
  cat $indir/$infile.tsv | awk '($7 == "protein_coding") {print $0}' | awk 'BEGIN{OFS="\t"} ($6 == "+"){print $1,$2-'"$fudge"',$2+1-'"$fudge"',$4,$5,$6} ($6 == "-"){print $1,$3+'"$fudge"',$3+1+'"$fudge"',$4,$5,$6}' | sort-bed - > tmp/$infile.tsspc
@@ -30,7 +30,7 @@ function makeUpsFile {
  infile=$1.change-U
  fudge=250 ## Currently BED files are written WITHOUT the TSS area.
  avoid=2000
- dist=30000
+ dist=50000
 
  ## Focus on protein-coding genes.  Get TSS.
  cat $indir/$infile.tsv | awk '($7 == "protein_coding") {print $0}' | awk 'BEGIN{OFS="\t"} ($6 == "+"){print $1,$2-'"$fudge"'-'"$dist"',$2+1-'"$fudge"'-'"$avoid"',$4,$5,$6} ($6 == "-"){print $1,$3+'"$fudge"'+'"$avoid"',$3+1+'"$fudge"'+'"$dist"',$4,$5,$6}' | sort-bed - > tmp/$infile.tsspc
