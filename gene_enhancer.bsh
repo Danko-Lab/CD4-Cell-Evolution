@@ -38,7 +38,7 @@ function makeUpsFile {
  cat $indir/$infile.all.tsv | grep "dREG_ENH\|dREG_INGENE\|dREG_TSS" | sort-bed - > tmp/$infile.enh # dREG_ENH\|dREG_INGENE\|dREG_TSS
 
  ## Get the set of all enahcners nearby the TSS of each gene.
- bedmap --echo --median tmp/$infile.tsspc  tmp/$infile.enh | sed "s/|/\t/g" | sed "s/NAN/NA/g" > tmp/$infile.tsspc.enh
+ bedmap --echo --mean tmp/$infile.tsspc  tmp/$infile.enh | sed "s/|/\t/g" | sed "s/NAN/NA/g" > tmp/$infile.tsspc.enh
 }
 
 #makeUpsFile H
