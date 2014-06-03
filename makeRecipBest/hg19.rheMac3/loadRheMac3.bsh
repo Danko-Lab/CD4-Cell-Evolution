@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+netClass -noAr rheMac3.hg19.rbest.net.gz rheMac3 hg19 rheMac3Tohg19.rbest.class.net
+hgLoadNet hg19 rheMac3_net_rbest rheMac3Tohg19.rbest.class.net
+gzip rheMac3Tohg19.rbest.class.net
+

@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+
+export PATH=$PATH:/home/dankoc/src/kent/kent/src/hg/utils/automation/
+
+
+
+# mkdir hg19.panTro4
+# mkdir hg19.panTro4/axtChain
+
+doRecipBest.pl -workhorse=`uname -n` -stop=recipBest -buildDir /usr/projects/GROseq/NHP/makeRecipBest/hg19.rheMac3 hg19 rheMac3 > rheMac3.log
