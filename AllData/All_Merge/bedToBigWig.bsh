@@ -30,7 +30,8 @@ for f in $FILES
 function liftToHg19 {
  for i in $FILES
  do
-   f=`$f | cut -d \_ -f 1`
+   f=`echo $i | cut -d \. -f 1`
+   echo $f
 
    ## Convert to bedGraph
    zcat $f\_plus.wig.gz | perl ~/perl/wig2bedGraph.pl + > $f.bedGraph
@@ -74,13 +75,13 @@ FILES=`ls C*.bed.gz`
 CHINFO=chromInfo.panTro4
 makeBigWig
 MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.panTro4/panTro4.hg19.rbest.chain.gz # Use rbest
-#liftToHg19
+liftToHg19
 
 FILES=`ls M*.bed.gz`
 CHINFO=chromInfo.rheMac3
 makeBigWig
 MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.chain.gz # Use rbest
-#liftToHg19
+liftToHg19
 
 ## Cleanup.
 rm *.nr.rs.* tmp *.bedGraph *.bedGraph.gz
