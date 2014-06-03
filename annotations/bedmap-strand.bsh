@@ -1,0 +1,32 @@
+#!/usr/bin/bash
+
+# bedmap dosen't seem to respect strand?!  Tremendous oversight.  This wrapper forces strand, and returns an entire file.
+#
+# ASSUMPTIONS:
+# * ONLY SUPPORTS 1 MAPFILE.
+# * ASSUMES THE OUTPUT IS A BEDFILE THAT CAN BE PASSED TO sort-bed ... means --echo MUST be first.
+# * ACTUALLY, ONLY SUPPORTS GIVING THE MAPFILE AND REFFILE ARGUMENTS.  ALL OTHERS ARE NOT USED.
+
+nmap=$(expr $#) 
+nref=$(expr $# - 1)
+
+MAPFILE=${!nmap}
+REFFILE=${!nref}
+
+#_args=${array[@]:0:nref}
+#echo $_args
+
+cat $MAPFILE | awk '$6=="+" {print $0}' > tmp.plus.$MAPFILE.tmp
+cat $MAPFILE | awk '$6=="-" {print $0}' > tmp.minus.$MAPFILE.tmp
+cat tmp.plus.$MAPFILE.tmp tmp.minus.$MAPFILE.tmp | sort-bed - > tmp.both.$MAPFILE.tmp
+
+cat $REFFILE | awk '$6=="+" {print $0}' > tmp.plus.$REFFILE.tmp
+cat $REFFILE | awk '$6=="-" {print $0}' > tmp.minus.$REFFILE.tmp
+cat $REFFILE | awk '$6=="." {print $0}' > tmp.both.$REFFILE.tmp
+
+bedmap --echo --sum tmp.plus.$REFFILE.tmp tmp.plus.$MAPFILE.tmp > plus.map.tmp
+bedmap --echo --sum tmp.minus.$REFFILE.tmp tmp.minus.$MAPFILE.tmp > minus.map.tmp
+bedmap --echo --sum tmp.both.$REFFILE.tmp tmp.both.$MAPFILE.tmp > both.map.tmp
+
+cat plus.map.tmp minus.map.tmp both.map.tmp | sort-bed -
+rm *.tmp
