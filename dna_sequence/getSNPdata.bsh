@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+#
+# Gets data on nucleotide differences between human and chimpanzee.
+
+hgsql hg19 -N -e "select * from rheMac3Diff" | sort-bed - | gzip > rheMac3.diff.tsv.gz
+
