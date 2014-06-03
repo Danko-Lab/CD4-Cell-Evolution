@@ -1,0 +1,3 @@
+Scripts taken (with modifications) from Luo et. al. (2014) BMC Genomics.
+
+For GENCODE biotype information, see here: http://www.gencodegenes.org/gencode_biotypes.html

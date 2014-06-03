@@ -1,0 +1,125 @@
+#!/usr/bin/bash
+TMP="GENCODE"
+FILE="../annot/A.brk.bed"
+ols=0.5
+olsRep=0.90
+## Remove previous annotations.
+rm $TMP/*.bed
+
+## Run the annotations!
+echo "All transcripts"
+cat ../../annotations/gencode.v18.transcript.tsv | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$6,$4,$8,$9,$10,$7}' | sort-bed - > GENCODE/gencode.tsv 
+
+cat $FILE | awk '{print $4}' | sort | uniq | grep "" -c
+
+## Compare to GENCODE annotations. #######################################################
+##########################################################################################
+overlapSelect -strand -statsOutput -overlapSimilarity=$ols -selectCoordCols=0,1,2,3,4 GENCODE/gencode.tsv $FILE $TMP/GENCODE.overlap.stats
+R --no-save --args $TMP/GENCODE.overlap.stats $FILE GENCODE/gencode.tsv $TMP/GENCODE.Overlap.bed $TMP/GENCODE.NoOverlap.bed < parseGencodeAnnotationSimilarity.R
+
+### Get stats on transcript biotypes.
+echo "All GENCODE annotations:"
+grep "" -c $TMP/GENCODE.Overlap.bed
+
+echo "Protein coding genes:"
+grep "protein_coding\|_gene" -c $TMP/GENCODE.Overlap.bed
+
+echo "RNA Genes:"
+grep "protein_coding\|pseudogene" -v $TMP/GENCODE.Overlap.bed | grep "RNA\|processed_transcript" -c
+echo "lincRNA" 
+grep "lincRNA" -c $TMP/GENCODE.Overlap.bed
+echo "Processed transcript"
+grep "processed_transcript" -c $TMP/GENCODE.Overlap.bed
+
+echo "Pseudogene:"
+grep "pseudogene" -c $TMP/GENCODE.Overlap.bed
+
+
+## Annotated RNA Genes ###################################################################
+##########################################################################################
+echo "Annotated RNA Genes"
+overlapSelect -mergeOutput -strand -dropped=$TMP/rna.NoOverlap.bed rnaGenes.bed $TMP/GENCODE.NoOverlap.bed $TMP/rnaGene.Overlap.bed
+cat $TMP/rnaGene.Overlap.bed | awk '{print $4}' | sort | uniq | grep "" -c
+
+## Also get miRNAs that overlap with known genes.
+#echo "RNA genes in genic transcripts"
+
+cat $TMP/GENCODE.Overlap.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,$5,$6}' > $TMP/refGene.Overlap.TMP.bed
+overlapSelect -mergeOutput -strand rnaGenes.bed $TMP/refGene.Overlap.TMP.bed $TMP/rnaGene.Genic.Overlap.TMP.bed
+cat $TMP/rnaGene.Genic.Overlap.TMP.bed | sort|  uniq >  $TMP/rnaGene.Genic.Overlap.bed
+rm $TMP/refGene.Overlap.TMP.bed $TMP/rnaGene.Genic.Overlap.TMP.bed
+
+
+## Divergent Transcription ###############################################################
+##########################################################################################
+echo "Divergent Transcription"
+cat GENCODE/gencode.tsv | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$5,1,$4}'> GENCODE/gencode.truncatedbed.bed
+## Create the divergent transcription promoter annotates from the transcripts themselves, as well as from gene annotations.
+#perl MakePromoterAnnotations.pl refseqGenes.bed 500 500 1000 > $TMP/PromoterLocations.bed
+perl MakePromoterAnnotations.pl GENCODE/gencode.truncatedbed.bed 500 500 1000 > $TMP/PromoterLocations.bed
+perl MakePromoterAnnotations.pl $FILE           500 500 1000 >>$TMP/PromoterLocations.bed
+#perl SizeSelect.pl $TMP/as-refGene.NoOverlap.bed $TMP/div 5000  ## Size select ... DO NOT!
+
+## Run command.
+overlapSelect -overlapThreshold=0.10 -mergeOutput -oppositeStrand -dropped=$TMP/divergent.NoOverlap.bed $TMP/PromoterLocations.bed $TMP/rna.NoOverlap.bed $TMP/divergent.Overlap.TMP.bed
+
+## Size select relative to overlapping gene! Size must be >= 2x the size.
+cat $TMP/divergent.Overlap.TMP.bed | awk 'BEGIN{OFS="\t"} ((2*($3-$2))<($14-$13)){print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10}' > $TMP/divergent.Overlap.bed
+cat $TMP/divergent.Overlap.TMP.bed | awk 'BEGIN{OFS="\t"} ((2*($3-$2))>=($14-$13)){print $1,$2,$3,$4,$5,$6}' >> $TMP/divergent.NoOverlap.bed
+
+## Make sure that there are no overlaps!
+echo 'Do <- read.table("'$TMP'/divergent.Overlap.bed")' > DIVfilter.R
+echo 'Dn <- read.table("'$TMP'/divergent.NoOverlap.bed")' >> DIVfilter.R
+echo 'Dn <- Dn[!(Dn$V4 %in% Do$V4),]' >> DIVfilter.R
+echo 'write.table(Dn, "'$TMP'/divergent.NoOverlap.bed", row.names=F, quote=F, col.names=F, sep="\t")' >> DIVfilter.R
+R --no-save < DIVfilter.R > $TMP/ROUT.out
+
+rm $TMP/divergent.Overlap.TMP.bed  #rm $TMP/div.lg.bed $TMP/div.sm.bed ## Cleanup
+#perl ~/perl/col.pl $TMP/divergent.NoOverlap.bed 3 | sort | uniq | grep "" -c
+cat $TMP/divergent.Overlap.bed | awk '{print $4}' | sort | uniq | grep "" -c
+
+
+## Antisense Transcription ###############################################################
+##########################################################################################
+echo "Antisense Transcription"
+overlapSelect -overlapSimilarity=$ols -selectCoordCols=0,1,2,3,4 -mergeOutput -oppositeStrand -dropped=$TMP/as-refGene.NoOverlap.bed GENCODE/gencode.tsv $TMP/divergent.NoOverlap.bed $TMP/as-refGene.Overlap.bed
+#grep -c "" $TMP/as-refGene.NoOverlap.bed
+#perl ~/perl/col.pl $TMP/as-refGene.NoOverlap.bed 3 | sort | uniq | grep "" -c
+cat $TMP/as-refGene.Overlap.bed | awk '{print $4}' | sort | uniq | grep "" -c
+
+
+## Enhancer Transcription ################################################################
+##########################################################################################
+#echo "Enhancer Transcription"
+#cat ER.E2.Peaks.bed |  awk 'BEGIN{OFS="\t"} {print $1,$2-1000,$3+1000}' > $TMP/ERPeaks.txt
+#overlapSelect -selectCoordCols=0,1,2 -dropped=$TMP/et.NoOverlap.bed $TMP/ERPeaks.txt $TMP/divergent.NoOverlap.bed $TMP/E2PeaksOverlap.bed
+##grep -c "" $TMP/et.NoOverlap.bed
+##perl ~/perl/col.pl $TMP/et.NoOverlap.bed 3 | sort | uniq| grep -c ""
+#perl ~/perl/col.pl $TMP/E2PeaksOverlap.bed 3 | sort | uniq| grep -c ""
+
+
+## Repeat Transcription ##################################################################
+##########################################################################################
+echo "Identifying transcription with a large ovelap to repeat masker tracks."
+overlapSelect -overlapSimilarity=$olsRep -mergeOutput -dropped=$TMP/repeat.NoOverlap.bed rmsk.bed $TMP/as-refGene.NoOverlap.bed $TMP/repeat.Overlap.bed
+cat $TMP/repeat.Overlap.bed | awk '{print $4}' |sort |  uniq| grep -c ""
+
+
+## Integernic Transcription ##############################################################
+##########################################################################################
+echo "Separating remaining transcripts into genic{sense/antisense}/intergenic classes"
+overlapSelect -mergeOutput -strand -selectCoordCols=0,1,2,3,4 -dropped=$TMP/refBadMatch.NoOverlap.bed GENCODE/gencode.tsv $TMP/repeat.NoOverlap.bed $TMP/refGeneBadMatch.Overlap.bed
+#grep -c "" $TMP/refBadMatch.NoOverlap.bed
+#perl ~/perl/col.pl $TMP/refBadMatch.NoOverlap.bed 3 |sort |  uniq| grep -c ""
+cat $TMP/refGeneBadMatch.Overlap.bed | awk '{print $4}' |sort |  uniq| grep -c ""
+
+overlapSelect -mergeOutput -oppositeStrand -selectCoordCols=0,1,2,3,4 -dropped=$TMP/refASBadMatch.NoOverlap.bed GENCODE/gencode.tsv $TMP/refBadMatch.NoOverlap.bed $TMP/refGeneASBadMatch.Overlap.bed
+#grep -c "" $TMP/refASBadMatch.NoOverlap.bed  ## Intergenic === Anything left over in this file.
+#perl ~/perl/col.pl $TMP/refASBadMatch.NoOverlap.bed 3 | sort|  uniq| grep -c ""
+cat $TMP/refGeneASBadMatch.Overlap.bed | awk '{print $4}' |sort |  uniq| grep -c ""
+
+cat $TMP/refASBadMatch.NoOverlap.bed | awk '{print $4}' |sort |  uniq| grep -c ""
+
+## Cleanup ##
+#rm $TMP/*.NoOverlap.bedl
+

@@ -1,0 +1,25 @@
+## Make all transcripts file...
+#rm *.bed
+
+## Protein coding genes.
+hgsql hg19 -N -e "select chrom, txStart, txEnd, name2, exonCount, strand from refGene where chrom not like '%random%' and chrom not like '%hap%'" > /usr/projects/GROseq/NHP/tu_caller/AnnotatePredictions/refseqGenes.bed
+hgsql hg19 -N -e "select chrom, txStart, txEnd, name, exonCount, strand from knownGene where chrom not like '%random%' and chrom not like '%hap%'" > /usr/projects/GROseq/NHP/tu_caller/AnnotatePredictions/ucscGenes.bed
+hgsql hg19 -N -e "select chrom, txStart, txEnd, name2, exonCount, strand from ensGene where chrom not like '%random%' and chrom not like '%hap%'" > /usr/projects/GROseq/NHP/tu_caller/AnnotatePredictions/ensGenes.bed
+
+cat refseqGenes.bed > AllGeneAnnotations.bed
+cat ucscGenes.bed  >> AllGeneAnnotations.bed
+cat ensGenes.bed   >> AllGeneAnnotations.bed
+
+##
+## Run 4/29/2014 -- current version is mirBase20
+#wget ftp://mirbase.org/pub/mirbase/CURRENT/genomes/hsa.gff3 
+
+## Get the rnaGenes track, and liftOver to hg19 (no native hg19 as of 2/21/11).
+hgsql hg18 -N -e "select chrom,chromStart,chromEnd,type,score,strand from rnaGene where name not like '%pseudo%' and type not like '%miRNA%' and chrom not like '%random%' and chrom not like '%hap%'" > /usr/projects/GROseq/NHP/tu_caller/AnnotatePredictions/rnaGenes.hg18.bed
+liftOver rnaGenes.hg18.bed /gbdb/hg18/liftOver/hg18ToHg19.over.chain.gz rnaGenes.hg19.bed rnaGenes.liftOver.UNMAPPED.bed
+cat rnaGenes.hg19.bed > rnaGenes.bed
+R --no-save < writeMirBase.R
+cat hsa.mirbase20.hg19.bed >> rnaGenes.bed
+
+## Get RMSK track...
+hgsql hg19 -N -e "select genoName,genoStart,genoEnd,repClass from rmsk" > /usr/projects/GROseq/NHP/tu_caller/AnnotatePredictions/rmsk.bed
