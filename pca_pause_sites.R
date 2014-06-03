@@ -27,13 +27,12 @@ getPsPc <- function(x) {
 
  ## For each gene, construct a matrix of ... reads x sample.
  ## https://github.com/andrelmartins/bigWig/blob/master/bigWig/R/basepair.query.R
- for(i in 1:ns) {
-  bed6.step.bpQuery.bigWig(bwp[[i]], bwm[[i]], rps)
-    
- } 
+ mat <- lapply(1:ns, function(i) {
+  bed6.step.bpQuery.bigWig(bwp[[i]], bwm[[i]], rps, 1)
+ }) ## Change this to one matrix per condition.
 
  ## PCA. Filter for pause sites that don't change in quantity.
-
+ 
 
  ## Get pause sites whose PCA is significantly different across species.  
  ##  Quantify withing-species divergence; -> between species divergence.
