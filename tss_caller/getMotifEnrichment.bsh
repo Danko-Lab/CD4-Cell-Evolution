@@ -1,0 +1,33 @@
+#!/usr/bin/bash
+. runInsightFunction.bsh
+
+inpath=/usr/projects/GROseq/NHP/tss_caller/Results/
+MOTIFS=/usr/data/GROseq.parser/hg19/cd4/dreg/cd4.dreg.tfs263.th6.db.starch
+FOOTPR=/usr/data/GROseq.parser/hg19/cd4/dnase1fp/footprints/dnase1.merge.sort.bam.dnase.peaks.bed.WellingtonFootprints.FDR.0.01.bed
+
+min_occ=100
+MotifScore=7
+##
+
+function insightCommonMotifs {
+ motifhits=$1 ## H-U.motifs.change.up.bed
+ R --no-save --args $inpath/$motifhits $min_occ $inpath/$motifhits.common < getCommonMotifs.R
+ 
+ useMotifs=`cat $inpath/$motifhits.common`
+ for i in $useMotifs
+ do
+  echo $i
+  cat $inpath/$motifhits | grep $i > $inpath/$i.bed
+  runINSIGHT motif.$i.$motifhits $i.bed 
+  rm $i.bed
+ done
+}
+
+
+#cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change.tsv | grep "PromEnh" | sort-bed -  > $inpath/H-U.change.bed
+#bedops --element-of -1 $MOTIFS $inpath/H-U.change.bed > $inpath/H-U.motifs.change.bed
+
+cat /usr/projects/GROseq/NHP/annotations/chage_expr/H.change.tsv | grep "PromEnh" | awk '($14>2) {print $0}' | sort-bed -  > $inpath/H-U.change.up.bed
+bedops --element-of -1 $MOTIFS $inpath/H-U.change.up.bed | awk '($5>'"$MotifScore"') {print $0}' > $inpath/H-U.motifs.change.up.bed
+insightCommonMotifs H-U.motifs.change.up.bed
+
