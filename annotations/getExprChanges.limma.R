@@ -110,14 +110,19 @@ NROW(unique(ca[fdr_t[,3] < PVAL & fdr_t[,6] < PVAL & ca[,"annot_type"] == "gc18"
 
 ## Write table of genes to use in GO.
 writeExprChange <- function(ss, name, indx, indx_pi) {
+ ## For GO.
  write.table(unique(ca[fdr_t[,indx] < PVAL & ca[,"annot_type"] == "gc18","mgi"]), paste("chage_expr/",name,".U.mgi.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
- write.table(cbind(genes, fdr_t, fc_t)[fdr_t[,indx]<PVAL, ], paste("chage_expr/",name,".change-U.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
-
  write.table(unique(ca[fdr_t[,indx_pi] < PVAL & ca[,"annot_type"] == "gc18","mgi"]), paste("chage_expr/",name,".PI.mgi.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
- write.table(cbind(genes, fdr_t, fc_t)[fdr_t[,indx_pi]<PVAL, ], paste("chage_expr/",name,".change-PI.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
-
  write.table(unique(ca[fdr_t[,indx] < PVAL & fdr_t[,indx_pi] < PVAL & ca[,"annot_type"] == "gc18","mgi"]), paste("chage_expr/",name,".U+PI.mgi.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
+
+ ## Tables ...
+ write.table(cbind(genes[,1:4], fc_t[,indx],genes[,6:10], fdr_t, fc_t)[fdr_t[,indx]<PVAL, ], paste("chage_expr/",name,".change-U.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
+ write.table(cbind(genes[,1:4], fc_t[,indx], genes[,6:10], fdr_t, fc_t)[fdr_t[,indx_pi]<PVAL, ], paste("chage_expr/",name,".change-PI.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
  write.table(cbind(genes, fdr_t, fc_t)[fdr_t[,indx] < PVAL & fdr_t[,indx_pi]<PVAL, ], paste("chage_expr/",name,".change-U+PI.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
+
+ ## Tables ... all genes (no p-value).
+ write.table(cbind(genes[,1:4], fc_t[,indx],genes[,6:10], fdr_t, fc_t), paste("chage_expr/",name,".change-U.all.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
+ write.table(cbind(genes[,1:4], fc_t[,indx_pi],genes[,6:10], fdr_t, fc_t), paste("chage_expr/",name,".change-PI.all.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
 }
 
 writeExprChange(ss, "H", 1,4)
