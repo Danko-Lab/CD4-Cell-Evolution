@@ -49,11 +49,15 @@ cat annot/brk.minus.bed | awk 'BEGIN{OFS="\t"} {print $1,$3,$3+1}' | sort-bed - 
 bedops --difference annot/A.plus.bed annot/brk.plus.dreg.tss.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$1"_"$2"_"$3,"0","+"}' > annot/A.brk.bed
 bedops --difference annot/A.minus.bed annot/brk.minus.dreg.tss.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$1"_"$2"_"$3,"0","-"}' >> annot/A.brk.bed
 cat annot/A.brk.bed | sort-bed - > annot/A.brk.bed.tmp
-mv A.brk.bed.tmp A.brk.bed
+mv annot/A.brk.bed.tmp annot/A.brk.bed
 
 ########
 # Classify TU. 
-# 
+#
+cd ../annotations ## On the first run, files do not exist.
+bash makeAnnotations.bsh
+cd ../tu_caller
+ 
 cd AnnotatePredictions
 bash annotationPipeline.gencode.bsh
 R --no-save --args ../annot/A.brk.bed ../annot/A.brk.annot.bed  < AnnotateTrans.R
