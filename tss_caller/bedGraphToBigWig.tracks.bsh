@@ -1,0 +1,12 @@
+#!/usr/bin/bash
+
+## Converts a bedGraph to a bigWig.
+for i in "H-U.TSS.bedGraph.gz" "C-U.TSS_hg19.bedGraph.gz" "M-U.TSS_hg19.bedGraph.gz"
+do
+  echo $i
+  j=`echo $i | cut -d \. -f 1,2,3`
+  k=`echo $i | cut -d \. -f 1,2`
+  zcat $i | sort-bed - > $j 
+  bedGraphToBigWig $j ../hg19.chromInfo $k.bw
+  rm $j
+done
