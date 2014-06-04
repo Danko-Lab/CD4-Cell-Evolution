@@ -5,13 +5,13 @@
 dir=alm_tu
 
 function makeBeds {
- zcat $dir/$1-U.preds$2.bed.gz | awk '($6 == "+") {print $0 }' | sort-bed - > $dir/$1.plus.bed 
- zcat $dir/$1-U.preds$2.bed.gz | awk '($6 == "-") {print $0 }' | sort-bed - > $dir/$1.minus.bed 
+ zcat $dir/$1-U.preds.full.bed.gz | awk '($6 == "+") {print $0 }' | sort-bed - > $dir/$1.plus.bed 
+ zcat $dir/$1-U.preds.full.bed.gz | awk '($6 == "-") {print $0 }' | sort-bed - > $dir/$1.minus.bed 
 }
 
 makeBeds H
-makeBeds C .hg19
-makeBeds M .hg19
+makeBeds C
+makeBeds M
 
 ## Make ancestral TU.
 ## Using: (H I C) U (H I M) U (C I M) where I === Intersection
