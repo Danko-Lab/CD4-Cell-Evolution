@@ -13,7 +13,7 @@ densScatterplot <- function(x1, x2, n=256, ...) {
   df$col <- cols[df$dens]
 
   ## Plot it, reordering rows so that densest points are plotted on top
-  plot(x2~x1, data=df[order(df$dens),], pch=20, col=df$col, cex=2, ...)
+  plot(x2~x1, data=df[order(df$dens),], pch=20, col=col, cex=2, ...)
 }
 
 
