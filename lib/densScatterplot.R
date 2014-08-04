@@ -16,4 +16,4 @@ densScatterplot <- function(x1, x2, n=256, ...) {
   plot(x2~x1, data=df[order(df$dens),], pch=20, col=col, cex=2, ...)
 }
 
-
+## For a scale bar, see this: http://stackoverflow.com/questions/9314658/colorbar-from-custom-colorramppalette
