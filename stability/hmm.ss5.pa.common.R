@@ -1,5 +1,5 @@
-source("../taf15_experiment_motivation/pipeline/polyA.vs.SS5.qhmm.R", chdir=TRUE)
-hg19 = twobit.load("hg19.2bit")
+source("polyA.vs.SS5.qhmm.R", chdir=TRUE)
+hg19 = twobit.load("/gbdb/hg19/hg19.2bit")
 scan.length = 1500 # 1.5 kbp
 
 collect.sequence <- function(twobit, bed, seq.length = 1500) {

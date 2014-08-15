@@ -2,6 +2,7 @@
 # reimplementation of the polyA vs SS5 HMM using the QHMM package
 #
 library(grocap)
+require(twoBit)
 library(rqhmm)
 
 #
@@ -112,7 +113,7 @@ make.ss5.pA.qhmm <- function(back, ss5, polyA) {
 # PWMs
 #
 
-load("../../splicing/splicing.pwms.Rdata")
+load("splicing.pwms.Rdata")
 
 # poly A
 polyA.patterns = list(
