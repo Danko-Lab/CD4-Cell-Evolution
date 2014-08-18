@@ -1,5 +1,7 @@
 source("polyA.vs.SS5.qhmm.R", chdir=TRUE)
 hg19 = twobit.load("/gbdb/hg19/hg19.2bit")
+rheMac3 = twobit.load("/gbdb/rheMac3/rheMac3.2bit")
+panTro4 = twobit.load("/gbdb/panTro4/panTro4.2bit")
 scan.length = 1500 # 1.5 kbp
 
 collect.sequence <- function(twobit, bed, seq.length = 1500) {
@@ -59,3 +61,4 @@ unstable.score <- function(hmm, data, n.threads = 1) {
     sum(out.probs[4:5])
   })
 }
+
