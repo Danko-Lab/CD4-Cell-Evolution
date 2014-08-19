@@ -22,4 +22,3 @@ data.frame(tss_hg19, H, C, M)
 summary(unstable.score(hmm= res, data= make.ss5.pA.hmm.data(collect.sequence(hg19, read.table("tmp.plus"))), n.threads = 1))
 #[cgd24@cbsubscb08 stability]$ cat ../annotations/gencode.v18.transcript.tsv | grep "protein_coding" | grep "-" | head -n 100 > tmp.minus
 summary(unstable.score(hmm= res, data= make.ss5.pA.hmm.data(collect.sequence(hg19, read.table("tmp.minus"))), n.threads = 1))
-
