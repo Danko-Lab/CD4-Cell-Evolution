@@ -23,6 +23,7 @@ colnames(ts) <- colnames(ca)
 
 ## Join em
 ca <- rbind(ca, ps, ts)
+ca <- ca[grep("random", ca$chrom, invert=TRUE),]
 
 ## Rename.
 names(ca) <- c("chrom", "chromStart", "chromEnd", "name", "score", "strand", "type", "mgi", "mapSize", "annot_type",
