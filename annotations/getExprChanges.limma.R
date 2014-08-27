@@ -31,7 +31,9 @@ source("../lib/runLimmaQuantile.R")
 condition <- species
 condition[species == "H"] <- "Human"
 condition[species != "H"] <- "NHP"
-hs    <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="Human", condB="NHP", q.cut=PVAL, lfc=FOLD)
+pdf("MAPlotHuman.pdf")
+hs    <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="Human", condB="NHP", q.cut=PVAL, lfc=FOLD, plotMA=TRUE)
+dev.off()
 hs_pi <- runLimmaQuantile(counts[,dindx_pi], condition[dindx_pi], genes, condA="Human", condB="NHP", q.cut=PVAL, lfc=FOLD)
 
 condition <- species

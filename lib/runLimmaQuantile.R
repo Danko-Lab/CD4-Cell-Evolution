@@ -9,7 +9,7 @@
 
 runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB, 
                              q.cut=0.01, lfc=0.0, lib.size=colSums(count.dat),
-                             useVoom=FALSE){
+                             useVoom=FALSE, plotMA=FALSE){
   require(limma)
   ## updated limma from 3.12.1 to 3.12.3 to 3.14.1 CGD: Now to 3.18.13
   if(! packageDescription("limma")$Version >= "3.18.13"){
@@ -38,6 +38,15 @@ runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB,
   fit2 <- eBayes(fit2)
   res=decideTests(fit2,p.value=q.cut,lfc=lfc)
   tab<-topTable(fit2, adjust = "BH", number=nrow(fit2), sort.by='none')
+
+  if(plotMA) {
+#   plotMA(fit2, array=2, status=as.factor(decideTests(fit2)[,2]), col=c("black", "red", "blue"))
+   plotMA(fit2, array=2, status=(p.adjust(fit2$p.value, method="fdr")<PVAL), col=c("black", "red"))
+   abline(h=0, col="blue")
+
+#   plotMDS(dat,top=500,labels=species,gene.selection="common")
+  }
+
 #  rownames(tab)=tab[,1]
   if(useVoom){
     counts.limma=2^dat$E[match(rownames(tab), rownames(dat$E)),] ## CGD: Changed to re-order using rownames ...
