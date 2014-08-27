@@ -41,7 +41,9 @@ runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB,
 
   if(plotMA) {
 #   plotMA(fit2, array=2, status=as.factor(decideTests(fit2)[,2]), col=c("black", "red", "blue"))
-   plotMA(fit2, array=2, status=(p.adjust(fit2$p.value, method="fdr")<PVAL), col=c("black", "red"))
+   status <- as.character(p.adjust(fit2$p.value, method="fdr")<PVAL)
+   status[genes[,4] == "chr5_140005300_140013300"] <- "zCD14"
+   plotMA(fit2, array=2, status=status, col=c("black", "red", "blue"))
    abline(h=0, col="blue")
 
 #   plotMDS(dat,top=500,labels=species,gene.selection="common")
