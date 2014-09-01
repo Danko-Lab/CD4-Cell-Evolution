@@ -78,6 +78,11 @@ dataID=H-U.FPmotifs.change.up
 inbed=H-U.FPmotifs.change.up.bed
 runINSIGHT $dataID $inbed &
 
+####
+## Run on raw elements.
+
+
+
 ###############################################################################################
 ##
 ## Run on RAW dREG elements ... overall changes to tss usage.
