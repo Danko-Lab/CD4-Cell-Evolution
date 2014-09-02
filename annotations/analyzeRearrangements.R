@@ -4,7 +4,7 @@ require(ggplot2)
 library(reshape2)
 
 load("fdr.RData")
-PVAL <- 0.01
+PVAL <- 0.05#1
 
 summary(fdr_df$fdr_min < PVAL) ## ~12k transcripts that change expression.
 changeExpr <- fdr_df$fdr_min < PVAL & !is.na(fdr_df$fdr_min) & abs(fdr_df$fc_min) > FOLD #1
@@ -20,7 +20,7 @@ sum(changeExpr & isExpr)/ sum(isExpr)
 ## Compare frequency of changes in expression for transcripts inside re-arrangements.
 
 ## Re-read data, and restrict search to known genes.
-use_indx <- which(ca$type == "protein_coding") # which(ca$annot_type == "gc18") 
+use_indx <- which(ca$type == "protein_coding") # which(ca$annot_type == "gc18") # 1:NROW(ca) 
 
 gap <- gap[use_indx,]
 fdr_df <- fdr_df[use_indx,]
@@ -43,7 +43,11 @@ chimpData <- list( nonSyn=c(NROW(unique(ca$mgi[chimpchange & isExpr & gap$V2 == 
                                                 NROW(unique(ca$mgi[isExpr & gap$V2 == "syn"]))), 
 
 		    inv=c(NROW(unique(ca$mgi[chimpchange & isExpr & gap$V2 == "inv"])),
-                                                NROW(unique(ca$mgi[isExpr & gap$V2 == "inv"]))), 
+                                                NROW(unique(ca$mgi[isExpr & gap$V2 == "inv"]))),
+
+                 any=c(NROW(unique(ca$mgi[chimpchange & isExpr & gap$V2 != "NONE"])),
+	                                        NROW(unique(ca$mgi[isExpr & gap$V2 != "NONE"]))),
+ 
 
 		 none=c(NROW(unique(ca$mgi[chimpchange & isExpr & gap$V2 == "NONE"])),
                                                 NROW(unique(ca$mgi[isExpr & gap$V2 == "NONE"]))) 
@@ -59,6 +63,9 @@ macaqueData <- list( nonSyn=c(NROW(unique(ca$mgi[macaquechange & isExpr & gap$V4
 
                     inv=c(NROW(unique(ca$mgi[macaquechange & isExpr & gap$V4 == "inv"])),
                                                 NROW(unique(ca$mgi[isExpr & gap$V4 == "inv"]))),
+
+                    any=c(NROW(unique(ca$mgi[macaquechange & isExpr & gap$V4 != "NONE"])),
+                                                NROW(unique(ca$mgi[isExpr & gap$V4 != "NONE"]))),
 
                  none=c(NROW(unique(ca$mgi[macaquechange & isExpr & gap$V4 == "NONE"])),
                                                 NROW(unique(ca$mgi[isExpr & gap$V4 == "NONE"])))   
@@ -98,10 +105,10 @@ fisher.test(data.frame(c(NROW(unique(ca$mgi[macaquechange & isExpr & gap$V4 == "
 
 
 
-data_df <- data.frame(Species= factor(c(rep("Chimpanzee", 4), rep("Rhesus Macaque", 4))), 
-				Type= factor(rep(c("Inversion", "None", "Different Chrom", "Same Chrom"), 2), levels=c("Different Chrom", "Same Chrom", "Inversion", "None")), 
-				Value= as.double(c(c(chimpData$inv[1]/chimpData$inv[2], chimpData$none[1]/chimpData$none[2], chimpData$nonSyn[1]/chimpData$nonSyn[2], chimpData$syn[1]/chimpData$syn[2]), 
-					c(macaqueData$inv[1]/macaqueData$inv[2], macaqueData$none[1]/macaqueData$none[2], macaqueData$nonSyn[1]/macaqueData$nonSyn[2], macaqueData$syn[1]/macaqueData$syn[2]) )))
+data_df <- data.frame(Species= factor(c(rep("Chimpanzee", 5), rep("Rhesus Macaque", 5))), 
+				Type= factor(rep(c("Any", "Inversion", "None", "Different Chrom", "Same Chrom"), 2), levels=c("Different Chrom", "Same Chrom", "Inversion", "Any", "None")), 
+				Value= as.double(c(c(chimpData$any[1]/chimpData$any[2], chimpData$inv[1]/chimpData$inv[2], chimpData$none[1]/chimpData$none[2], chimpData$nonSyn[1]/chimpData$nonSyn[2], chimpData$syn[1]/chimpData$syn[2]), 
+					c(macaqueData$any[1]/macaqueData$any[2], macaqueData$inv[1]/macaqueData$inv[2], macaqueData$none[1]/macaqueData$none[2], macaqueData$nonSyn[1]/macaqueData$nonSyn[2], macaqueData$syn[1]/macaqueData$syn[2]) )))
 data_df
 
 
