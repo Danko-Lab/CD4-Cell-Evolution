@@ -1,8 +1,9 @@
 #!/usr/bin/bash
 . runInsightFunction.bsh
-FC_TH=2 # 1.58
-PVAL_TH=0.01 #  0.05 0.01
+FC_TH=2 #  1.58 2
+PVAL_TH=0.02 #  0.05 0.01
 DREG_TH=0.7
+MOTIF=9 # 7 8
 PATTERN="dREG" # "dREG_ENH\|dREG_INGENE" #"dREG_TSS" "dREG" "dREG_ENH" "dREG_INGENE"
 
 inpath=/usr/projects/GROseq/NHP/tss_caller/Results/
@@ -14,38 +15,37 @@ cgpath=/usr/projects/GROseq/NHP/annotations/chage_expr
 ## Basics
 
 ## All dREG w/ MOTIFS.
-cat HCM-U-PI.dREG-tss-clusters.tsv | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/H-U+PI.motifs7.bed
+cat HCM-U-PI.dREG-tss-clusters.tsv | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>'"$MOTIF"') {print $0}' > $inpath/H-U+PI.motifs7.bed
 dataID=H-U+PI.motifs7
 inbed=H-U+PI.motifs7.bed
-#runINSIGHT $dataID $inbed &
+runINSIGHT $dataID $inbed &
 
 ## ALL DNase-1 peaks w/ MOTIFS.
-cat $DNASEP | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/DNase.motifs7.bed
+cat $DNASEP | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>'"$MOTIF"') {print $0}' > $inpath/DNase.motifs7.bed
 dataID=DNase.motifs7
 inbed=DNase.motifs7.bed
-#runINSIGHT $dataID $inbed &
-
+runINSIGHT $dataID $inbed &
 
 ## Changed in U condition dREG w/ MOTIFS.
-cat $cgpath/H.change-U.tsv | grep $PATTERN | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/H-U.motifs7.change.bed
+cat $cgpath/H.change-U.tsv | grep $PATTERN | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>'"$MOTIF"') {print $0}' > $inpath/H-U.motifs7.change.bed
 dataID=H-U.motifs7.change
 inbed=H-U.motifs7.change.bed
 runINSIGHT $dataID $inbed &
 
 ## Changed in U+PI conditions dREG w/ MOTIFS.
-cat $cgpath/H.change-U+PI.tsv | grep $PATTERN | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/H-U+PI.motifs7.change.bed
+cat $cgpath/H.change-U+PI.tsv | grep $PATTERN | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>'"$MOTIF"') {print $0}' > $inpath/H-U+PI.motifs7.change.bed
 dataID=H-U+PI.motifs7.change
 inbed=H-U+PI.motifs7.change.bed
 runINSIGHT $dataID $inbed &
 
 ## Changed in U condition dREG w/ MOTIFS.
-cat $cgpath/H.change-U.tsv | grep $PATTERN | awk '($5 > '"$DREG_TH"' && $11 < '"$PVAL_TH"') {print $0}' | awk '($21>'"$FC_TH"') {print $0}' | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/H-U.motifs7.change.strict.bed
+cat $cgpath/H.change-U.tsv | grep $PATTERN | awk '($5 > '"$DREG_TH"' && $11 < '"$PVAL_TH"') {print $0}' | awk '($21>'"$FC_TH"' || $21<(-'"$FC_TH"')) {print $0}' | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>'"$MOTIF"') {print $0}' > $inpath/H-U.motifs7.change.strict.bed
 dataID=H-U.motifs7.change.strict
 inbed=H-U.motifs7.change.strict.bed
 runINSIGHT $dataID $inbed &
 
 ## Changed in U+PI conditions dREG w/ MOTIFS.
-cat $cgpath/H.change-U+PI.tsv | grep $PATTERN | awk '($5 > '"$DREG_TH"' && $11 < '"$PVAL_TH"') {print $0}' | awk '($21>'"$FC_TH"') {print $0}' | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>7) {print $0}' > $inpath/H-U+PI.motifs7.change.strict.bed
+cat $cgpath/H.change-U+PI.tsv | grep $PATTERN | awk '($5 > '"$DREG_TH"' && $11 < '"$PVAL_TH"') {print $0}' | awk '($21>'"$FC_TH"' || $21<(-'"$FC_TH"')) {print $0}' | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>'"$MOTIF"') {print $0}' > $inpath/H-U+PI.motifs7.change.strict.bed
 dataID=H-U+PI.motifs7.change.strict
 inbed=H-U+PI.motifs7.change.strict.bed
 runINSIGHT $dataID $inbed &
