@@ -9,8 +9,11 @@ change <- fdr_df$fdr_min < PVAL | fdr_df$fdr_min_pi < PVAL
 
 ## Clustering...
 source("../lib/CCVgen.R")
-CreateCoorelationMatrix(MATRIX=fc_t[change,], NAMES=rownames(fdr_df$name[change]), k=NULL, METH="ward", MODE="heatmap")
+png("heat.tmp2.png", height=10000, width=600)
+ CreateCoorelationMatrix(MATRIX=fc_t[change,], NAMES=rownames(fdr_df$name[change]), k=8, METH="ward", MODE="heatmap")
+dev.off()
 
+q("no")
 
 ## Simplest clustering...
 png("tmp.png")
