@@ -7,20 +7,27 @@ load("fdr.RData")
 PVAL <- 0.01
 change <- fdr_df$fdr_min < PVAL | fdr_df$fdr_min_pi < PVAL
 
+## Clustering...
+source("../lib/CCVgen.R")
+CreateCoorelationMatrix(MATRIX=fc_t[change,], NAMES=rownames(fdr_df$name[change]), k=NULL, METH="ward", MODE="heatmap")
+
+
 ## Simplest clustering...
-heatmap(fc_t[change,])
+png("tmp.png")
+ heatmap(fc_t[change,])
+dev.off()
 
 ## Cluster changed genes...
 hc <- hclust(dist(fc_t[change,], method = "euclidean"), method="single")
-heatmap(hc)
-
 hc1 <- as.dendrogram(hc)
 ord.hc1 <- order.dendrogram(hc1)
-hc2 <- reorder(hc1, cond[ord.hc1])
-ord.hc2 <- order.dendrogram(hc2)
+
+
+pl <- levelplot((fc_t[change,])[ord.hc1,], col.regions= yb.sig.pal(100, scale=3), xlab="", ylab="")
+print(pl)
 
 ## Write plots...
- pl <- levelplot((cc)[ord.hc2, ord.hc2], col.regions= yb.sig.pal(100, scale=3), xlab="", ylab="", #rev(cm.colors(100)),  # #c("white", "yellow", "blue") # c("#E9F231", "#B1EC2C", "#5DBDEF")
+ pl <- levelplot((cc)[ord.hc1, ord.hc1], col.regions= yb.sig.pal(100, scale=3), xlab="", ylab="", #rev(cm.colors(100)),  # #c("white", "yellow", "blue") # c("#E9F231", "#B1EC2C", "#5DBDEF")
                  colorkey = list(space="left", labels=list(cex=1.5)),
                  scales = list(x= list(rot=90, cex=1.5, labels=labs[ord.hc2]), y=list(draw=FALSE)), #scales = list(x = list(rot = 90)), 
                  legend = list(
