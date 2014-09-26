@@ -37,5 +37,12 @@ X <- rbind(c(1,1,1,2,2,3,3,3,    1,1,1,2,2,3,3), c(rep(4,8), rep(5,7)))
 norm_vals <- RUVinv(Y, X, ctrl)
 
 
+##
+## As a santiy check, these control genes are generally higher in Chimp.  
+## Human and rhesus similar, w/ some outliers.
 
+plot(log(rowMeans(Y[ctrl,1:3])), log(rowMeans(Y[ctrl,4:5])), xlab="human", ylab="chimp")
+abline(0,1)
 
+plot(log(rowMeans(Y[ctrl,1:3])), log(rowMeans(Y[ctrl,7:9])), xlab="human", ylab="rhesus")
+abline(0,1)

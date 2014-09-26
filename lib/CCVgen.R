@@ -85,7 +85,7 @@ if(MODE == "heatmap") {
 	print(MODE)
 	## Center/scale
 	SIZE = 250
-	CS <- t(scale(t(choppedM), center=choppedM[,1]))
+	CS <- t(scale(t(choppedM))) #t(scale(t(choppedM), center=choppedM[,1])) ## CGD: 9-26-14 ... Try clustering w/o centering.
 	CS <- CS/max(abs(CS))
 	for(i in 1:NROW(CS) ) {
 		## Change to [0/1].
@@ -129,7 +129,7 @@ if(MODE == "heatmap") {
 				plot(TIME, MEANS, col="black", cex.axis=3.5, cex.lab=4, 
 					type="l", xlab="E2 (min)", ylab="Relative Expression")#, ylim=c(MIN,0))
 				for(row in which(CLUSTER==num))
-					points(TIME, as.real(CS[row,]), col="light gray", type="l")
+					points(TIME, as.double(CS[row,]), col="light gray", type="l")
 				points(TIME, MEANS, col="blue", type="l", lwd=6)
 			dev.off()
 		}
@@ -203,7 +203,7 @@ AddGOSquares <- function(CLU, K, include.labels=FALSE) {
 
 			N[i] <- NTotal;
 			Y[i] <- NInPathway[1];
-			C[i] <- as.real( IntraClusterDistanceMean(CLU,CLU$order[which(CT == i)]) );
+			C[i] <- as.double( IntraClusterDistanceMean(CLU,CLU$order[which(CT == i)]) );
 			P[i] <- Pval;
 			NAMES[i] <- PathName[1];
 
@@ -227,7 +227,7 @@ AddGOSquares <- function(CLU, K, include.labels=FALSE) {
 		else {
 			N[i] <- NROW(which(CT == i));
 			Y[i] <- 0;
-			C[i] <- as.real( IntraClusterDistanceMean(CLU,CLU$order[which(CT == i)]) );
+			C[i] <- as.double( IntraClusterDistanceMean(CLU,CLU$order[which(CT == i)]) );
 			P[i] <- 1;
 			NAMES[i] <- "NA";
 	

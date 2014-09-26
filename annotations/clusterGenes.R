@@ -7,6 +7,12 @@ load("fdr.RData")
 PVAL <- 0.01
 change <- fdr_df$fdr_min < PVAL | fdr_df$fdr_min_pi < PVAL
 
+## Reverse tehse columns... 
+fc_t[,7:10] <- -1*fc_t[,7:10]
+
+## Change order ... H-U,H-PI,H-PI/U, ...
+fc_t <- fc_t[,c(1,4,7,2,5,8,3,6,9,10)]
+
 ## Clustering...
 source("../lib/CCVgen.R")
 png("heat.tmp2.png", height=10000, width=600)
