@@ -5,6 +5,27 @@
 
 source("readData.R")
 
+##
+## Do PCA ...
+
+# Get RPKM
+rpkm_df <- as.matrix(ca[,indx.good[c(2:9,11:17)]]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
+for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- log(1000*(rpkm_df[,i]+1)/sum(rpkm_df[,i]) *1000/(ca[,"mapSize"]))
+#for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*rpkm_df[,i]/sum(rpkm_df[,i]) *1000/(ca[,"mapSize"])
+
+pca <- prcomp(rpkm_df[,1:8])#, center=TRUE, scale=TRUE) ## UNT
+cols <- c(rep("red",3), rep("green",2), rep("blue", 3))
+
+pca <- prcomp(rpkm_df)#, scale=T) ## ALL
+cols <- c(rep("red",3), rep("green",2), rep("blue", 3), rep("red", 3), rep("green", 2), rep("blue", 2))
+
+summary(pca) # Prints variance summary for all principal components.
+#plot(pca$rotation[,1], pca$rotation[,2], pch=19, col=cols)
+pairs(pca$rotation[,1:4], col=cols)
+
+## 
+## Correlate each PC w/ the expected effects of cell compositio on GE.
+
 
 ##
 ## Get a set of genes expected to be invariant ...
@@ -22,37 +43,17 @@ CD14c <- bedQuery.bigWig(ca[,1:3], cd14p1, gapValue=0)+ #+bed.region.bpQuery.big
          bedQuery.bigWig(ca[,1:3], cd14m1, gapValue=0)+
          bedQuery.bigWig(ca[,1:3], cd14m2, gapValue=0)
 
-ctrl <- (log((CD4c+1)/sum(CD4c))-log((CD14c+1)/sum(CD14c))) < -5
+ctrl_m <- (log((CD4c+1)/sum(CD4c))-log((CD14c+1)/sum(CD14c))) < -5
+ctrl_t <- (log((CD4c+1)/sum(CD4c))-log((CD14c+1)/sum(CD14c))) > 5
+
+monocyte <- (log((CD4c+1)/sum(CD4c))-log((CD14c+1)/sum(CD14c)))
+
+tst <- ctrl_m | ctrl_t
 
 ##
-## Get RPKM
-rpkm_df <- as.matrix(ca[,indx.good[c(2:9,11:17)]]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
-for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*rpkm_df[,i]/sum(rpkm_df[,i]) *1000/(ca[,"mapSize"])
+## Do correlation.
+for(i in 1:5) {
+ print(cor.test(pca$x[tst,i], monocyte[tst], method="spearman"))
+# boxplot(pca$x[ctrl_m,i], pca$x[ctrl_t,i])
+}
 
-
-##
-## Now apply the RUV method...
-require(ruv.DE)
-
-Y <- rpkm_df #as.matrix(ca[,indx.good[c(2:9,11:17)]])
-
-#X <- as.integer(as.factor(rbind(c("H","H","H","C","C","M","M","M",    "H","H","H","C","C","M","M"), c(rep("U",8), rep("PI",7)))))
-
-X <- t(rbind(c(1,1,1,2,2,3,3,3,    1,1,1,2,2,3,3), c(rep(4,8), rep(5,7))))
-### ctrl <- ca$type == "protein_coding" ## Assume no changes in protein-coding...
-
-norm_vals <- RUVinv(Y, X, ctrl)
-
-
-##
-## As a santiy check, these control genes are generally higher in Chimp.  
-## Human and rhesus similar, w/ some outliers.
-
-exp(summary(as.double(log(rowMeans(Y[ctrl,1:3])+1)-log(rowMeans(Y[ctrl,4:5])+1))))
-exp(summary(as.double(log(rowMeans(Y[ctrl,1:3])+1)-log(rowMeans(Y[ctrl,7:9])+1))))
-
-plot(log(rowMeans(Y[ctrl,1:3])), log(rowMeans(Y[ctrl,4:5])), xlab="human", ylab="chimp")
-abline(0,1)
-
-plot(log(rowMeans(Y[ctrl,1:3])), log(rowMeans(Y[ctrl,7:9])), xlab="human", ylab="rhesus")
-abline(0,1)

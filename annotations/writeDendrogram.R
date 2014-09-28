@@ -27,8 +27,8 @@ yb.sig.pal <- function(n, scale=10) {
 }
 
 drawCor <- function(indx) {
-	rpkm_df <- as.matrix(ca[,indx])/(ca[,"mapSize"]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
-	for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*rpkm_df[,i]/sum(rpkm_df[,i])
+	rpkm_df <- as.matrix(ca[,indx])#/(ca[,"mapSize"]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
+	for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*rpkm_df[,i]/sum(rpkm_df[,i]) *1000/(ca[,"mapSize"]) ## Normalization MUST be here.
 
 	cond <- Condition[indx]
 	spec <- Species[indx]
