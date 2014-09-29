@@ -29,19 +29,7 @@ pairs(pca$rotation[,1:5], col=cols, pch=pch)
 
 ##
 ## Get a set of genes expected to be invariant ...
-require(bigWig)
-cd4 <- load.bigWig("/usr/data/GROseq.parser/hg19/cd4/rnaseq/cd4.epigenome.rnaseq.bw")
-cd14p1 <- load.bigWig("/usr/data/GROseq.parser/hg19/cd14/rnaseq/wgEncodeCshlLongRnaSeqMonocd14CellPapPlusRep1.bigWig")
-cd14p2 <- load.bigWig("/usr/data/GROseq.parser/hg19/cd14/rnaseq/wgEncodeCshlLongRnaSeqMonocd14CellPapPlusRep2.bigWig")
-cd14m1 <- load.bigWig("/usr/data/GROseq.parser/hg19/cd14/rnaseq/wgEncodeCshlLongRnaSeqMonocd14CellPapMinusRep1.bigWig")
-cd14m2 <- load.bigWig("/usr/data/GROseq.parser/hg19/cd14/rnaseq/wgEncodeCshlLongRnaSeqMonocd14CellPapMinusRep2.bigWig")
-
-## Count reads ... 
-CD4c  <- bedQuery.bigWig(ca[,1:3], cd4, gapValue=0) #bed.region.bpQuery.bigWig(cd4, ca[,1:6])
-CD14c <- bedQuery.bigWig(ca[,1:3], cd14p1, gapValue=0)+ #+bed.region.bpQuery.bigWig(cd14p2, ca[,1:6])+bed.region.bpQuery.bigWig(cd14m1, ca[,1:6])+bed.region.bpQuery.bigWig(cd14m2, ca[,1:6])
-         bedQuery.bigWig(ca[,1:3], cd14p2, gapValue=0)+
-         bedQuery.bigWig(ca[,1:3], cd14m1, gapValue=0)+
-         bedQuery.bigWig(ca[,1:3], cd14m2, gapValue=0)
+souce("../dataSanityChecks/compareBloodCells.R")
 
 ctrl_m <- (log((CD4c+1)/sum(CD4c))-log((CD14c+1)/sum(CD14c))) < -5
 ctrl_t <- (log((CD4c+1)/sum(CD4c))-log((CD14c+1)/sum(CD14c))) > 5
