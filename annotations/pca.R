@@ -7,11 +7,11 @@ source("readData.R")
 
 ##
 ## Do PCA ...
+rpkm_df <- log(rpkm_df[,c(2:9,11:17)]+1e-7)
 
-# Get RPKM
-rpkm_df <- as.matrix(ca[,indx.good[c(2:9,11:17)]]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
-for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- log(1000*(rpkm_df[,i]+0.25)/sum(rpkm_df[,i]) *1000/(ca[,"mapSize"]))
-#for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*rpkm_df[,i]/sum(rpkm_df[,i]) *1000/(ca[,"mapSize"])
+#pkm_df <- as.matrix(ca[,indx.good[c(2:9,11:17)]]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
+#or(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- log(1000*(rpkm_df[,i]+0.25)/sum(rpkm_df[,i]) *1000/(ca[,"mapSize"]))
+
 
 pca <- prcomp(rpkm_df[,1:8], center=FALSE, scale=FALSE) ## UNT
 #pca <- prcomp(rpkm_df[,9:15], center=FALSE, scale=FALSE) ## PI

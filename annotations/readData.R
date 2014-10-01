@@ -59,3 +59,8 @@ indx.all <- c(11:33)## ALL
 indx.unt <- c(11:14,16:20,31:33)## ONLY UNTREATED, GOOD Remove C2-U
 #indx <- c(11:12,14:22,24,26) ## "Good?!"  Remove H2-U, C2-PI, M1-PI
 indx.good <- c(11:14,16:24,26:27,29:33) ## "Good?!"  Remove C2-U+PI, M1-PI
+
+# Get RPKM
+rpkm_df <- as.matrix(ca[,indx.good]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
+for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*(rpkm_df[,i]+0)/sum(rpkm_df[,i]) *1000/(ca[,"mapSize"])
+

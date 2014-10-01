@@ -9,9 +9,6 @@ source("readData.R")
 ## Use only untreated, and get switch to RPKM
 ca <- ca[,c(1:10,indx.good)]
 
-rpkm_df <- as.matrix(ca[,c(11:NCOL(ca))])/(ca[,"mapSize"]) #/ (colSums(ca[,c(10:15)])) ## Normalize counts ... RPKM
-for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*rpkm_df[,i]/sum(rpkm_df[,i])
-
 counts <- ca[,c(12:19,21:27)]
 genes  <- ca[,c(1:10)]
 

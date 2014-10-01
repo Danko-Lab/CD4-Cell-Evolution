@@ -7,9 +7,27 @@
 ##  Genome Biology, 14(9), R95. doi:10.1186/gb-2013-14-9-r95
 ## 
 
+removePC <- function(dat, i, plot.pc=TRUE) {
+  pca <- prcomp(dat, center=FALSE, scale=FALSE) ## UNT
+
+  cols <- c(rep("red",3), rep("green",2), rep("blue", 3), rep("dark red", 3), rep("dark green", 2), rep("dark blue", 2), "black", "black")
+  pch <- c(rep(19,8), rep(6,7), 9, 24)
+
+  summary(pca) # Prints variance summary for all principal components.
+  #plot(pca$rotation[,1], pca$rotation[,2], pch=19, col=cols)
+  if(plot.pc) {
+    pairs(pca$rotation[,1:5], col=cols, pch=pch)
+  }
+
+  n <- NROW(pca$rotation)
+  adj_df <- ((pca$x[,c(1:(i-1),(i+1):n)] %*% t(pca$rotation[,c(1:(i-1),(i+1):n)])))
+
+  return(adj_df)
+}
+
 runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB, 
                              q.cut=0.01, lfc=0.0, lib.size=colSums(count.dat),
-                             useVoom=FALSE, plotMA=FALSE){
+                             useVoom=FALSE, plotMA=FALSE, remove.pc=NULL){
   require(limma)
   ## updated limma from 3.12.1 to 3.12.3 to 3.14.1 CGD: Now to 3.18.13
   if(! packageDescription("limma")$Version >= "3.18.13"){
@@ -19,7 +37,7 @@ runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB,
   groups=as.factor(conditions)
   design <- model.matrix(~0+groups)
   colnames(design) = levels(groups)
-  
+
   if(useVoom){ ### THIS PART REQUIRES UPDATING!
     require(edgeR)
     nf <- calcNormFactors(count.dat)
@@ -30,8 +48,13 @@ runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB,
 
     dat=counts.log.norm.dat
 #    plotDensities(dat)
-  } 
-  
+  }
+  ## PCA.
+#  if(!is.null(remove.pc)) {
+#    dat <- removePC(dat, remove.pc)
+#  }
+
+  ## DGE.  
   fit=lmFit(dat,design)
   contrast.matrix <- makeContrasts(contrasts= paste(condA,"-",condB), levels=design)
   fit2 <- contrasts.fit(fit, contrast.matrix) 

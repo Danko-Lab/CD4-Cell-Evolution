@@ -9,10 +9,7 @@ source("readData.R")
 ## Use only untreated, and get switch to RPKM
 ca <- ca[,c(1:10,indx.good)]
 
-rpkm_df <- as.matrix(ca[,c(11:NCOL(ca))])/(ca[,"mapSize"]) #/ (colSums(ca[,c(10:15)])) ## Normalize counts ... RPKM
-for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*rpkm_df[,i]/sum(rpkm_df[,i])
-
-counts <- ca[,c(12:19,21:27)]
+counts <- ca[,c(12:19,21:27)] #rpkm_df[,c(2:9,11:17)] #ca[,c(12:19,21:27)]
 genes  <- ca[,c(1:10)]
 species  <- c("H","H","H","C","C","M","M","M",    "H","H","H","C","C","M","M")
 treatment<- c(rep("U",8), rep("PI",7))
@@ -32,21 +29,21 @@ condition <- species
 condition[species == "H"] <- "Human"
 condition[species != "H"] <- "NHP"
 pdf("MAPlotHuman.pdf")
-hs    <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="Human", condB="NHP", q.cut=PVAL, lfc=FOLD, plotMA=TRUE)
+hs    <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="Human", condB="NHP", q.cut=PVAL, lfc=FOLD, plotMA=TRUE, remove.pc=3)
 dev.off()
-hs_pi <- runLimmaQuantile(counts[,dindx_pi], condition[dindx_pi], genes, condA="Human", condB="NHP", q.cut=PVAL, lfc=FOLD)
+hs_pi <- runLimmaQuantile(counts[,dindx_pi], condition[dindx_pi], genes, condA="Human", condB="NHP", q.cut=PVAL, lfc=FOLD, remove.pc=3)
 
 condition <- species
 condition[species == "C"] <- "Chimp"
 condition[species != "C"] <- "PRIMATES"
-cs <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="Chimp", condB="PRIMATES", q.cut=PVAL, lfc=FOLD)
-cs_pi <- runLimmaQuantile(counts[,dindx_pi], condition[dindx_pi], genes, condA="Chimp", condB="PRIMATES", q.cut=PVAL, lfc=FOLD)
+cs <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="Chimp", condB="PRIMATES", q.cut=PVAL, lfc=FOLD, remove.pc=3)
+cs_pi <- runLimmaQuantile(counts[,dindx_pi], condition[dindx_pi], genes, condA="Chimp", condB="PRIMATES", q.cut=PVAL, lfc=FOLD, remove.pc=3)
 
 condition <- species
 condition[species == "M"] <- "RM"
 condition[species != "M"] <- "PRIMATES"
-ms <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="RM", condB="PRIMATES", q.cut=PVAL, lfc=FOLD) 
-ms_pi <- runLimmaQuantile(counts[,dindx_pi], condition[dindx_pi], genes, condA="RM", condB="PRIMATES", q.cut=PVAL, lfc=FOLD)
+ms <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="RM", condB="PRIMATES", q.cut=PVAL, lfc=FOLD, remove.pc=3) 
+ms_pi <- runLimmaQuantile(counts[,dindx_pi], condition[dindx_pi], genes, condA="RM", condB="PRIMATES", q.cut=PVAL, lfc=FOLD, remove.pc=3)
 
 condition <- treatment
 hs_tfc <- runLimmaQuantile(counts[,dindx_h], condition[dindx_h], genes, condA="U", condB="PI", q.cut=PVAL, lfc=FOLD) 
