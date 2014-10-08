@@ -36,11 +36,11 @@ for(i in 1:NROW(bed)) {
   pad <- overlap- ((bed[i,3]-bed[i,2]) %% overlap) ## Padding, to make the window a multiple of the step size.
   bases  <- seq(bed[i,2], bed[i,3]+pad, overlap)
 
-  countsp <- abs(step.bpQuery.bigWig(bw_plus, chrom=bed[i,1], start= bed[i,2], end= bed[i,3]+pad, step=overlap))
+  countsp <- abs(step.bpQuery.bigWig(bw_plus, chrom=as.character(bed[i,1]), start= bed[i,2], end= bed[i,3]+pad, step=overlap))
   countsp_SUM <- sapply(1:(length(countsp)-nwindows), function(x) {sum(countsp[x:(x+nwindows)])})
   stopifnot(NROW(bases)-1-nwindows == NROW(countsp_SUM)) ## SANTIY CHECK
 
-  countsm <- abs(step.bpQuery.bigWig(bw_minus, chrom=bed[i,1], start= bed[i,2], end= bed[i,3]+pad, step=overlap))
+  countsm <- abs(step.bpQuery.bigWig(bw_minus, chrom=as.character(bed[i,1]), start= bed[i,2], end= bed[i,3]+pad, step=overlap))
   countsm_SUM <- sapply(1:(length(countsm)-nwindows), function(x) {sum(countsm[x:(x+nwindows)])})
   stopifnot(NROW(bases)-1-nwindows == NROW(countsm_SUM)) ## SANTIY CHECK
 

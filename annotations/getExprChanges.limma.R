@@ -9,17 +9,17 @@ source("readData.R")
 ## Use only untreated, and get switch to RPKM
 ca <- ca[,c(1:10,indx.good)]
 
-counts <- ca[,c(12:19,21:27)] #rpkm_df[,c(2:9,11:17)] #ca[,c(12:19,21:27)]
+counts <- ca[,c(12:19,21:26)] #rpkm_df[,c(2:9,11:17)] #ca[,c(12:19,21:27)]
 genes  <- ca[,c(1:10)]
-species  <- c("H","H","H","C","C","M","M","M",    "H","H","H","C","C","M","M")
-treatment<- c(rep("U",8), rep("PI",7))
+species  <- c("H","H","H","C","C","M","M","M",    "H","H","C","C","M","M") ## CGDCG"H"
+treatment<- c(rep("U",8), rep("PI",6)) ## CGDCG 7
 
 ## Indices for different combinations of data.
 dindx_u  <- c(1:8)
-dindx_pi <- c(9:15)
-dindx_h  <- c(1:3,9:11)
-dindx_c  <- c(4:5,12:13)
-dindx_m  <- c(6:8,14:15)
+dindx_pi <- c(9:14) # c(9:15)
+dindx_h  <- c(1:3,9:10) # c(1:3,9:11)
+dindx_c  <- c(4:5,11:12) #c(4:5,12:13)
+dindx_m  <- c(6:8,13:14) #c(6:8,14:15)
 
 ## Import function from lib.
 source("../lib/runLimmaQuantile.R")

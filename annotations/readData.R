@@ -58,7 +58,9 @@ ca <- ca[grep("random", ca$chrom, invert=TRUE),]
 indx.all <- c(11:33)## ALL
 indx.unt <- c(11:14,16:20,31:33)## ONLY UNTREATED, GOOD Remove C2-U
 #indx <- c(11:12,14:22,24,26) ## "Good?!"  Remove H2-U, C2-PI, M1-PI
-indx.good <- c(11:14,16:24,26:27,29:33) ## "Good?!"  Remove C2-U+PI, M1-PI
+#indx.good <- c(11:14,16:24,26:27,29:33) ## "Good?!"  Remove C2-U+PI, M1-PI
+indx.good <- c(11:14,16:23,26:27,29:33) ## "Good?!"  Remove C2-U+PI, M1-PI, H3-PI
+
 
 # Get RPKM
 rpkm_df <- as.matrix(ca[,indx.good]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
