@@ -41,9 +41,9 @@ function makeUpsFile {
  bedmap --echo --mean tmp/$infile.tsspc  tmp/$infile.enh | sed "s/|/\t/g" | sed "s/NAN/NA/g" > tmp/$infile.tsspc.enh
 }
 
-#makeUpsFile H
-#makeUpsFile C
-#makeUpsFile M
+makeUpsFile H
+makeUpsFile C
+makeUpsFile M
 
 
 
