@@ -2,7 +2,7 @@
 ##
 load("fdr.RData")
 PVAL <- 0.01
-EXPR <- 0 #5e-5
+EXPR <- 5e-5
 
 toLogical <- function(indx, expLength) {
   var <- rep(FALSE, expLength)

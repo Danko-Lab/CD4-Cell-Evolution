@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 . runInsightFunction.bsh
-FC_TH=1.58 #  1.58 2
+FC_TH=2 #  1.58 2
 PVAL_TH=0.02 #  0.05 0.01
-DREG_TH=0.7
+DREG_TH=0.8 # 0.7
 MOTIF=7 # 7 8 9
 PATTERN="dREG" # "dREG_ENH\|dREG_INGENE" #"dREG_TSS" "dREG" "dREG_ENH" "dREG_INGENE"
 

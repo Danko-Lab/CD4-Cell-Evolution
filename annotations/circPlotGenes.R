@@ -1,6 +1,8 @@
 ##
 ## Sanity checks for gene expression changes ... Look at the reported raw levels of gene expression.
 
+load("fdr.RData")
+
 source("readData.R")
 
 rpkm_df <- as.matrix(ca[,indx.good[c(2:9,11:17)]]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
@@ -8,6 +10,18 @@ for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- log(1000*(rpkm_df[,i]+0.25)/sum(rpkm_df
 
 source("../lib/circplot.R")
 snU <- c(rep("H",3), rep("C", 2), rep("M",3))
+
+## Write out all human
+hc <- fdr_df[fdr_df$HumanFDR < 0.05,][order(fdr_df$HumanFDR[fdr_df$HumanFDR < 0.05]),]
+hcn<- as.character$name(fdr_df[fdr_df$HumanFDR < 0.05][order(fdr_df$HumanFDR[fdr_df$HumanFDR < 0.05])])
+pdf("circPlot.hc.pdf")
+for(n in hcn) {
+  cd.circplot(rpkm_df[ca$name == n, 1:8], snU)
+}
+dev.off()
+
+## Specific examples...
+q("no")
 
 ## Good ...
 cd.circplot(rpkm_df[ca$name == "chr12_15771150_15943000", 1:8], snU)
