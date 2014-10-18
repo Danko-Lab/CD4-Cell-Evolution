@@ -46,3 +46,10 @@ cd.circplot(rpkm_df[ca$name == "chr17_38776650_38777400", 1:8], snU) ## Extra ch
 
 ## Untested
 
+
+## IL2RA
+cd.circplot(rpkm_df[ca$name == "chr10_6041300_6104350", 1:8], snU) # U
+cd.circplot(rpkm_df[ca$name == "chr10_6041300_6104350", 9:15], snU[1:7]) #PI
+
+## IL2RA-enhancer
+cd.circplot(rpkm_df[ca$name == "chr10_6079150_6108800", 9:15], snU[1:7]) #PI

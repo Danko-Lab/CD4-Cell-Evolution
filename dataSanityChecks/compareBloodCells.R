@@ -2,6 +2,7 @@
 ## Compare to GE data taken from a number of distinct blood cells to ensure no contamination.
 
 setwd("/usr/projects/GROseq/NHP/annotations")
+load("fdr.RData")
 
 source("readData.R")
 
@@ -47,7 +48,10 @@ boxplot(Hu[ctrl_mem], Ch[ctrl_mem], Ma[ctrl_mem])
 boxplot(Hu[ctrl_cd8], Ch[ctrl_cd8], Ma[ctrl_cd8])
 boxplot(Hu[ctrl_pbmc], Ch[ctrl_pbmc], Ma[ctrl_pbmc])
 
-## Adjusted by PCA ... 
+## Check numbers...
+sum(fdr_df$HumanFDR < 0.01 & ctrl_mon)/sum(ctrl_mon) ## Only ~4% of Monocyte spec. genes change in human.
+sum(fdr_df$HumanFDR < 0.01 & ctrl_mon)/sum(fdr_df$HumanFDR < 0.01) ## Only ~2% of changes in human.
+
 
 
  
