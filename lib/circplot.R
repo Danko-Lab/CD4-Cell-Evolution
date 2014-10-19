@@ -27,7 +27,7 @@ cd.circplot<- function(data, names, fill="black") {
 	## Set up the plot.
 	width <- 1/NROW(labels)/20
 	centerseq <- seq(width, 1, 1/NROW(labels))
-	centers <- centerseq[as.integer(as.factor(names))]
+	centers <- centerseq[match(names, labels)] #as.integer(as.factor(names))]
 	next.vp <- viewport(x= 0.1, y= 0.15, width = 0.9, height = 0.85, just=c("left","bottom"))
 	pushViewport(next.vp)
 
@@ -43,8 +43,9 @@ cd.circplot<- function(data, names, fill="black") {
 
 	## Medians/ Means
 	for(i in 1:NROW(labels)) {
-		indx <- levels(as.factor(names))==labels[i]
-		grid.lines(centerseq[i]+c(-1/12/NROW(labels),1/12/NROW(labels)), mean(data[names==labels[indx]])) ## Draw horizontal line at mean.
+		#indx <- levels(as.factor(names))==labels[i]
+		indx <- names==labels[i]
+                grid.lines(centerseq[i]+c(-1/12/NROW(labels),1/12/NROW(labels)), mean(data[indx])) ## Draw horizontal line at mean.
 	}
 	popViewport()
 
@@ -58,10 +59,12 @@ cd.circplot<- function(data, names, fill="black") {
 	next.vp <- viewport(x= 0.1, y= 0, width = 0.9, height = 0.15, just=c("left","bottom"))
 	pushViewport(next.vp)
 	for(i in 1:NROW(labels)) {
-		grid.text(labels[levels(as.factor(names))==labels[i]], x= centerseq[i], y= 0.95, rot = 65, just=c("right", "top"))
+		#grid.text(labels[levels(as.factor(names))==labels[i]], x= centerseq[i], y= 0.95, rot = 65, just=c("right", "top"))
+                grid.text(labels[i], x= centerseq[i], y= 0.95, rot = 65, just=c("right", "top"))
 	}
 	popViewport()
 }
 ## test:
 ## cd.circplot(c(1:10)/10, c(rep("A",4), rep("B", 2), rep("C", 4)))
+## cd.circplot(c(1:10)/10, c(rep("A",4), rep("B", 2), rep("C", 2), rep("aD", 2)))
 

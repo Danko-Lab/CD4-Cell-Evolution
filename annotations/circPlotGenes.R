@@ -9,7 +9,7 @@ rpkm_df <- as.matrix(ca[,indx.good[c(2:9,11:17)]]) ## "Good?!"  Remove H2-U, H3-
 for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- log(1000*(rpkm_df[,i]+0.25)/sum(rpkm_df[,i]) *1000/(ca[,"mapSize"]))
 
 source("../lib/circplot.R")
-snU <- c(rep("H",3), rep("C", 2), rep("M",3))
+snU <- c(rep("H-U",3), rep("C-U", 2), rep("M-U",3), rep("H-PI", 3), rep("C-PI", 2), rep("M-PI", 2))
 
 ## Write out all human
 hc <- fdr_df[fdr_df$HumanFDR < 0.05,][order(fdr_df$HumanFDR[fdr_df$HumanFDR < 0.05]),]
@@ -24,7 +24,7 @@ dev.off()
 q("no")
 
 ## Good ...
-cd.circplot(rpkm_df[ca$name == "chr12_15771150_15943000", 1:8], snU)
+cd.circplot(rpkm_df[ca$name == "chr12_15771150_15943000"], snU)
 cd.circplot(rpkm_df[ca$name == "chr13_77989450_77990050", 1:8], snU)
 cd.circplot(rpkm_df[ca$name == "chr12_6308800_6352600", 1:8], snU) ## CD9.  Quite clear.
 cd.circplot(rpkm_df[ca$name == "chr12_2173350_2176350", 1:8], snU)
@@ -53,3 +53,6 @@ cd.circplot(rpkm_df[ca$name == "chr10_6041300_6104350", 9:15], snU[1:7]) #PI
 
 ## IL2RA-enhancer
 cd.circplot(rpkm_df[ca$name == "chr10_6079150_6108800", 9:15], snU[1:7]) #PI
+
+## MALT1
+cd.circplot(rpkm_df[ca$name == "chr18_56338250_56435300", 1:8], snU) # U
