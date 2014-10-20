@@ -1,2 +1,2 @@
 #!/usr/bin/bash
-zcat 50mers.unmap.bed.gz 50mers.rheMac3-hg19.bed.gz 50mers.panTro4-hg19.bed.gz | sort-bed - | bedops -m - | gzip > allUnmap.merge.bed.gz
+zcat 50mers.unmap.bed.gz 50mers.rheMac3-hg19.bed.gz 50mers.panTro4-hg19.bed.gz | sort-bed - | bedops -m - | starch - > allUnmap.merge.bed.starch

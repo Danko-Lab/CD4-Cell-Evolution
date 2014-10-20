@@ -18,6 +18,8 @@ export PAUSEINCR=pause.increments.bed
 export TSSSITES=tsssites.tsv
 export TSSINCR=tss.increments.bed
 
+export NOMAPLOCI=/usr/projects/GROseq/NHP/AllData/mapping/allUnmap.merge.bed.starch
+
 ######################################
 ## Use Transcription Units detected by HMM ...
 zcat ../tu_caller/annot/TU.final.bed.gz | sort-bed - > $GENCODE_TSV
@@ -48,8 +50,8 @@ makeOrthoAnnot
 export NET=$RHESUS_NET
 makeOrthoAnnot
 
-## Combine gaps.
-bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save > gapMerge
+## Combine gaps and mappability loci in hg19 coordinates.
+bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save $NOMAPLOCI > gapMerge
 #rm *.save
 
 ######################################
