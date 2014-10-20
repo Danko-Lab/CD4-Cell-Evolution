@@ -4,7 +4,7 @@ cgpath=/usr/projects/GROseq/NHP/annotations/chage_expr
 PATTERN="dREG" # "dREG_ENH\|dREG_INGENE" #"dREG_TSS" "dREG" "dREG_ENH" "dREG_INGENE"
 
 # Convert Grch38 to hg19
-liftOver  SNP.hg12.bed /gbdb/hg38/liftOver/hg38ToHg19.over.chain.gz SNP.hg19.bed unmap.bed
+liftOver  SNP.hg38.bed /gbdb/hg38/liftOver/hg38ToHg19.over.chain.gz SNP.hg19.bed unmap.bed
 
 # dREG elements.
 cat $cgpath/H.change-U.tsv $cgpath/H.change-PI.tsv | grep $PATTERN | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4}' | sort-bed - | bedtools closest -d -a SNP.hg19.bed -b stdin > dist.tsv

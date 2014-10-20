@@ -55,3 +55,6 @@ cd.circplot(rpkm_df[ca$name == "chr10_6079150_6108800", ], snU)
 
 ## MALT1
 cd.circplot(rpkm_df[ca$name == "chr18_56338250_56435300", ], snU) 
+
+
+cd.circplot(rpkm_df[ca$name == "chr15_67356550_67513750",],snU)

@@ -1,0 +1,23 @@
+#!/usr/bin/bash
+SEQNAMES=`zcat ../rheMac3.rRNA.fa.gz | grep ">" | sed "s/^>//g"`
+#zcat 25mers.gtTxt.gz | perl ~/src/perl/tallymer2bed.pl $SEQNAMES | bedops -m  - | gzip > 25mers.rheMac3.unmap.bed.gz
+#zcat 30mers.gtTxt.gz | perl ~/src/perl/tallymer2bed.pl $SEQNAMES | bedops -m  - | gzip > 30mers.rheMac3.unmap.bed.gz
+#zcat 50mers.gtTxt.gz | perl ~/src/perl/tallymer2bed.pl $SEQNAMES | bedops -m  - | gzip > 50mers.rheMac3.unmap.bed.gz
+
+## Also use liftOver on the raw (un-merged) file.
+zcat 25mers.gtTxt.gz | perl ~/src/perl/tallymer2bed.pl $SEQNAMES > 25mers.rheMac3.nomerge.bed
+zcat 30mers.gtTxt.gz | perl ~/src/perl/tallymer2bed.pl $SEQNAMES > 30mers.rheMac3.nomerge.bed
+zcat 50mers.gtTxt.gz | perl ~/src/perl/tallymer2bed.pl $SEQNAMES > 50mers.rheMac3.nomerge.bed
+
+MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.chain.gz # Use rbest
+liftOver 25mers.rheMac3.nomerge.bed $MAPCHAIN 25mers.rheMac3-hg19.bed UNMAP
+liftOver 30mers.rheMac3.nomerge.bed $MAPCHAIN 30mers.rheMac3-hg19.bed UNMAP
+liftOver 50mers.rheMac3.nomerge.bed $MAPCHAIN 50mers.rheMac3-hg19.bed UNMAP
+
+rm 25mers.rheMac3.nomerge.bed 30mers.rheMac3.nomerge.bed 50mers.rheMac3.nomerge.bed UNMAP
+
+cat 25mers.rheMac3-hg19.bed | sort-bed - | bedops -m - | gzip > 25mers.rheMac3-hg19.bed.gz
+cat 30mers.rheMac3-hg19.bed | sort-bed - | bedops -m - | gzip > 30mers.rheMac3-hg19.bed.gz
+cat 50mers.rheMac3-hg19.bed | sort-bed - | bedops -m - | gzip > 50mers.rheMac3-hg19.bed.gz
+
+rm *.bed

@@ -1,0 +1,24 @@
+#!/usr/bin/bash
+SEQNAMES=`zcat ../panTro4.rRNA.fa.gz | grep ">" | sed "s/^>//g"`
+#zcat 25mers.gtTxt.gz | perl ~/src/perl/tallymer2bed.pl $SEQNAMES | bedops -m  - | gzip > 25mers.panTro4.bed.gz
+#zcat 30mers.gtTxt.gz | perl ~/src/perl/tallymer2bed.pl $SEQNAMES | bedops -m  - | gzip > 30mers.panTro4.bed.gz
+#zcat 50mers.gtTxt.gz | perl ~/src/perl/tallymer2bed.pl $SEQNAMES | bedops -m  - | gzip > 50mers.panTro4.bed.gz
+
+## Also use liftOver on the raw (un-merged) file.
+zcat 25mers.gtTxt.gz | perl ~/src/perl/tallymer2bed.pl $SEQNAMES > 25mers.panTro4.nomerge.bed
+zcat 30mers.gtTxt.gz | perl ~/src/perl/tallymer2bed.pl $SEQNAMES > 30mers.panTro4.nomerge.bed
+zcat 50mers.gtTxt.gz | perl ~/src/perl/tallymer2bed.pl $SEQNAMES > 50mers.panTro4.nomerge.bed
+
+MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.panTro4/panTro4.hg19.rbest.chain.gz # Use rbest
+liftOver 25mers.panTro4.nomerge.bed $MAPCHAIN 25mers.panTro4-hg19.bed UNMAP
+liftOver 30mers.panTro4.nomerge.bed $MAPCHAIN 30mers.panTro4-hg19.bed UNMAP
+liftOver 50mers.panTro4.nomerge.bed $MAPCHAIN 50mers.panTro4-hg19.bed UNMAP
+
+rm 25mers.panTro4.nomerge.bed 30mers.panTro4.nomerge.bed 50mers.panTro4.nomerge.bed UNMAP
+
+cat 25mers.panTro4-hg19.bed | sort-bed - | bedops -m - | gzip > 25mers.panTro4-hg19.bed.gz
+cat 30mers.panTro4-hg19.bed | sort-bed - | bedops -m - | gzip > 30mers.panTro4-hg19.bed.gz
+cat 50mers.panTro4-hg19.bed | sort-bed - | bedops -m - | gzip > 50mers.panTro4-hg19.bed.gz
+
+rm *.bed
+
