@@ -1,0 +1,56 @@
+#!/usr/bin/bash
+
+sortedbams=`ls H2_*.bam C3*.bam M2*.bam`  # C4*.bam H2-2*.bam H1-PIP*.bam M3*.bam`
+for i in $sortedbams
+do
+  echo $i
+#  samtools view $i | ~/perl/sam2bed.pl | gzip > $i.bed.gz
+  bedtools bamtobed -i $i | awk 'BEGIN{OFS="\t"} ($5 > 0){print $0}' | awk 'BEGIN{OFS="\t"} ($6 == "+") {print $1,$2,$2+1,$4,$5,$6}; ($6 == "-") {print $1,$3-1,$3,$4,$5,$6}' | gzip > $i.bed.gz
+done
+
+mv H2_U.fastq.gz.sort.bam.bed.gz H2-U.bed.gz
+mv H2_PI.fastq.gz.sort.bam.bed.gz H2-PI.bed.gz
+mv C3_U.fastq.gz.sort.bam.bed.gz C3-U.bed.gz
+mv C3_PI.fastq.gz.sort.bam.bed.gz C3-PI.bed.gz
+mv M2_U.fastq.gz.sort.bam.bed.gz M2-U.bed.gz
+mv M2_PI.fastq.gz.sort.bam.bed.gz M2-PI.bed.gz
+
+
+#mv 2483_1522_7758_C2YNMACXX_mu-1_ACTTGA.na.fastq.gz.sort.bam.bed.gz J-U-k.bed.gz
+#mv 2483_1522_7759_C2YNMACXX_pi-2_GATCAG.na.fastq.gz.sort.bam.bed.gz J-PI-k.bed.gz
+
+
+#mv C4_PI.fastq.gz.sort.bam.bed.gz C4-PI.bed.gz
+#mv H1-PIP_U.fastq.gz.sort.bam.bed.gz H1-U.pip.bed.gz
+#mv H2-2_U.fastq.gz.sort.bam.bed.gz H2.2-U.bed.gz
+#mv M3_U.fastq.gz.sort.bam.bed.gz M3-U.bed.gz
+#mv C4_U.fastq.gz.sort.bam.bed.gz C4-U.bed.gz
+#mv H2-2_PI.fastq.gz.sort.bam.bed.gz H2.2-PI.bed.gz
+#mv M3_PI.fastq.gz.sort.bam.bed.gz M3-PI.bed.gz
+
+
+#mv 1559_5598_5527_N_H2_U_ATCACG.na.fastq.gz.sort.bam.bed.gz H2-U.bed.gz
+#mv 1559_5598_5528_N_H2_PI_CGATGT.na.fastq.gz.sort.bam.bed.gz H2-PI.bed.gz
+#mv 1935_5598_6194_N_H2-2-U_ACAGTG.na.fastq.gz.sort.bam.bed.gz H2.2-U.bed.gz
+#mv 1935_5598_6195_N_H2-2-PI_GCCAAT.na.fastq.gz.sort.bam.bed.gz H2.2-PI.bed.gz
+#mv 1935_5598_6200_N_H1-PIP-U_TTAGGC.na.fastq.gz.sort.bam.bed.gz H1-U.pip.bed.gz
+#mv 869_5598_4110_N_J-U_ATCACG.na.fastq.gz.sort.bam.bed.gz J-U.bed.gz
+#mv 869_5598_4111_N_J-PI_CGATGT.na.fastq.gz.sort.bam.bed.gz J-PI.bed.gz
+#mv 869_5598_4112_N_CD4-U_TTAGGC.na.fastq.gz.sort.bam.bed.gz CD4-U.bed.gz
+#mv 869_5598_4113_N_CD4-PI_TGACCA.na.fastq.gz.sort.bam.bed.gz CD4-PI.bed.gz
+#mv H3_PI.fastq.gz.sort.bam.bed.gz H3-PI.bed.gz
+#mv H3_U.fastq.gz.sort.bam.bed.gz H3-U.bed.gz
+#
+#mv 1559_5598_5529_N_C3_U_TTAGGC.na.fastq.gz.sort.bam.bed.gz C3-U.bed.gz
+#mv 1559_5598_5530_N_C3_PI_TGACCA.na.fastq.gz.sort.bam.bed.gz C3-PI.bed.gz
+#mv 1559_5598_5531_N_M2_U_ACAGTG.na.fastq.gz.sort.bam.bed.gz M2-U.bed.gz
+#mv 1559_5598_5532_N_M2_PI_GCCAAT.na.fastq.gz.sort.bam.bed.gz M2-PI.bed.gz
+#mv 1935_5598_6196_N_C4-U_CAGATC.na.fastq.gz.sort.bam.bed.gz C4-U.bed.gz
+#mv 1935_5598_6197_N_C4-PI_ACTTGA.na.fastq.gz.sort.bam.bed.gz C4-PI.bed.gz
+#mv 1935_5598_6198_N_M3-U_GATCAG.na.fastq.gz.sort.bam.bed.gz M3-U.bed.gz
+#mv 1935_5598_6199_N_M3-PI_TAGCTT.na.fastq.gz.sort.bam.bed.gz M3-PI.bed.gz
+#mv C2_PI.fastq.gz.sort.bam.bed.gz C2-PI.bed.gz
+#mv C2_U.fastq.gz.sort.bam.bed.gz C2-U.bed.gz
+#mv M1_PI.fastq.gz.sort.bam.bed.gz M1-PI.bed.gz
+#mv M1_U.fastq.gz.sort.bam.bed.gz M1-U.bed.gz
+#
