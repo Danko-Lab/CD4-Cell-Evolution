@@ -86,3 +86,10 @@ liftToHg19
 ## Cleanup.
 rm *.nr.rs.* tmp *.bedGraph *.bedGraph.gz
 
+## Softlinks are required in just a few places.
+ln -s H-U_plus.bw H-U_plus.hg19.bw
+ln -s H-U_minus.bw H-U_minus.hg19.bw
+ln -s H-PI_plus.bw H-PI_plus.hg19.bw
+ln -s H-PI_minus.bw H-PI_minus.hg19.bw
+
+

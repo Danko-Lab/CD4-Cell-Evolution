@@ -124,8 +124,8 @@ MERGEDIR=/usr/projects/GROseq/NHP/AllData/All_Merge
 
 for i in H-U H-PI C-U C-PI M-U M-PI
 do
-#  echo $i
-  R --no-save --args dreg.tss pauseSites.new.tmp $MERGEDIR/${i}_plus.bw $MERGEDIR/${i}_minus.bw < getPauseSites.R
+  echo $i
+  R --no-save --args dreg.tss pauseSites.new.tmp $MERGEDIR/${i}_plus.hg19.bw $MERGEDIR/${i}_minus.hg19.bw < getPauseSites.R
   cat pauseSites.new.tmp pauseSites.tmp | sort-bed - > pauseSites3.tmp
   mv pauseSites3.tmp pauseSites.tmp
 done
