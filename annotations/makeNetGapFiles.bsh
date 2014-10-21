@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+rm *.tmp
 
 export GENCODE_TSV=transcriptionUnits.tsv
 export CHIMP_NET=panTro4_net_rbest     # netPanTro4

@@ -10,8 +10,8 @@ source("../lib/normalizeSubsample.R")
 load("../annotations/fdr.RData")
 
 ## Sanity check ... use Amean?!
-cor.test(hs$Amean, log(ca$"Human 1"+1))
-densScatterplot(hs$Amean, log(ca$"Human 1"+1), xlab="Limma", ylab="Raw counts")
+#cor.test(hs$Amean, log(ca$"Human 1"+1))
+#densScatterplot(hs$Amean, log(ca$"Human 1"+1), xlab="Limma", ylab="Raw counts")
 
 ## Compare Human and Chimp.
 cor.test(ca$"Human 1", ca$"Chimp 4")
