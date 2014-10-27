@@ -3,7 +3,7 @@
 
 setwd("/usr/projects/GROseq/NHP/annotations")
 
-source("fdr.RData")
+load("fdr.RData")
 
 ## Index extent of changes.
 isresp <- fdr_df$U2PIFDR_H < 0.05 & fdr_df$U2PIFDDR_C < 0.05 & fdr_df$U2PIFDR_M < 0.05 ## Clearly responding in all three.

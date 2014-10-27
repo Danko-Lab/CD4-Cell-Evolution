@@ -2,5 +2,34 @@
 #
 # Gets data on nucleotide differences between human and chimpanzee.
 
-hgsql hg19 -N -e "select * from rheMac3Diff" | sort-bed - | gzip > rheMac3.diff.tsv.gz
+hgsql CGhg19 -N -e "select * from panTro4Diff" | sort-bed - | starch - > panTro4.diff.bed.starch
+hgsql CGhg19 -N -e "select * from rheMac3Diff" | sort-bed - | starch - > rheMac3.diff.bed.starch
+
+## Join to get hg19-specific differences, use inner join
+# Note that here I require identical Chimp/ Rhesus alleles
+hgsql CGhg19 -N -e "
+ select panTro4Diff.chrom, 
+        panTro4Diff.chromStart, 
+        panTro4Diff.chromEnd, 
+        panTro4Diff.hg19, 
+        panTro4Diff.panTro4, 
+        rheMac3Diff.rheMac3 
+  FROM panTro4Diff 
+  INNER JOIN rheMac3Diff on 
+    panTro4Diff.chrom = rheMac3Diff.chrom AND 
+    panTro4Diff.chromStart = rheMac3Diff.chromStart AND 
+    panTro4Diff.panTro4 = rheMac3Diff.rheMac3" | sort-bed - | starch - > hg19.diff.bed.starch
+
+hgsql CGhg19 -N -e "
+ select panTro4Diff.chrom, 
+        panTro4Diff.chromStart, 
+        panTro4Diff.chromEnd, 
+        panTro4Diff.hg19, 
+        panTro4Diff.panTro4, 
+        rheMac3Diff.rheMac3 
+  FROM panTro4Diff 
+  INNER JOIN rheMac3Diff on 
+    panTro4Diff.chrom = rheMac3Diff.chrom AND 
+    panTro4Diff.chromStart = rheMac3Diff.chromStart AND
+    panTro4Diff.panTro4 != rheMac3Diff.rheMac3 limit 10" | sort-bed - | starch - > all.diff.bed.starch
 
