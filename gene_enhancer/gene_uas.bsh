@@ -1,0 +1,25 @@
+#!/usr/bin/bash
+#
+# For each gene that changes in a branch-specific fashion, identifies
+# the set of antisense TU nearby.
+
+
+function makeSimFile {
+ indir=../annotations/chage_expr/
+ infile=$1.change-U
+ fudge=250 ## Currently BED files are written WITHOUT the TSS area.
+ dist=0
+
+ ## Focus on protein-coding genes.  Get TSS.
+ cat $indir/$infile.tsv | awk '($7 == "protein_coding") {print $0}' | awk 'BEGIN{OFS="\t"} ($6 == "+"){print $1,$2-'"$fudge"',$2+'"$fudge"',$4,$5,$6} ($6 == "-"){print $1,$3-'"$fudge"',$3+'"$fudge"',$4,$5,$6}' | sort-bed - > tmp/$infile.tsspc
+
+ cat $indir/$infile.all.tsv | grep "ups_antisense" | sort-bed - > tmp/$infile.ups 
+ 
+ ## Get the set of all enahcners nearby the TSS of each gene.
+ bedmap --range $dist --echo --mean tmp/$infile.tsspc  tmp/$infile.ups | sed "s/|/\t/g" | sed "s/NAN/NA/g" > tmp/$infile.tsspc.ups
+}
+
+makeSimFile H
+makeSimFile C
+makeSimFile M
+
