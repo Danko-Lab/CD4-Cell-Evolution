@@ -1,0 +1,10 @@
+##
+##
+## Summaries of TRE changes between species.
+
+
+## Fraction of TREs in assembly gaps in at least one species.
+bedmap --count --fraction-ref 0.5 HCM-U-PI.dREG-tss-clusters.tsv ../annotations/gapMerge | grep -c -v "^0$" 
+bedmap --count --fraction-ref 0.5 HCM-U-PI.dREG-tss-clusters.tsv ../annotations/gapMerge | grep -c ""
+
+## Get the expression levels of each TRE.
