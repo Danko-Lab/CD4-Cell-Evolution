@@ -22,7 +22,8 @@ ts <- cbind(ts[,1:9], "tss", ts[,10:NCOL(ts)])
 colnames(ts) <- colnames(ca)
 
 ## Join em
-ca <- rbind(ca, ps, ts)
+#ca <- rbind(ca, ps, ts)
+ca <- rbind(ca, ts)  ## Don't use pause sites here!! Analyze these separately.
 
 ## Rename.
 names(ca) <- c("chrom", "chromStart", "chromEnd", "name", "score", "strand", "type", "mgi", "mapSize", "annot_type",
