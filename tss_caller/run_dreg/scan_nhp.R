@@ -1,4 +1,4 @@
-require(featureDetector)
+require(dREG)
 
 args <- commandArgs(trailingOnly=TRUE)
 prefix   <- args[1]
@@ -10,7 +10,7 @@ gs_minus_path <- paste(prefix, c("-U_minus.bw","-PI_minus.bw"),sep="") #-U.bed.g
 
 outnames <- paste(prefix, c("-U.TSS.bedGraph.gz", "-PI.TSS.bedGraph.gz"), sep="")
 
-load("cd4.dnase1.adbn.RData")#asvm.RData")
+load("asvm.intersDNase.getTrainSet.RData")#"cd4.dnase1.adbn.RData")#asvm.RData")
 gdm <- genomic_data_model(window_sizes= c(10, 25, 50, 500, 5000), half_nWindows= c(10, 10, 30, 20, 20)) 
 
 for(i in 1:length(gs_plus_path)) {
