@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 #
-cgpath=/usr/projects/GROseq/NHP/annotations/chage_expr
+cgpath=../annotations/chage_expr
 PATTERN="dREG" # "dREG_ENH\|dREG_INGENE" #"dREG_TSS" "dREG" "dREG_ENH" "dREG_INGENE"
 
 # Convert Grch38 to hg19
@@ -9,4 +9,8 @@ liftOver  SNP.hg38.bed /gbdb/hg38/liftOver/hg38ToHg19.over.chain.gz SNP.hg19.bed
 # dREG elements.
 cat $cgpath/H.change-U.tsv $cgpath/H.change-PI.tsv | grep $PATTERN | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4}' | sort-bed - | bedtools closest -d -a SNP.hg19.bed -b stdin > dist.tsv
 
+# dREG elements w/ SNAP SNP inside.
+cat $cgpath/H.change-U.tsv $cgpath/H.change-PI.tsv | grep $PATTERN | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4}' | sort-bed - | bedtools closest -d -t first -a stdin -b snap/snap.hg19 > dist.ld.tsv
+
+## Get the LD block, from furthest to longest.
 

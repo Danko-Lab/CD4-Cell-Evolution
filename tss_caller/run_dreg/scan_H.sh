@@ -3,7 +3,7 @@
 #$ -N dREG.human
 #$ -o dREG.human.out.$JOB_ID
 #$ -j y
-#$ -pe bscb 32
+#$ -pe bscb 16
 #$ -M dankoc@gmail.com
 #$ -m be
 #$ -l h_rt=24:00:00
@@ -16,10 +16,11 @@ TH=0.95
 STARTDIR=`pwd`
 SCRATCH=/SSD/cgd24_tssDetector_$PREFIX
 mkdir $SCRATCH
-cp ~/nextgen/projects/GROseq/NHP/tss_caller/run_dreg/scan_nhp.R $SCRATCH ## 
-cp /home/cgd24/projects/tss_detector/train_svm_nhp/cd4.dnase1.adbn.RData $SCRATCH
+cp /bscb/bscb07/cgd24/projects/NHP/tss_caller/run_dreg/scan_nhp.R $SCRATCH ## 
+cp /home/cgd24/projects/tss_detector/train_svm/asvm.intersDNase.getTrainSet.RData $SCRATCH
+#cp /home/cgd24/projects/tss_detector/train_svm_nhp/cd4.dnase1.adbn.RData $SCRATCH
 #cp /home/cgd24/projects/tss_detector/train_svm/asvm.RData $SCRATCH ## 
-cp ~/nextgen/projects/GROseq/NHP/$DATADIR/$PREFIX*.bw $SCRATCH
+cp /bscb/bscb07/cgd24/projects/NHP/$DATADIR/$PREFIX-U*us.bw $SCRATCH
 cd $SCRATCH
 
 ## Run R. 

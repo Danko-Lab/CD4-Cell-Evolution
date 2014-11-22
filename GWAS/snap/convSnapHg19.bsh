@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+zcat SNAPResults.txt.gz | sed 's/\r//' | awk 'BEGIN{OFS="\t"} {print $6,$7,$7+1,$2}' | grep -v "HG18\|N\/A" > snap.hg18
+liftOver snap.hg18 hg18ToHg19.over.chain.gz snap.hg19 unmap.txt
+
+
