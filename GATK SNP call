@@ -1,0 +1,93 @@
+export JAVA_HOME=/usr/local/jdk1.7.0_51
+export PATH=$JAVA_HOME/bin:$PATH
+export JAVA_HOME=/usr/local/jdk1.7.0_51
+export PATH=$JAVA_HOME/bin:$PATH
+
+#Align reads from each individual to the reference
+
+bwa aln -t 8 -n 0.04 /workdir/hy31/hg19/hg19.rRNA.fa  H1_1_PI.fastq.gz> H1_1_PI.sai
+bwa samse -n 10 -r '@RG\tID:869_5598_4113_N_CD4-PI_TGACCA.na.fastq\tSM:H1_PI\tPL:ILLUMINA' /workdir/hy31/hg19/hg19.rRNA.fa H1_1_PI.sai H1_1_PI.fastq.gz> H1_1_PI.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/CleanSam.jar INPUT=H1_1_PI.sam OUTPUT=H1_1_PI.cleaned.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/SamFormatConverter.jar INPUT=H1_1_PI.cleaned.sam  OUTPUT=H1_1_PI.cleaned.bam
+java -Xmx4g -jar  /programs/bin/picard-tools/SortSam.jar INPUT=H1_1_PI.cleaned.bam OUTPUT=H1_1_PI.cleaned.sorted.bam SORT_ORDER=coordinate
+
+bwa aln -t 8 -n 0.04 /workdir/hy31/hg19/hg19.rRNA.fa  H1_U.fastq.gz> H1_U.sai
+bwa samse -n 10 -r '@RG\tID:/869_5598_4112_N_CD4-U_TTAGGC.na.fastq\tSM:H1_U\tPL:ILLUMINA' /workdir/hy31/hg19/hg19.rRNA.fa H1_U.sai H1_U.fastq.gz> H1_U.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/CleanSam.jar INPUT=H1_U.sam OUTPUT=H1_U.cleaned.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/SamFormatConverter.jar INPUT=H1_U.cleaned.sam  OUTPUT=H1_U.cleaned.bam
+java -Xmx4g -jar  /programs/bin/picard-tools/SortSam.jar INPUT=H1_U.cleaned.bam OUTPUT=H1_U.cleaned.sorted.bam SORT_ORDER=coordinate
+
+bwa aln -t 8 -n 0.04 /workdir/hy31/hg19/hg19.rRNA.fa  H1_PIP_U.fastq.gz> H1_PIP_U.sai
+bwa samse -n 10 -r '@RG\tID:H1_PIP_U.fastq\tSM:H1_PIP_U\tPL:ILLUMINA' /workdir/hy31/hg19/hg19.rRNA.fa H1_PIP_U.sai H1_PIP_U.fastq.gz> H1_PIP_U.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/CleanSam.jar INPUT=H1_PIP_U.sam OUTPUT=H1_PIP_U.cleaned.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/SamFormatConverter.jar INPUT=H1_PIP_U.cleaned.sam  OUTPUT=H1_PIP_U.cleaned.bam
+java -Xmx4g -jar  /programs/bin/picard-tools/SortSam.jar INPUT=H1_PIP_U.cleaned.bam OUTPUT=H1_PIP_U.cleaned.sorted.bam SORT_ORDER=coordinate
+
+bwa aln -t 8 -n 0.04 /workdir/hy31/hg19/hg19.rRNA.fa  H2-2_U.fastq.gz> H2-2_U.sai
+bwa samse -n 10 -r '@RG\tID:H2-2_U.fastq\tSM:H2-2_U\tPL:ILLUMINA' /workdir/hy31/hg19/hg19.rRNA.fa H2-2_U.sai H2-2_U.fastq.gz> H2-2_U.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/CleanSam.jar INPUT=H2-2_U.sam OUTPUT=H2-2_U.cleaned.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/SamFormatConverter.jar INPUT=H2-2_U.cleaned.sam  OUTPUT=H2-2_U.cleaned.bam
+java -Xmx4g -jar  /programs/bin/picard-tools/SortSam.jar INPUT=H2-2_U.cleaned.bam OUTPUT=H2-2_U.cleaned.sorted.bam SORT_ORDER=coordinate
+
+bwa aln -t 8 -n 0.04 /workdir/hy31/hg19/hg19.rRNA.fa  H2_U.fastq.gz> H2_U.sai
+bwa samse -n 10 -r '@RG\tID:H2_U.fastq\tSM:H2_U\tPL:ILLUMINA' /workdir/hy31/hg19/hg19.rRNA.fa H2_U.sai H2_U.fastq.gz> H2_U.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/CleanSam.jar INPUT=H2_U.sam OUTPUT=H2_U.cleaned.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/SamFormatConverter.jar INPUT=H2_U.cleaned.sam  OUTPUT=H2_U.cleaned.bam
+java -Xmx4g -jar  /programs/bin/picard-tools/SortSam.jar INPUT=H2_U.cleaned.bam OUTPUT=H2_U.cleaned.sorted.bam SORT_ORDER=coordinate
+
+bwa aln -t 8 -n 0.04 /workdir/hy31/hg19/hg19.rRNA.fa  H2-2_PI.fastq.gz> H2-2_PI.sai
+bwa samse -n 10 -r '@RG\tID:H2-2_PI.fastq\tSM:H2-2_PI\tPL:ILLUMINA' /workdir/hy31/hg19/hg19.rRNA.fa H2-2_PI.sai H2-2_PI.fastq.gz> H2-2_PI.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/CleanSam.jar INPUT=H2-2_PI.sam OUTPUT=H2-2_PI.cleaned.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/SamFormatConverter.jar INPUT=H2-2_PI.cleaned.sam  OUTPUT=H2-2_PI.cleaned.bam
+java -Xmx4g -jar  /programs/bin/picard-tools/SortSam.jar INPUT=H2-2_PI.cleaned.bam OUTPUT=H2-2_PI.cleaned.sorted.bam SORT_ORDER=coordinate
+
+bwa aln -t 8 -n 0.04 /workdir/hy31/hg19/hg19.rRNA.fa  H2_PI.fastq.gz > H2_PI.sai
+bwa samse -n 10 -r '@RG\tID:H2_PI.fastq\tSM:H2_PI\tPL:ILLUMINA' /workdir/hy31/hg19/hg19.rRNA.fa H2_PI.sai H2_PI.fastq.gz> H2_PI.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/CleanSam.jar INPUT=H2_PI.sam OUTPUT=H2_PI.cleaned.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/SamFormatConverter.jar INPUT=H2_PI.cleaned.sam  OUTPUT=H2_PI.cleaned.bam
+java -Xmx4g -jar  /programs/bin/picard-tools/SortSam.jar INPUT=H2_PI.cleaned.bam OUTPUT=H2_PI.cleaned.sorted.bam SORT_ORDER=coordinate
+
+bwa aln -t 8 -n 0.04 /workdir/hy31/hg19/hg19.rRNA.fa  H3_PI.fastq.gz > H3_PI.sai
+bwa samse -n 10 -r '@RG\tID:H3_PI.fastq\tSM:H3_PI\tPL:ILLUMINA' /workdir/hy31/hg19/hg19.rRNA.fa H3_PI.sai H3_PI.fastq.gz> H3_PI.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/CleanSam.jar INPUT=H3_PI.sam OUTPUT=H3_PI.cleaned.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/SamFormatConverter.jar INPUT=H3_PI.cleaned.sam  OUTPUT=H3_PI.cleaned.bam
+java -Xmx4g -jar  /programs/bin/picard-tools/SortSam.jar INPUT=H3_PI.cleaned.bam OUTPUT=H3_PI.cleaned.sorted.bam SORT_ORDER=coordinate
+
+bwa aln -t 8 -n 0.04 /workdir/hy31/hg19/hg19.rRNA.fa  H3_U.fastq.gz> H3_U.sai
+bwa samse -n 10 -r '@RG\tID:H3_U.fastq\tSM:H3_U\tPL:ILLUMINA' /workdir/hy31/hg19/hg19.rRNA.fa H3_U.sai H3_U.fastq.gz> H3_U.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/CleanSam.jar INPUT=H3_U.sam OUTPUT=H3_U.cleaned.sam
+java -Xmx4g -jar  /programs/bin/picard-tools/SamFormatConverter.jar INPUT=H3_U.cleaned.sam  OUTPUT=H3_U.cleaned.bam
+java -Xmx4g -jar  /programs/bin/picard-tools/SortSam.jar INPUT=H3_U.cleaned.bam OUTPUT=H3_U.cleaned.sorted.bam SORT_ORDER=coordinate
+
+#java -jar /programs/picard-tools-1.84/AddOrReplaceReadGroups.jar  INPUT=H1_PIP_U.cleaned.sorted.bam OUTPUT=H1_PIP_U.cleaned.sorted.RGfixed.bam RGID=H1_PIP_U.fastq RGPL=illumina RGSM=H1 RGLB=H1_PIP_U RGPU=H1_PIP_U
+java -jar /programs/picard-tools-1.84/AddOrReplaceReadGroups.jar  INPUT=H1_1_PI.cleaned.sorted.bam OUTPUT=H1_1_PI.cleaned.sorted.RGfixed.bam RGID=H1_1_PI.fastq RGPL=illumina RGSM=H1 RGLB=H1_1_PI RGPU=H1_1_PI
+java -jar /programs/picard-tools-1.84/AddOrReplaceReadGroups.jar  INPUT=H1_U.cleaned.sorted.bam OUTPUT=H1_U.cleaned.sorted.RGfixed.bam RGID=H1_U.fastq RGPL=illumina RGSM=H1 RGLB=H1_U RGPU=H1_U
+java -jar /programs/picard-tools-1.84/AddOrReplaceReadGroups.jar  INPUT=H2-2_PI.cleaned.sorted.bam OUTPUT=H2-2_PI.cleaned.sorted.RGfixed.bam RGID=H2-2_PI.fastq RGPL=illumina RGSM=H2 RGLB=H2-2_PI RGPU=H2-2_PI
+java -jar /programs/picard-tools-1.84/AddOrReplaceReadGroups.jar  INPUT=H2-2_U.cleaned.sorted.bam OUTPUT=H2-2_U.cleaned.sorted.RGfixed.bam RGID=H2-2_U.fastq RGPL=illumina RGSM=H2 RGLB=H2-2_U RGPU=H2-2_U
+java -jar /programs/picard-tools-1.84/AddOrReplaceReadGroups.jar  INPUT=H2_PI.cleaned.sorted.bam OUTPUT=H2_PI.cleaned.sorted.RGfixed.bam RGID=H2_PI.fastq RGPL=illumina RGSM=H2 RGLB=H2_PI RGPU=H2_PI
+java -jar /programs/picard-tools-1.84/AddOrReplaceReadGroups.jar  INPUT=H2_U.cleaned.sorted.bam OUTPUT=H2_U.cleaned.sorted.RGfixed.bam RGID=H2_U.fastq RGPL=illumina RGSM=H2 RGLB=H2_U RGPU=H2_U
+java -jar /programs/picard-tools-1.84/AddOrReplaceReadGroups.jar  INPUT=H3_U.cleaned.sorted.bam OUTPUT=H3_U.cleaned.sorted.RGfixed.bam RGID=H3_U.fastq RGPL=illumina RGSM=H3 RGLB=H3_U RGPU=H3_U
+java -jar /programs/picard-tools-1.84/AddOrReplaceReadGroups.jar  INPUT=H3_U.cleaned.sorted.bam OUTPUT=H3_U.cleaned.sorted.RGfixed.bam RGID=H3_U.fastq RGPL=illumina RGSM=H3 RGLB=H3_U RGPU=H3_U
+
+#merge all files
+java -Xmx16g -jar /programs/picard-tools-1.84/MergeSamFiles.jar INPUT=H3_U.cleaned.sorted.RGfixed.bam INPUT=H3_PI.cleaned.sorted.RGfixed.bam INPUT=H2_PI.cleaned.sorted.RGfixed.bam INPUT=H2_U.cleaned.sorted.RGfixed.bam INPUT=H2-2_PI.cleaned.sorted.RGfixed.bam INPUT=H2-2_U.cleaned.sorted.RGfixed.bam INPUT=H1_U.cleaned.sorted.RGfixed.bam INPUT=H1_PIP_U.cleaned.sorted.RGfixed.bam INPUT=H1_1_PI.cleaned.bam OUTPUT=all.mergednew.RGfixed.bam
+
+#validate merged bam file
+java -Xmx4g -jar /programs/picard-tools-1.84/ValidateSamFile.jar INPUT=all.mergednew.RGfixed.bam OUTPUT=all.mergednew.RGfixed.validate REFERENCE_SEQUENCE=/workdir/hy31/hg19/hg19.rRNA.fa 
+
+#index bam file
+java -Xmx4g -jar /programs/picard-tools-1.84/BuildBamIndex.jar INPUT=all.mergednew.RGfixed.bam  OUTPUT=all.mergednew.RGfixed.bai
+
+#use GATK for SNP-calling.
+java -Xmx16g -jar /programs/bin/GATK/GenomeAnalysisTK.jar -I all.mergednew.RGfixed.bam -R /workdir/hy31/hg19/hg19.rRNA.fa  -T RealignerTargetCreator -o RGfixed.finalMerged.forIndelRealigner.intervals
+
+#realign around indels
+java -Xmx16g -jar /programs/bin/GATK/GenomeAnalysisTK.jar -I ll.mergednew.RGfixed.bam -R /workdir/hy31/hg19/hg19.rRNA.fa  -T IndelRealigner -targetIntervals  RGfixed.finalMerged.forIndelRealigner.intervals -o RGfixed.finalMerged.realigned.bam
+
+#index new bam file
+java -Xmx4g -jar /programs/bin/picard-tools/BuildBamIndex.jar INPUT=RGfixed.finalMerged.realigned.bam OUTPUT=RGfixed.finalMerged.realigned.bai VALIDATION_STRINGENCY=STRINGENT
+
+#call SNPs and indels using GATK 
+java -Xmx16g -jar /programs/bin/GATK/GenomeAnalysisTK.jar -R /workdir/hy31/hg19/hg19.rRNA.fa   -T UnifiedGenotyper -I RGfixed.finalMerged.realigned.bam  -o RGfixed.finalMerged.realigned.snps.raw.vcf 
+
+
