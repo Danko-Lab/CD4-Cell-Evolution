@@ -1,0 +1,14 @@
+#beagle4 imputation for Chromosome 1
+wget http://bochet.gcc.biostat.washington.edu/beagle/1000_Genomes_phase1_vcf/chr1.1kg.ref.phase1_release_v3.20101123.vcf.gz
+wget http://bochet.gcc.biostat.washington.edu/beagle/1000_Genomes_phase1_vcf/chr1.1kg.ref.phase1_release_v3.20101123.vcf.gz.tbi
+
+vcftools --gzvcf RGfixed.finalMerged.realigned.snps.raw.vcf.gz --chr chr1 --recode -c | gzip -c > GATK.chr1.vcf.gz
+gunzip GATK.chr1.vcf.gz 
+sed 's/chr1/1/g' GATK.chr1.vcf > newGATK.chr1.vcf
+gzip newGATK.chr1.vcf
+java -jar beagle.r1398.jar ref=chr1.1kg.ref.phase1_release_v3.20101123.vcf.gz gt=newGATK.chr1.vcf.gz chrm=1 out=chr1.beagle4.out
+
+rm chr1.1kg.ref.phase1_release_v3.20101123.vcf.gz
+rm chr1.1kg.ref.phase1_release_v3.20101123.vcf.gz.tbi
+rm GATK.chr1.vcf.gz
+
