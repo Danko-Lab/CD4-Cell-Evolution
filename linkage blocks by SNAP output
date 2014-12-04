@@ -1,0 +1,66 @@
+################################################################################
+###The goal of this code is to identify the linkage blocks from SNAP output file
+#################################################################################
+#Input SNAP output file 
+SNAP<-read.table(file="C:/Users/hy31/Desktop/Danko/GWAS/blocks/SNAP.out.csv",header=TRUE, sep=",")
+
+################################################
+#Define blocks for each SNPs in the SNAP output
+##################################################
+output<-NULL
+chr<-for(j in 1:22){
+
+SNAPsub<-SNAP[which(SNAP$Chromosome==paste("chr",j,sep="")),]
+m<-length(unique(SNAPsub$SNP)) 
+snplist<-as.vector(unique(SNAPsub$SNP))
+for(i in 1:m){
+snp<-snplist[i]
+alldist<-as.vector(SNAPsub$Coordinate_HG18[which(SNAPsub$SNP==paste(snp))])
+maxdist<-max(as.numeric(alldist))
+mindist<-min(as.numeric(alldist))
+result<-c(snp,j, mindist, maxdist,maxdist-mindist)
+output<-rbind(output, result)
+	}
+}
+output<-as.table(output)
+names(output)<-c("SNP","chr","start","end","width")
+write.csv(output,file="C:/Users/hy31/Desktop/Danko/GWAS/blocks/SNAP.Blocks.csv")
+#modified the header of the files
+#########################################################
+#check and correct for duplicated or overlapped blocks
+#########################################################
+output<-read.table(file="C:/Users/hy31/Desktop/Danko/GWAS/blocks/SNAP.Blocks.csv",header=TRUE, sep=",")
+allout<-NULL
+allblock<-NULL
+#source("http://bioconductor.org/biocLite.R")
+#biocLite("IRanges")
+require(IRanges)
+chr<-for(j in 1:22){
+outputsub<-output[which(output$chr==j),]
+ir <- IRanges(outputsub$start, outputsub$end)
+outputsub$group <- subjectHits(findOverlaps(ir, reduce(ir)))
+t<-max(outputsub$group)
+	for(k in 1:t){
+	low<-min(outputsub$start[which(outputsub$group==k)],outputsub$end[which(outputsub$group==k)])
+	high<-max(outputsub$start[which(outputsub$group==k)],outputsub$end[which(outputsub$group==k)])
+	result<-c(j,low,high,high-low,k)
+	allblock<-rbind(allblock, result)# after merging overlapping blocks
+	}
+allout<-rbind(allout,outputsub) #original numbers of blocks (before merging
+}
+write.csv(allout,file="C:/Users/hy31/Desktop/Danko/GWAS/blocks/all.block.beforeMerge.csv")
+write.csv(allblock,file="C:/Users/hy31/Desktop/Danko/GWAS/blocks/all.block.Merged.csv")
+
+# dim(allblock)
+#[1] 509   5
+# dim(allout)
+#[1] 733   6
+
+#plot size distribution of blocks
+up<-range(allblock[,4])[2]
+[1] 887959
+size<-c(50*0:20000) 
+#hist(allblock[,4], breaks = size,ylim=c(0,80))#there are a lot of size 0 block--removed it and save it as merged.block.zero.removed.txt
+hist(allblock[,4],xlab="block size (bp)")
+
+
