@@ -6,7 +6,7 @@ function convert {
    echo $i
    j=`echo $i | cut -d \. -f 1,2,3`
    k=`echo $i | cut -d \. -f 1,2`
-   zcat $i | awk '{printf("%s\t%s\t%s\t%.2f\n", $1,$2,$3,$4)}' > $j 
+   zcat $i | awk '{printf("%s\t%s\t%s\t%.2f\n", $1,$2,$3,$4)}' | sort-bed - > $j 
    bedGraphToBigWig $j $2 $k.bw
    rm $j
 }
