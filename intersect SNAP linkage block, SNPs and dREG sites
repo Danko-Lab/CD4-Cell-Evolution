@@ -1,0 +1,34 @@
+
+################################################################
+#find snp from beagle4 imputation that located within the SNAP blocks
+###############################################################
+dos2unix Merged.block.bed
+awk '{ print "chr" $1 "\t" $2-1 "\t" $3}' Merged.block.bed >new.Merged.block.bed #why doing this? Because many blocks has size= 1bp.
+
+cp /home/hy31/Danko/chr22.beagle4.out.vcf.gz .
+gunzip chr22.beagle4.out.vcf.gz
+awk '{ print "chr" $1 "\t" $2-1 "\t" $2 "\t" $3}' chr22.beagle4.out.vcf >chr22.snp.bed
+sed '/chr#/d' chr22.snp.bed >chr22.snp.new.bed
+bedtools intersect -a chr22.snp.new.bed -b new.Merged.block.bed -c > chr22.block.snp
+awk '($5=="1") {print}' chr22.block.snp > chr22.block.intersect.snp
+
+############################################################
+#find snp in the block that overlapped with the dREG sites
+############################################################
+bedtools intersect -a chr22.block.intersect.snp -b H.change_PI+U.dREG.bed -c > chr22.block.dREGsnp
+awk '($6=="1") {print}' chr22.block.dREGsnp > chr22.block.dREG.intersect.snp
+wc -l chr22.block.dREG.intersect.snp
+
+################################################################################################################################
+#iteration for all chromosomes and combined all chr#.block.dREG.intersect.snp files into on file, allchr.block.dREG.intersect.snp
+##################################################################################################################################
+
+
+################################################################################################################################
+#combined all chr#.block.dREG.intersect.snp files into on file
+##################################################################################################################################
+cat *.block.dREG.intersect.snp > allchr.block.dREG.intersect.snp
+
+wc -l  allchr.block.dREG.intersect.snp
+
+#151 allchr.block.dREG.intersect.snp#a total of 151 SNPs found!
