@@ -1,12 +1,28 @@
 #!/usr/bin/bash
 
 ## Converts a bedGraph to a bigWig.
-for i in "H-U.TSS.bedGraph.gz" "C-U.TSS_hg19.bedGraph.gz" "M-U.TSS_hg19.bedGraph.gz"
+function convert {
+   i=$1
+   echo $i
+   j=`echo $i | cut -d \. -f 1,2,3`
+   k=`echo $i | cut -d \. -f 1,2`
+   zcat $i | awk '{printf("%s\t%s\t%s\t%.2f\n", $1,$2,$3,$4)}' > $j 
+   bedGraphToBigWig $j $2 $k.bw
+   rm $j
+}
+## And also convert panTro4 and rheMac3
+
+for file in "H-U.TSS.bedGraph.gz" "C-U.TSS_hg19.bedGraph.gz" "M-U.TSS_hg19.bedGraph.gz" "H-PI.TSS.bedGraph.gz" "C-PI.TSS_hg19.bedGraph.gz" "M-PI.TSS_hg19.bedGraph.gz"
 do
-  echo $i
-  j=`echo $i | cut -d \. -f 1,2,3`
-  k=`echo $i | cut -d \. -f 1,2`
-  zcat $i | sort-bed - > $j 
-  bedGraphToBigWig $j ../hg19.chromInfo $k.bw
-  rm $j
+  convert $file ../hg19.chromInfo
+done
+
+for file in "C-U.TSS.bedGraph.gz" "C-PI.TSS.bedGraph.gz"
+do
+  convert $file ../panTro4.chromInfo.txt
+done
+
+for file in "M-U.TSS.bedGraph.gz" "M-PI.TSS.bedGraph.gz"
+do
+  convert $file ../rheMac3.chromInfo.txt
 done
