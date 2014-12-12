@@ -6,11 +6,12 @@
 #$ -pe bscb 16
 #$ -M dankoc@gmail.com
 #$ -m be
-#$ -l h_rt=24:00:00
+#$ -l h_rt=48:00:00
+#$ -q long_term.q
 
 PREFIX=H
 DATADIR=AllData/All_Merge
-TH=0.95
+TH=0.8
 
 ## Copy files to scratch space (/workdir and /SSD).
 STARTDIR=`pwd`
@@ -20,7 +21,7 @@ cp /bscb/bscb07/cgd24/projects/NHP/tss_caller/run_dreg/scan_nhp.R $SCRATCH ##
 cp /home/cgd24/projects/tss_detector/train_svm/asvm.intersDNase.getTrainSet.RData $SCRATCH
 #cp /home/cgd24/projects/tss_detector/train_svm_nhp/cd4.dnase1.adbn.RData $SCRATCH
 #cp /home/cgd24/projects/tss_detector/train_svm/asvm.RData $SCRATCH ## 
-cp /bscb/bscb07/cgd24/projects/NHP/$DATADIR/$PREFIX-U*us.bw $SCRATCH
+cp /bscb/bscb07/cgd24/projects/NHP/$DATADIR/$PREFIX*us.bw $SCRATCH
 cd $SCRATCH
 
 ## Run R. 
