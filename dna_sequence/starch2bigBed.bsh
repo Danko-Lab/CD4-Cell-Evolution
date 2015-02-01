@@ -2,7 +2,7 @@
 chromInfo=/bscb/bscb07/cgd24/data/hg19/hg19.chromInfo
 
 function starch2bb {
- bedmap --echo $1.diff.bed.starch > $1.diff.bed
+ bedmap --echo $1.diff.bed.starch | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$5}'  > $1.diff.bed
  bedToBigBed $1.diff.bed $chromInfo $1.diff.bb
  rm $1.diff.bed
 }
