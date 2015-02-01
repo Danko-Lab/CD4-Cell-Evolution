@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+chromInfo=/bscb/bscb07/cgd24/data/hg19/hg19.chromInfo
+
+function starch2bb {
+ bedmap --echo $1.diff.bed.starch > $1.diff.bed
+ bedToBigBed $1.diff.bed $chromInfo $1.diff.bb
+ rm $1.diff.bed
+}
+
+starch2bb panTro4
+starch2bb rheMac3

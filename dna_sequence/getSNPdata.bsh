@@ -33,3 +33,14 @@ hgsql CGhg19 -N -e "
     panTro4Diff.chromStart = rheMac3Diff.chromStart AND
     panTro4Diff.panTro4 != rheMac3Diff.rheMac3 limit 10" | sort-bed - | starch - > all.diff.bed.starch
 
+## Descriptoin:
+#cdanko@nextgen:/usr/projects/GROseq/NHP/dna_sequence$ hgsql CGhg19 -N -e "describe panTro4Diff" 
+#+------------+------------------+-----+-----+------+--+
+#|      chrom |     varchar(255) |  NO | MUL | NULL |  |
+#| chromStart | int(10) unsigned |  NO |     | NULL |  |
+#|   chromEnd | int(10) unsigned |  NO |     | NULL |  |
+#|       hg19 |          char(1) | YES |     | NULL |  |
+#|    panTro4 |          char(1) | YES |     | NULL |  |
+#+------------+------------------+-----+-----+------+--+
+
+
