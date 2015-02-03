@@ -7,5 +7,6 @@ function starch2bb {
  rm $1.diff.bed
 }
 
-starch2bb panTro4
-starch2bb rheMac3
+starch2bb hg19
+#starch2bb panTro4
+#starch2bb rheMac3
