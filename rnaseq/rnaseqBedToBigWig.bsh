@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# To get chromInfo, run the command below.  NOTE: MUST REMOVE HEADER LINE.
+twoBitInfo /gbdb/hg19/hg19.2bit chromInfo.hg19
+twoBitInfo /gbdb/rheMac3/rheMac3.2bit chromInfo.rheMac3
+twoBitInfo /gbdb/panTro4/panTro4.2bit chromInfo.panTro4
+
+
+function makeBigWig {
+ for f in $FILES
+ do 
+   echo $f
+
+   ## Convert to wig
+   bedtools genomecov -split -strand + -dz -ibam  $f  -g /bscb/bscb07/cgd24/data/hg19/hg19.chromInfo | awk 'BEGIN{OFS="\t"} {print $1,$2,$2+1,$3}'  > FILE.bedgraph.gz
+   bedtools genomecov -split -strand + -dz -ibam  $f  -g /bscb/bscb07/cgd24/data/hg19/hg19.chromInfo | awk 'BEGIN{OFS="\t"} {print $1,$2,$2+1,$3}'  > FILE.bedgraph.gz
+
+   gzip $f*.wig
+ 
+   ## Then to bigWig
+   bedGraphToBigWig $f\_plus.wig.gz $CHINFO $f\_plus.bw
+   wigToBigWig $f\_minus.wig.gz $CHINFO $f\_minus.bw
+
+ done
+}
+
+function liftToHg19 {
+ for f in $FILES
+ do
+   ## Convert to bedGraph
+   zcat $f\_plus.wig.gz | perl ~/perl/wig2bedGraph.pl + > $f.bedGraph
+   zcat $f\_minus.wig.gz | perl ~/perl/wig2bedGraph.pl - >> $f.bedGraph
+
+   ## Use liftOver.  Other options: -tab -minMatch=0.1
+   liftOver $f.bedGraph $MAPCHAIN $f.hg19.bedGraph $UNMAPPED
+   rm $f.bedGraph
+   gzip $f.hg19.bedGraph
+
+   ## Split back into separate files.
+   zcat $f.hg19.bedGraph.gz | grep "\+$" > $f\_plus.hg19.bedGraph.gz
+   zcat $f.hg19.bedGraph.gz | grep "\-$" > $f\_minus.hg19.bedGraph.gz
+
+   ## Sort the bed file and convert to a wiggle.
+   sort-bed $f\_plus.hg19.bedGraph.gz | perl ~/perl/bedGraph2Wig.pl $f\_plus 197,0,11 | gzip > $f\_plus.hg19.wig.gz
+   sort-bed $f\_minus.hg19.bedGraph.gz | perl ~/perl/bedGraph2Wig.pl $f\_minus 0,132,209 | gzip > $f\_minus.hg19.wig.gz
+   rm $f\_plus.hg19.bedGraph.gz $f\_minus.hg19.bedGraph.gz
+
+   ## Convert bedGarph to bigWig
+   ## Note can also be done using bedGraoh to bigWig, as follows: 
+#   bedGraphToBigWig $f\_plus.hg19.bedGraph.gz $CHINFOhg $f\_plus.hg19.bw
+#   bedGraphToBigWig $f\_minus.hg19.bedGraph.gz $CHINFOhg $f\_minus.hg19.bw
+   wigToBigWig $f\_plus.hg19.wig.gz $CHINFOhg $f\_plus.hg19.bw
+   wigToBigWig $f\_minus.hg19.wig.gz $CHINFOhg $f\_minus.hg19.bw
+
+ done
+}
+
+## Preclean
+rm *.wig.gz *.bw *.bedGraph *.bedGraph.gz
+
+UNMAPPED=tmp
+CHINFOhg=chromInfo.hg19
+
+FILES=`ls H*.bed.gz`
+CHINFO=chromInfo.hg19
+makeBigWig
+
+FILES=`ls C*.bed.gz`
+CHINFO=chromInfo.panTro4
+makeBigWig
+MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.panTro4/panTro4.hg19.rbest.chain.gz # Use rbest
+#MAPCHAIN=/home/dankoc/liftOver/panTro4ToHg19.over.chain.gz
+liftToHg19
+
+FILES=`ls M*.bed.gz`
+CHINFO=chromInfo.rheMac3
+makeBigWig
+MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.chain.gz # Use rbest
+#MAPCHAIN=/gbdb/rheMac3/liftOver/rheMac3ToHg19.over.chain.gz
+liftToHg19
+
+## Cleanup.
+rm *.nr.rs.* tmp *.bedGraph *.bedGraph.gz
+

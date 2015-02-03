@@ -6,7 +6,7 @@ load("fdr.RData")
 source("readData.R")
 
 rpkm_df <- as.matrix(ca[,indx.good[c(2:9,11:17)]]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
-for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- log(1000*(rpkm_df[,i]+0.25)/sum(rpkm_df[,i]) *1000/(ca[,"mapSize"]))
+for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- log(1000*(rpkm_df[,i]+0.25)/sum(rpkm_df[,i]) *1000/(ca[,"mapSize"]), 2)
 
 source("../lib/circplot.R")
 snU <- c(rep("H-U",3), rep("C-U", 2), rep("M-U",3), rep("H-PI", 3), rep("C-PI", 2), rep("M-PI", 2))
@@ -45,6 +45,10 @@ cd.circplot(rpkm_df[ca$name == "chr6_36879950_36880650", ], snU) ## Again, H and
 cd.circplot(rpkm_df[ca$name == "chr17_38776650_38777400", ], snU) ## Extra chimp might help?!
 
 ## Untested
+
+## MYC
+cd.circplot(rpkm_df[ca$name == "chr8_128746500_128768850",], snU)
+cd.circplot(rpkm_df[ca$name == "chr8_128806600_129211750",], snU)
 
 
 ## IL2RA
