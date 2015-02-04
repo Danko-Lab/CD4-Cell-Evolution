@@ -1,0 +1,30 @@
+#!/usr/bin/bash
+# Get RPKM normalized data for H, C, and M.
+CI=/bscb/bscb07/cgd24/data/hg19/hg19.chromInfo
+
+function normBw {
+        echo $1 $2
+        bigWigToBedGraph $1.bw tmp.bedGraph ## NOTE THE USE OF hg19 coords here.  We're normalizing to hg19.
+	cat tmp.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4*1000*1000/'$2'/1}' > tmp.rpkm.bedGraph
+	bedGraphToBigWig tmp.rpkm.bedGraph $CI $1.rpkm.bw
+	rm tmp.bedGraph tmp.rpkm.bedGraph
+}
+
+normBw H-U_plus 95359834
+normBw H-U_minus 95359834
+
+normBw H-PI_plus 94225069
+normBw H-PI_minus 94225069
+
+normBw C-U_plus.hg19 63969209
+normBw C-U_minus.hg19 63969209
+ 
+normBw C-PI_plus.hg19 56886264
+normBw C-PI_minus.hg19 56886264
+
+normBw M-U_plus.hg19 64132179
+normBw M-U_minus.hg19 64132179
+
+normBw M-PI_plus.hg19 44838487
+normBw M-PI_minus.hg19 44838487
+
