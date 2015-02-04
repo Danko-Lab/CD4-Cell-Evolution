@@ -1,0 +1,21 @@
+#!/usr/bin/bash
+# Counts reads in each bigWig file.
+
+function getCountsBw {
+	echo $1
+	bigWigToBedGraph $1_plus.hg19.bw tmp.plus.bedGraph ## NOTE THE USE OF hg19 coords here.  We're normalizing to hg19.
+	bigWigToBedGraph $1_minus.hg19.bw tmp.minus.bedGraph
+	cat tmp.plus.bedGraph  | awk '{print $4}' | gzip >  $1.counts.gz
+	cat tmp.minus.bedGraph | awk '{print $4}' | gzip >> $1.counts.gz
+	R --quiet --no-save -e 'sum(abs(read.table("'$1'.counts.gz")))'
+	rm tmp.plus.bedGraph tmp.minus.bedGraph $1.counts.gz
+}
+
+## Get post-liftOver counts.
+for i in H-U C-U M-U H-PI C-PI M-PI
+do
+	echo $i
+	getCountsBw $i
+done
+
+
