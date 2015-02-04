@@ -1,9 +1,9 @@
 #!/usr/bin/bash
 
-CD4=/usr/projects/GROseq/CD4/Alignments
-PREP1=/usr/projects/GROseq/NHP/Alignments_1stPrep
-PREP2=/usr/projects/GROseq/NHP/Alignments_2ndPrep
-PREP3=/usr/projects/GROseq/NHP/Alignments_3rdPrep
+CD4=~/storage/projects/CD4/Alignments
+PREP1=~/storage/projects/NHP/Alignments_1stPrep
+PREP2=~/storage/projects/NHP/Alignments_2ndPrep
+PREP3=~/storage/projects/NHP/Alignments_3rdPrep
 
 ## Merge Human
 zcat $CD4/H1-U.bed.gz $PREP1/H3-U.bed.gz $PREP3/H2.2-U.bed.gz | sort-bed - | gzip > H-U.bed.gz ## Eliminate H2-U

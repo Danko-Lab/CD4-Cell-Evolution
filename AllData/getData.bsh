@@ -7,7 +7,7 @@ ALIGN1=../Alignments_1stPrep
 ALIGN2=../Alignments_2ndPrep
 ALIGN3=../Alignments_3rdPrep
 
-twoBitInfo /gbdb/hg19/hg19.2bit chromInfo.hg19
+#twoBitInfo /gbdb/hg19/hg19.2bit chromInfo.hg19
 function makeBigWig {
 for f in $FILES
  do
