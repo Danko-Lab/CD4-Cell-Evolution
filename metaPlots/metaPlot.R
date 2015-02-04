@@ -1,14 +1,14 @@
 require(bigWig)
 DATA_PATH="/home/cgd24/NHP/AllData/All_Merge/"
 
-HP <- load.bigWig(paste(DATA_PATH, "H-U_plus.bw", sep=""))
-HM <- load.bigWig(paste(DATA_PATH, "H-U_minus.bw", sep=""))
-CP <- load.bigWig(paste(DATA_PATH, "C-U_plus.hg19.bw", sep=""))
-CM <- load.bigWig(paste(DATA_PATH, "C-U_minus.hg19.bw", sep=""))
-MP <- load.bigWig(paste(DATA_PATH, "M-U_plus.hg19.bw", sep=""))
-MM <- load.bigWig(paste(DATA_PATH, "M-U_minus.hg19.bw", sep=""))
+HP <- load.bigWig(paste(DATA_PATH, "H-U_plus.rpkm.bw", sep=""))
+HM <- load.bigWig(paste(DATA_PATH, "H-U_minus.rpkm.bw", sep=""))
+CP <- load.bigWig(paste(DATA_PATH, "C-U_plus.hg19.rpkm.bw", sep=""))
+CM <- load.bigWig(paste(DATA_PATH, "C-U_minus.hg19.rpkm.bw", sep=""))
+MP <- load.bigWig(paste(DATA_PATH, "M-U_plus.hg19.rpkm.bw", sep=""))
+MM <- load.bigWig(paste(DATA_PATH, "M-U_minus.hg19.rpkm.bw", sep=""))
 
-doit <- function(bed, stp=100, halfWindow= 2500, ...) {
+doit <- function(bed, stp, halfWindow, ...) {
 	bed <- bed[grep("Un|random", bed$V1, invert=TRUE),]
 	bed_rev <- bed; bed_rev[bed[,6] == "+",6] <- "-"; bed_rev[bed[,6] == "-",6] <- "+"
 
@@ -32,12 +32,14 @@ doit <- function(bed, stp=100, halfWindow= 2500, ...) {
 
 }
 
+stp=100; halfWindow= 2500
+
 bed <- center.bed(read.table("myc.bed.gz"), upstreamWindow=halfWindow, downstreamWindow=halfWindow)
-doit(bed)
+doit(bed, stp=stp, halfWindow=halfWindow)
 
 bed <- center.bed(read.table("HMBOX.bed.gz"), upstreamWindow=halfWindow, downstreamWindow=halfWindow)
-doit(bed)
+doit(bed, stp=stp, halfWindow=halfWindow)
 
 gc <- fiveprime.bed(read.table("../annotations/gencode.v18.transcript.tsv"), upstreamWindow=halfWindow, downstreamWindow=halfWindow)
 gc <- gc[sample(which(gc$V7 == "protein_coding"), 500),]
-doit(gc)
+doit(gc, stp=stp, halfWindow=halfWindow)
