@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # To get chromInfo, run the command below.  NOTE: MUST REMOVE HEADER LINE.
-twoBitInfo /gbdb/hg19/hg19.2bit chromInfo.hg19
-twoBitInfo /gbdb/rheMac3/rheMac3.2bit chromInfo.rheMac3
-twoBitInfo /gbdb/panTro4/panTro4.2bit chromInfo.panTro4
+#twoBitInfo /gbdb/hg19/hg19.2bit chromInfo.hg19
+#twoBitInfo /gbdb/rheMac3/rheMac3.2bit chromInfo.rheMac3
+#twoBitInfo /gbdb/panTro4/panTro4.2bit chromInfo.panTro4
 
 
 function makeBigWig {
@@ -65,23 +65,23 @@ function liftToHg19 {
 rm *.wig.gz *.bw *.bedGraph *.bedGraph.gz
 
 UNMAPPED=tmp
-CHINFOhg=chromInfo.hg19
+CHINFOhg=../../hg19.chromInfo
 
 FILES=`ls H*.bed.gz`
-CHINFO=chromInfo.hg19
+CHINFO=../../hg19.chromInfo
 makeBigWig
 
 FILES=`ls C*.bed.gz`
-CHINFO=chromInfo.panTro4
+CHINFO=../../panTro4.chromInfo
 makeBigWig
-MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.panTro4/panTro4.hg19.rbest.chain.gz # Use rbest
-liftToHg19
+MAPCHAIN=~/NHP/makeRecipBest/hg19.panTro4/panTro4.hg19.rbest.chain.gz # Use rbest
+liftToHg19 &
 
 FILES=`ls M*.bed.gz`
-CHINFO=chromInfo.rheMac3
+CHINFO=../../rheMac3.chromInfo
 makeBigWig
-MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.chain.gz # Use rbest
-liftToHg19
+MAPCHAIN=~/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.chain.gz # Use rbest
+liftToHg19 &
 
 ## Cleanup.
 rm *.nr.rs.* tmp *.bedGraph *.bedGraph.gz

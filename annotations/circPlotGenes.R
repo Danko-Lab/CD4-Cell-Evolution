@@ -50,6 +50,8 @@ cd.circplot(rpkm_df[ca$name == "chr17_38776650_38777400", ], snU) ## Extra chimp
 cd.circplot(rpkm_df[ca$name == "chr8_128746500_128768850",], snU)
 cd.circplot(rpkm_df[ca$name == "chr8_128806600_129211750",], snU)
 
+## CD4
+cd.circplot(rpkm_df[ca$name == "chr12_6895750_6959750",], snU)
 
 ## IL2RA
 cd.circplot(rpkm_df[ca$name == "chr10_6041300_6104350", ][1,], snU)

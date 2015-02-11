@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+bwa aln -t 32 /home/cgd24/nextgen/home/cgd24/genomes/hg19/hg19/hg19 $i > $i.sai
+bowtie2 -x ~/storage/home/genomes/hg19/bowtie2/ -f 
