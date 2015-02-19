@@ -3,7 +3,7 @@
 FC_TH=2 #  1.58 2
 PVAL_TH=0.02 #  0.05 0.01
 DREG_TH=0.8 # 0.7
-MOTIF=7 # 7 8 9
+MOTIF=8 # 7 8 9
 PATTERN="dREG" # "dREG_ENH\|dREG_INGENE" #"dREG_TSS" "dREG" "dREG_ENH" "dREG_INGENE"
 
 inpath=/usr/projects/GROseq/NHP/tss_caller/Results/
@@ -30,25 +30,36 @@ cgpath=/usr/projects/GROseq/NHP/annotations/chage_expr
 cat $cgpath/H.change-U.tsv | grep $PATTERN | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>'"$MOTIF"') {print $0}' > $inpath/H-U.motifs7.change.bed
 dataID=H-U.motifs7.change
 inbed=H-U.motifs7.change.bed
-runINSIGHT $dataID $inbed &
+#runINSIGHT $dataID $inbed &
 
 ## Changed in U+PI conditions dREG w/ MOTIFS.
 cat $cgpath/H.change-U+PI.tsv | grep $PATTERN | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>'"$MOTIF"') {print $0}' > $inpath/H-U+PI.motifs7.change.bed
 dataID=H-U+PI.motifs7.change
 inbed=H-U+PI.motifs7.change.bed
-runINSIGHT $dataID $inbed &
+#runINSIGHT $dataID $inbed &
 
 ## Changed in U condition dREG w/ MOTIFS.
 cat $cgpath/H.change-U.tsv | grep $PATTERN | awk '($5 > '"$DREG_TH"' && $11 < '"$PVAL_TH"') {print $0}' | awk '($21>'"$FC_TH"' || $21<(-'"$FC_TH"')) {print $0}' | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>'"$MOTIF"') {print $0}' > $inpath/H-U.motifs7.change.strict.bed
 dataID=H-U.motifs7.change.strict
 inbed=H-U.motifs7.change.strict.bed
-runINSIGHT $dataID $inbed &
+#runINSIGHT $dataID $inbed &
 
 ## Changed in U+PI conditions dREG w/ MOTIFS.
 cat $cgpath/H.change-U+PI.tsv | grep $PATTERN | awk '($5 > '"$DREG_TH"' && $11 < '"$PVAL_TH"') {print $0}' | awk '($21>'"$FC_TH"' || $21<(-'"$FC_TH"')) {print $0}' | sort-bed - | bedops --element-of -1 $MOTIFS - | awk '($5>'"$MOTIF"') {print $0}' > $inpath/H-U+PI.motifs7.change.strict.bed
 dataID=H-U+PI.motifs7.change.strict
 inbed=H-U+PI.motifs7.change.strict.bed
+#runINSIGHT $dataID $inbed &
+
+cat dist.pics.tsv | awk 'BEGIN{OFS="\t"} ($10<25000){print $6,$7,$8}' | sort-bed - | uniq | bedops --element-of -1 $DNASEP - > $inpath/H-PICS.autoimmune.bed
+dataID=H-PICS.autoimmune
+inbed=H-PICS.autoimmune.bed
 runINSIGHT $dataID $inbed &
+
+cat dist.pics.tsv | awk 'BEGIN{OFS="\t"} ($10<25000){print $6,$7,$8}' | sort-bed - | uniq | bedops --element-of -1 $MOTIFS - | bedops --element-of -1 $DNASEP - | awk '($5>'"$MOTIF"') {print $0}' > $inpath/H-PICS.autoimmune.motifs.bed
+dataID=H-PICS.autoimmune.motifs
+inbed=H-PICS.autoimmune.motifs.bed
+runINSIGHT $dataID $inbed &
+
 
 ##
 ## OLD ...
