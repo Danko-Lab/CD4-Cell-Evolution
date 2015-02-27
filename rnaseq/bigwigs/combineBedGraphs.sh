@@ -79,3 +79,16 @@ done
 
 
 ## Then ... RPKM normlize for the browser.
+HCOUNTS=3318960093
+CCOUNTS=5006443463
+MCOUNTS=2958335679
+
+
+function getRPKM {
+	echo $1
+	
+}
+
+
+
+
