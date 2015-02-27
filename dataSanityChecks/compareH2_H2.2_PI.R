@@ -43,7 +43,14 @@ plot(log(abs(h2)+epsilon), log(abs(h2.2)+epsilon), pch=19)
 plot(log(abs(h2[h2>0 & h2.2>0])), log(abs(h2.2[h2>0 & h2.2>0])), pch=19)
 abline(0,1, col="blue")
 
+densScatterplot(log(abs(h2)+epsilon), log(abs(h2.2)+epsilon))
+
 ## Sanity check some longer genes...
 df <- cbind(gc18[,c(1:3.6,8)], lh2=log(abs(h2)+epsilon), lh2.2=log(abs(h2.2)+epsilon), lh1u=log(abs(h1u)+epsilon), lh1pi=log(abs(h1pi)+epsilon))
 df[grep("NFKB1", gc18$V8),]
+
+## Write out PDF ...
+pdf("Processing.Before.After.pdf")
+ densScatterplot(log(abs(h2)[h2>0 & h2.2>0]), log(abs(h2.2)[h2>0 & h2.2>0]), xlab="Overnight @4C", ylab="Process immediately")
+dev.off()
 
