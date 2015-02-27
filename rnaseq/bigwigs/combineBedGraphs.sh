@@ -8,7 +8,7 @@ bigWigToBedGraph Human.C.minus.BigWig.bw H-C.minus.bedGraph
 bigWigToBedGraph Human.D.plus.BigWig.bw  H-D.plus.bedGraph
 bigWigToBedGraph Human.D.minus.BigWig.bw H-D.minus.bedGraph
 
-bedtools unionbedg -i H-C.plus.bedGraph H-D.plus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4+$5}' > H.plus.bedGraph
+bedtools unionbedg -i H-C.plus.bedGraph H-D.plus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,-1*($4+$5)}' > H.plus.bedGraph
 bedtools unionbedg -i H-C.minus.bedGraph H-D.minus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4+$5}' > H.minus.bedGraph
 
 CHINFO=../../hg19.chromInfo
@@ -16,17 +16,17 @@ bedGraphToBigWig H.plus.bedGraph $CHINFO H.plus.bw
 bedGraphToBigWig H.minus.bedGraph $CHINFO H.minus.bw
 
 ## Chimp -U
-bigWigToBedGraph Chimp.F.plus.BigWig.bw  C-F.plus.bedGraph
-bigWigToBedGraph Chimp.F.minus.BigWig.bw C-F.minus.bedGraph
+#bigWigToBedGraph Chimp.F.plus.BigWig.bw  C-F.plus.bedGraph
+#bigWigToBedGraph Chimp.F.minus.BigWig.bw C-F.minus.bedGraph
 bigWigToBedGraph Chimp.G.plus.BigWig.bw  C-G.plus.bedGraph
 bigWigToBedGraph Chimp.G.minus.BigWig.bw C-G.minus.bedGraph
-bigWigToBedGraph Chimp.H.plus.BigWig.bw  C-H.plus.bedGraph
-bigWigToBedGraph Chimp.H.minus.BigWig.bw C-H.minus.bedGraph
+#bigWigToBedGraph Chimp.H.plus.BigWig.bw  C-H.plus.bedGraph
+#bigWigToBedGraph Chimp.H.minus.BigWig.bw C-H.minus.bedGraph
 bigWigToBedGraph Chimp.I.plus.BigWig.bw  C-I.plus.bedGraph
 bigWigToBedGraph Chimp.I.minus.BigWig.bw C-I.minus.bedGraph
 
-bedtools unionbedg -i C-F.plus.bedGraph C-G.plus.bedGraph C-H.plus.bedGraph C-I.plus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4+$5+$6+$7}' > C.plus.bedGraph
-bedtools unionbedg -i C-F.minus.bedGraph C-G.minus.bedGraph C-H.minus.bedGraph C-I.minus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4+$5+$6+$7}' > C.minus.bedGraph
+bedtools unionbedg -i C-G.plus.bedGraph C-I.plus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,-1*($4+$5)}' > C.plus.bedGraph
+bedtools unionbedg -i C-G.minus.bedGraph C-I.minus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4+$5}' > C.minus.bedGraph
 
 CHINFO=../../panTro4.chromInfo
 bedGraphToBigWig C.plus.bedGraph $CHINFO C.plus.bw
@@ -38,13 +38,16 @@ bigWigToBedGraph Rhesus.J.minus.BigWig.bw R-J.minus.bedGraph
 bigWigToBedGraph Rhesus.K.plus.BigWig.bw  R-K.plus.bedGraph
 bigWigToBedGraph Rhesus.K.minus.BigWig.bw R-K.minus.bedGraph
 
-bedtools unionbedg -i R-J.plus.bedGraph R-K.plus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4+$5}' > R.plus.bedGraph
-bedtools unionbedg -i R-J.minus.bedGraph R-K.minus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4+$5}' > R.minus.bedGraph
+bedtools unionbedg -i R-J.plus.bedGraph R-K.plus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,-1*($4+$5)}' > R.plus.bedGraph
+bedtools unionbedg -i R-J.minus.bedGraph R-K.minus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,-$4+$5}' > R.minus.bedGraph
 
 CHINFO=../../rheMac3.chromInfo
 bedGraphToBigWig R.plus.bedGraph $CHINFO R.plus.bw
 bedGraphToBigWig R.minus.bedGraph $CHINFO R.minus.bw
 
+rm *.bedGraph
+
+##
 ## Swap strands.
 mv H.plus.bw H-U.rnaseq.minus.bw
 mv H.minus.bw H-U.rnaseq.plus.bw
@@ -55,6 +58,24 @@ mv C.minus.bw C-U.rnaseq.plus.bw
 mv M.plus.bw M-U.rnaseq.minus.bw
 mv M.minus.bw M-U.rnaseq.plus.bw
 
+##
+## Normalize to RPKM for visulization.
+function getCountsBw {
+        echo $1
+        bigWigToBedGraph $1.rnaseq.plus.bw tmp.plus.bedGraph ## NOTE THE USE OF hg19 coords here.  We're normalizing to hg19.
+        bigWigToBedGraph $1.minus.hg19.bw tmp.minus.bedGraph
+        cat tmp.plus.bedGraph  | awk '{print $4}' | gzip >  $1.counts.gz
+        cat tmp.minus.bedGraph | awk '{print $4}' | gzip >> $1.counts.gz
+        R --quiet --no-save -e 'sum(abs(read.table("'$1'.counts.gz")))'
+        rm tmp.plus.bedGraph tmp.minus.bedGraph $1.counts.gz
+}
+
+## Get post-liftOver counts.
+for i in H-U C-U M-U
+do
+        echo $i
+        getCountsBw $i
+done
 
 
-
+## Then ... RPKM normlize for the browser.
