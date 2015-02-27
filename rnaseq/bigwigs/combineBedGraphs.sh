@@ -55,18 +55,18 @@ mv H.minus.bw H-U.rnaseq.plus.bw
 mv C.plus.bw C-U.rnaseq.minus.bw
 mv C.minus.bw C-U.rnaseq.plus.bw
 
-mv M.plus.bw M-U.rnaseq.minus.bw
-mv M.minus.bw M-U.rnaseq.plus.bw
+mv R.plus.bw M-U.rnaseq.minus.bw
+mv R.minus.bw M-U.rnaseq.plus.bw
 
 ##
 ## Normalize to RPKM for visulization.
 function getCountsBw {
         echo $1
-        bigWigToBedGraph $1.rnaseq.plus.bw tmp.plus.bedGraph ## NOTE THE USE OF hg19 coords here.  We're normalizing to hg19.
-        bigWigToBedGraph $1.minus.hg19.bw tmp.minus.bedGraph
+        bigWigToBedGraph $1.rnaseq.plus.bw tmp.plus.bedGraph
+        bigWigToBedGraph $1.rnaseq.minus.bw tmp.minus.bedGraph
         cat tmp.plus.bedGraph  | awk '{print $4}' | gzip >  $1.counts.gz
         cat tmp.minus.bedGraph | awk '{print $4}' | gzip >> $1.counts.gz
-        R --quiet --no-save -e 'sum(abs(read.table("'$1'.counts.gz")))'
+	R --quiet --no-save -e 'sum(as.numeric(abs(read.table("'$1'.counts.gz")$V1)))'
         rm tmp.plus.bedGraph tmp.minus.bedGraph $1.counts.gz
 }
 
