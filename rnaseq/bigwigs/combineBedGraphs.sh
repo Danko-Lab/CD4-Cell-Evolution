@@ -86,9 +86,17 @@ MCOUNTS=2958335679
 
 function getRPKM {
 	echo $1
-	
+	bigWigToBedGraph $1.rnaseq.plus.bw $1.rnaseq.plus.bg
+        bigWigToBedGraph $1.rnaseq.minus.bw $1.rnaseq.minus.bg
+	cat $1.rnaseq.plus.bg | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4*1000/'"$2"'*1000000}' > $1.rnaseq.rpkm.plus.bedGraph
+        cat $1.rnaseq.minus.bg | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4*1000/'"$2"'*1000000}' > $1.rnaseq.rpkm.minus.bedGraph
+	bedGraphToBigWig $1.rnaseq.rpkm.plus.bedGraph $3 $1.rnaseq.rpkm.plus.bigWig
+        bedGraphToBigWig $1.rnaseq.rpkm.minus.bedGraph $3 $1.rnaseq.rpkm.minus.bigWig
+	rm *.bg *.bedGraph
 }
 
-
+getRPKM H-U $HCOUNTS ../../hg19.chromInfo
+getRPKM C-U $HCOUNTS ../../panTro4.chromInfo
+getRPKM M-U $HCOUNTS ../../rheMac3.chromInfo
 
 
