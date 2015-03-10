@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+
+## Classifies sites as either (1) Promoter == proximal, stable.
+##            :OR:            (2) Enhancer == distal (>10kb), unstable.
+
+
