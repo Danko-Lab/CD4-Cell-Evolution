@@ -19,7 +19,7 @@ export PAUSEINCR=pause.increments.bed
 export TSSSITES=tsssites.tsv
 export TSSINCR=tss.increments.bed
 
-export NOMAPLOCI=/usr/projects/GROseq/NHP/AllData/mapping/allUnmap.merge.bed.starch
+export NOMAPLOCI=~/NHP/AllData/mapping/allUnmap.merge.bed.starch # /usr/projects/GROseq/NHP/AllData/mapping/allUnmap.merge.bed.starch
 
 ######################################
 ## Use Transcription Units detected by HMM ...
@@ -47,9 +47,9 @@ function makeOrthoAnnot {
 ####
 ## Make GAPS
 export NET=$CHIMP_NET
-makeOrthoAnnot
+#makeOrthoAnnot
 export NET=$RHESUS_NET
-makeOrthoAnnot
+#makeOrthoAnnot
 
 ## Combine gaps and mappability loci in hg19 coordinates.
 bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save $NOMAPLOCI > gapMerge
@@ -102,7 +102,7 @@ function writeAnnotTss {
 
 
 ## Now get data from TSS defined by dREG.
-INTSS=/usr/projects/GROseq/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.tsv
+INTSS=~/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.tsv  # /usr/projects/GROseq/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.tsv
 writeAnnotTss 1
 bedops --element-of -1 $INTSS annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_TSS"}' | sort-bed - > dreg.tss ## Identify intersection with TSS at the 5' end of annotated genes.
 cat $GENESFULL | grep "protein_coding" > genespc.tmp
@@ -121,7 +121,7 @@ makeIncrements $TSSSITES $TSSINCR
 ## Now get pause sites.
 ## Identify the peak 100 bp of txn in each dREG site.  That should be the pause site!
 
-MERGEDIR=/usr/projects/GROseq/NHP/AllData/All_Merge
+MERGEDIR=~/NHP/AllData/All_Merge  #/usr/projects/GROseq/NHP/AllData/All_Merge
 
 for i in H-U H-PI C-U C-PI M-U M-PI
 do

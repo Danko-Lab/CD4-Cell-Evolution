@@ -17,12 +17,16 @@ for f in $FILES
          awk 'BEGIN{OFS="\t"} {print $1,$2,($2+1),$4,$5,$6=="+"?"-":"+"}' | gzip > $g.nr.rs.bed.gz
  
    ## Convert to wig
-   bedToWig $g.nr.rs.bed.gz $g
+   #bedToWig $g.nr.rs.bed.gz $g
+   bedtools genomecov -bg -i $g.nr.rs.bed.gz -g $CHINFO -strand + | gzip > $g\_plus.bg.gz
+   bedtools genomecov -bg -i $g.nr.rs.bed.gz -g $CHINFO -strand - | gzip > $g\_minus.bg.gz
    gzip $g*.wig
  
    ## Then to bigWig
-   wigToBigWig $g\_plus.wig.gz $CHINFO $g\_plus.bw
-   wigToBigWig $g\_minus.wig.gz $CHINFO $g\_minus.bw
+   bedGraphToBigWig $g\_plus.bg.gz $CHINFO $g\_plus.bw
+   bedGraphToBigWig $g\_minus.bg.gz $CHINFO $g\_minus.bw
+   #wigToBigWig $g\_plus.wig.gz $CHINFO $g\_plus.bw
+   #wigToBigWig $g\_minus.wig.gz $CHINFO $g\_minus.bw
 
  done
 }
