@@ -16,17 +16,13 @@ for f in $FILES
    zcat $f | grep "rRNA" -v | \
          awk 'BEGIN{OFS="\t"} {print $1,$2,($2+1),$4,$5,$6=="+"?"-":"+"}' | gzip > $g.nr.rs.bed.gz
  
-   ## Convert to wig
-   #bedToWig $g.nr.rs.bed.gz $g
-   bedtools genomecov -bg -i $g.nr.rs.bed.gz -g $CHINFO -strand + | gzip > $g\_plus.bg.gz
-   bedtools genomecov -bg -i $g.nr.rs.bed.gz -g $CHINFO -strand - | gzip > $g\_minus.bg.gz
-   gzip $g*.wig
+   ## Convert to bedGraph ... Can't gzip these, unfortunately.
+   bedtools genomecov -bg -i $g.nr.rs.bed.gz -g $CHINFO -strand + > $g\_plus.bedGraph
+   bedtools genomecov -bg -i $g.nr.rs.bed.gz -g $CHINFO -strand - > $g\_minus.bedGraph
  
    ## Then to bigWig
-   bedGraphToBigWig $g\_plus.bg.gz $CHINFO $g\_plus.bw
-   bedGraphToBigWig $g\_minus.bg.gz $CHINFO $g\_minus.bw
-   #wigToBigWig $g\_plus.wig.gz $CHINFO $g\_plus.bw
-   #wigToBigWig $g\_minus.wig.gz $CHINFO $g\_minus.bw
+   bedGraphToBigWig $g\_plus.bedGraph $CHINFO $g\_plus.bw
+   bedGraphToBigWig $g\_minus.bedGraph $CHINFO $g\_minus.bw
 
  done
 }
@@ -38,8 +34,8 @@ function liftToHg19 {
    echo $f
 
    ## Convert to bedGraph
-   zcat $f\_plus.wig.gz | perl ~/perl/wig2bedGraph.pl + > $f.bedGraph
-   zcat $f\_minus.wig.gz | perl ~/perl/wig2bedGraph.pl - >> $f.bedGraph
+   cat $f\_plus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4,"+"}' > $f.bedGraph
+   cat $f\_minus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4,"-"}' >> $f.bedGraph
 
    ## Use liftOver.  Other options: -tab -minMatch=0.1
    liftOver $f.bedGraph $MAPCHAIN $f.hg19.bedGraph $UNMAPPED
@@ -47,26 +43,17 @@ function liftToHg19 {
    gzip $f.hg19.bedGraph
 
    ## Split back into separate files.
-   zcat $f.hg19.bedGraph.gz | grep "\+$" > $f\_plus.hg19.bedGraph.gz
-   zcat $f.hg19.bedGraph.gz | grep "\-$" > $f\_minus.hg19.bedGraph.gz
-
-   ## Sort the bed file and convert to a wiggle.
-   sort-bed $f\_plus.hg19.bedGraph.gz | perl ~/perl/bedGraph2Wig.pl $f\_plus 197,0,11 | gzip > $f\_plus.hg19.wig.gz
-   sort-bed $f\_minus.hg19.bedGraph.gz | perl ~/perl/bedGraph2Wig.pl $f\_minus 0,132,209 | gzip > $f\_minus.hg19.wig.gz
-   rm $f\_plus.hg19.bedGraph.gz $f\_minus.hg19.bedGraph.gz
+   zcat $f.hg19.bedGraph.gz | grep "\+$" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$5}' | sort-bed - > $f\_plus.hg19.bedGraph
+   zcat $f.hg19.bedGraph.gz | grep "\-$" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$5}' | sort-bed - > $f\_minus.hg19.bedGraph
 
    ## Convert bedGarph to bigWig
-   ## Note can also be done using bedGraoh to bigWig, as follows: 
-#   bedGraphToBigWig $f\_plus.hg19.bedGraph.gz $CHINFOhg $f\_plus.hg19.bw
-#   bedGraphToBigWig $f\_minus.hg19.bedGraph.gz $CHINFOhg $f\_minus.hg19.bw
-   wigToBigWig $f\_plus.hg19.wig.gz $CHINFOhg $f\_plus.hg19.bw
-   wigToBigWig $f\_minus.hg19.wig.gz $CHINFOhg $f\_minus.hg19.bw
-
+   bedGraphToBigWig $f\_plus.hg19.bedGraph $CHINFOhg $f\_plus.hg19.bw
+   bedGraphToBigWig $f\_minus.hg19.bedGraph $CHINFOhg $f\_minus.hg19.bw
  done
 }
 
 ## Preclean
-rm *.wig.gz *.bw *.bedGraph *.bedGraph.gz
+rm *.wig.gz *.bw *.bedGraph *.bedGraph.gz *.nr.rs.* *tmp* tmp
 
 UNMAPPED=tmp
 CHINFOhg=../../hg19.chromInfo
@@ -88,7 +75,7 @@ MAPCHAIN=~/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.chain.gz # Use rbes
 liftToHg19 &
 
 ## Cleanup.
-rm *.nr.rs.* tmp *.bedGraph *.bedGraph.gz
+#rm *.nr.rs.* tmp *.bedGraph *.bedGraph.gz
 
 ## Softlinks are required in just a few places.
 ln -s H-U_plus.bw H-U_plus.hg19.bw
