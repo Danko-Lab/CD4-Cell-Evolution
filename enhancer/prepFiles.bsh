@@ -4,3 +4,5 @@ hgsql hg19 -N -e "select chrom,txStart,txEnd,name,exonCount,strand from refGene"
 cat ../tss_caller/HCM-U-PI.dREG-tss-clusters.tsv | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' > tmp.dREG.bed
 zcat refGene.hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$6=="+"?$2:$3-1,$6=="+"?$2+1:$3,$4,$5,$6}' | sort-bed - | bedtools closest -d -b stdin -a tmp.dREG.bed | awk 'BEGIN{OFS="\t"} {print $10}' > proximity
 paste ../tss_caller/HCM-U-PI.dREG-tss-clusters.tsv proximity > HCM-U-PI.dREG-tss-clusters.dist.tsv
+
+rm proximity tmp.dREG.bed
