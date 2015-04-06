@@ -33,6 +33,10 @@ function liftToHg19 {
    f=`echo $i | cut -d \. -f 1`
    echo $f
 
+   ## Force each entry to represent precisely one base.
+#   cat $f\_plus.bedGraph | perl ~/NHP/lib/bedGraph2Wig.pl | perl ~/NHP/lib/wig2bedGraph.pl + | less
+#   cat $f\_minus.bedGraph | perl ~/NHP/lib/bedGraph2Wig.pl | perl ~/NHP/lib/wig2bedGraph.pl -  
+
    ## Convert to bedGraph
    cat $f\_plus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4,"+"}' > $f.bedGraph
    cat $f\_minus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4,"-"}' >> $f.bedGraph
@@ -66,7 +70,7 @@ FILES=`ls C*.bed.gz`
 CHINFO=../../panTro4.chromInfo
 makeBigWig
 MAPCHAIN=~/NHP/makeRecipBest/hg19.panTro4/panTro4.hg19.rbest.chain.gz # Use rbest
-liftToHg19 &
+liftToHg19 &i
 
 FILES=`ls M*.bed.gz`
 CHINFO=../../rheMac3.chromInfo

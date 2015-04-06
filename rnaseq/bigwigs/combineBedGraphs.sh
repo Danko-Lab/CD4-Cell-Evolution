@@ -39,7 +39,7 @@ bigWigToBedGraph Rhesus.K.plus.BigWig.bw  R-K.plus.bedGraph
 bigWigToBedGraph Rhesus.K.minus.BigWig.bw R-K.minus.bedGraph
 
 bedtools unionbedg -i R-J.plus.bedGraph R-K.plus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,-1*($4+$5)}' > R.plus.bedGraph
-bedtools unionbedg -i R-J.minus.bedGraph R-K.minus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,-$4+$5}' > R.minus.bedGraph
+bedtools unionbedg -i R-J.minus.bedGraph R-K.minus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4+$5}' > R.minus.bedGraph
 
 CHINFO=../../rheMac3.chromInfo
 bedGraphToBigWig R.plus.bedGraph $CHINFO R.plus.bw
@@ -81,7 +81,7 @@ done
 ## Then ... RPKM normlize for the browser.
 HCOUNTS=3318960093
 CCOUNTS=5006443463
-MCOUNTS=2958335679
+MCOUNTS=5250528546
 
 
 function getRPKM {
@@ -95,8 +95,8 @@ function getRPKM {
 	rm *.bg *.bedGraph
 }
 
-getRPKM H-U $HCOUNTS ../../../hg19.chromInfo
-getRPKM C-U $HCOUNTS ../../../panTro4.chromInfo
-getRPKM M-U $HCOUNTS ../../../rheMac3.chromInfo
+getRPKM H-U $HCOUNTS ../../hg19.chromInfo
+getRPKM C-U $HCOUNTS ../../panTro4.chromInfo
+getRPKM M-U $HCOUNTS ../../rheMac3.chromInfo
 
 

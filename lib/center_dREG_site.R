@@ -1,7 +1,7 @@
 ## 
 ## Centers dREG sites on the positions of highest read density.
 
-center_dREG_site <- function(bed_file, bw_plus_file, bw_minus_file, readThresh=10) {
+center_dREG_site <- function(bed, bw_plus_file, bw_minus_file, readThresh=10) {
   require(bigWig)
 
 #  readThresh <- 10 ## Mainly want to eliminate passing position bed[1,i] for regions without any read density.
@@ -35,7 +35,7 @@ center_dREG_site <- function(bed_file, bw_plus_file, bw_minus_file, readThresh=1
     countsm_SUM <- sapply(1:(length(countsm)-nwindows), function(x) {sum(countsm[x:(x+nwindows)])})
     stopifnot(NROW(bases)-1-nwindows == NROW(countsm_SUM)) ## SANTIY CHECK
 
-    if(max(countsp_SUM+chromsm_SUM) > readThresh) {
+    if(max(countsp_SUM+countsm_SUM) > readThresh) {
       chromStart  <- c(chromStart, bases[1]+(which.max(countsp_SUM+countsm_SUM)-1-nwindows)*overlap)
       chromEnd    <- c(chromEnd, bases[1]+(which.max(countsp_SUM+countsm_SUM)+nwindows)*overlap)
       chrom       <- c(chrom, as.character(bed[i,1]))
