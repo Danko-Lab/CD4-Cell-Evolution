@@ -2,8 +2,7 @@
 ##            :OR:            (2) Enhancer == distal (>10kb), unstable.
 
 ## Get the location of sites.
-intersection_call <- paste("zcat refGene.hg19.bed.gz | awk 'BEGIN{OFS=","\t","} {print $1,$6==","+","?$2:$3-1,$6==","+","?$2+1:$3,$4,$5,$6}' | sort-bed - | bedtools closest -d -b stdin -a ", sep='"')
-tss <- read.table(pipe(paste(intersection_call, "../tss_caller/HCM-U-PI.dREG-tss-clusters.tsv")))
+tss <- read.table("HCM-U-PI.dREG-tss-clusters.dist.tsv")
 tss <- tss[grep("chrUn|random", tss$V1, invert=TRUE),]
 
 ## Reposition to -110bp from the highest site.
@@ -43,3 +42,34 @@ stab_tss <- cbind(tss, tss_centers[,1:3], pl_Scores, mn_Scores)
 ## summary stats. 
 mins <- sapply(1:NROW(pl_Scores), function(x) {min(pl_Scores[x], mn_Scores[x])})
 cor.test(mins, stab_tss[,7], method="spearman")
+
+## classes ...
+stable_prox <- (stab_tss$V13 < dist & mins < Smax) & !is.na(mins)
+unstable_dist <- stab_tss$V13 > dist & mins > Umin & !is.na(mins)
+
+sum(stable_prox, na.rm=TRUE)
+sum(unstable_dist, na.rm=TRUE)
+
+require(vioplot)
+vioplot(stab_tss[stable_prox & !is.na(stab_tss[,7]),7], stab_tss[unstable_dist & !is.na(stab_tss[,7]),7], names=c("Stable-Proximal", "Unstable-Distal"))
+
+## Remove NAs.
+for(x in 7:13){ stab_tss[is.na(stab_tss[,x]),x] <- 0 }
+
+## Of sites in human, complete gains.
+sum(stab_tss[stable_prox,7] > high & stab_tss[stable_prox, 8] < low & stab_tss[stable_prox, 9] < low)/ sum(stab_tss[stable_prox, 7] > high)
+sum(stab_tss[unstable_dist,7] > high & stab_tss[unstable_dist, 8] < low & stab_tss[unstable_dist, 9] < low)/ sum(stab_tss[unstable_dist, 7] > high)
+
+## Changes.
+sum(stab_tss[stable_prox,7] > 0.7, na.rm=TRUE)/ sum(!is.na(stab_tss[stable_prox,7]))
+sum(stab_tss[unstable_dist,7] > 0.7, na.rm=TRUE)/ sum(!is.na(stab_tss[unstable_dist,7]))
+
+
+## Scatterplots of Hu-Mu, Hu-Hpi.
+plot(stab_tss[stable_prox,7]-stab_tss[stable_prox,9], stab_tss[stable_prox,7]-stab_tss[stable_prox,10], xlab="species")
+plot(stab_tss[unstable_dist,7]-stab_tss[unstable_dist,9], stab_tss[unstable_dist,7]-stab_tss[unstable_dist,10], xlab="species")
+source("../lib/densScatterplot.R")
+densScatterplot(stab_tss[stable_prox,7]-stab_tss[stable_prox,9], stab_tss[stable_prox,7]-stab_tss[stable_prox,10], xlab="species")
+densScatterplot(stab_tss[unstable_dist,7]-stab_tss[unstable_dist,9], stab_tss[unstable_dist,7]-stab_tss[unstable_dist,10], xlab="species")
+
+

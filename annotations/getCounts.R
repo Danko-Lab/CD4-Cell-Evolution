@@ -18,8 +18,8 @@ bed <- read.table(bed_file)
 bw_plus <- load.bigWig(bw_plus_file)
 bw_minus<- load.bigWig(bw_minus_file)
 
-counts <- bedQuery.bigWig(bed, bw_plus, bw_minus, gapValue=0)
-counts <- abs(counts)  ## Reverse strand for minus.
+counts <- bed6.region.bpQuery.bigWig(bw_plus, bw_minus, bed, abs.value=TRUE) #bedQuery.bigWig(bed, bw_plus, bw_minus, gapValue=0)
+#counts <- abs(counts)  ## Reverse strand for minus.
 
 bed[,5] <- counts
 write.table(bed, out_file, sep="\t", col.names=FALSE, row.names=FALSE, quote=FALSE)
