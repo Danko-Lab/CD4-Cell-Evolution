@@ -34,6 +34,7 @@ function liftToHg19 {
    zcat $f\_minus.wig.gz | perl ~/perl/wig2bedGraph.pl - >> $f.bedGraph
 
    ## Use liftOver.  Other options: -tab -minMatch=0.1
+   #CrossMap.py bed $MAPCHAIN $f.hg19.bedGraph $f.bedGraph ## Crossmap is an alterantive to liftOver.
    liftOver $f.bedGraph $MAPCHAIN $f.hg19.bedGraph $UNMAPPED
    rm $f.bedGraph
    gzip $f.hg19.bedGraph

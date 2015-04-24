@@ -42,7 +42,8 @@ function liftToHg19 {
    cat $f\_minus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4,"-"}' >> $f.bedGraph
 
    ## Use liftOver.  Other options: -tab -minMatch=0.1
-   liftOver $f.bedGraph $MAPCHAIN $f.hg19.bedGraph $UNMAPPED
+   CrossMap.py bed $MAPCHAIN $f.hg19.bedGraph $f.bedGraph
+#   liftOver $f.bedGraph $MAPCHAIN $f.hg19.bedGraph $UNMAPPED
    rm $f.bedGraph
    gzip $f.hg19.bedGraph
 
@@ -70,7 +71,7 @@ FILES=`ls C*.bed.gz`
 CHINFO=../../panTro4.chromInfo
 makeBigWig
 MAPCHAIN=~/NHP/makeRecipBest/hg19.panTro4/panTro4.hg19.rbest.chain.gz # Use rbest
-liftToHg19 &i
+liftToHg19 &
 
 FILES=`ls M*.bed.gz`
 CHINFO=../../rheMac3.chromInfo
