@@ -47,7 +47,7 @@ function getPauseCounts {
 #
 #}
 
-BWPATH=/usr/projects/GROseq/NHP/AllData
+BWPATH=/local/storage/projects/NHP/AllData
 
 ## Get counts, and place this in 'score'.
 export COUNTFILE=J.count.bed
