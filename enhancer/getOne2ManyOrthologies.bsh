@@ -1,0 +1,35 @@
+#!/usr/bin/bash
+# ASSUME: Sites that are gaps in the recipBest but NOT in the standard nets are 1:many orthologies.
+
+function makeOrthoAnnot {
+ ## Get gap data.
+ hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 2 AND qEnd > qStart" | grep "^c" | sort-bed - > $NET.L2.bed
+ hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 3 AND qEnd > qStart" | grep "^c" | sort-bed - > $NET.L3.bed.keep
+ hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 4 AND qEnd > qStart" | grep "^c" | sort-bed - > $NET.L4.bed
+ hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 5 AND qEnd > qStart" | grep "^c" | sort-bed - > $NET.L5.bed
+ hgsql hg19 -e "select qName,qStart,qEnd,type,level from $NET where level like 6 AND qEnd > qStart" | grep "^c" | sort-bed - > $NET.L6.bed
+
+ bedops --difference $NET.L2.bed $NET.L3.bed.keep > $NET.Gap2.bed ## Gets those in L2 which aren't in L3 ...
+ bedops --difference $NET.L4.bed $NET.L5.bed      > $NET.Gap3.bed ## Gets those in L2 which aren't in L3 ...
+
+ bedops --merge $NET.Gap2.bed $NET.Gap3.bed $NET.L6.bed > $NET.gapMerge.save ## Add back gaps in L4 ...
+
+ rm $NET*.bed
+}
+
+####
+## Make GAPS
+export NET=panTro4_net_rbest
+makeOrthoAnnot
+export NET=rheMac3_net_rbest
+makeOrthoAnnot
+
+export NET=netPanTro4
+makeOrthoAnnot
+export NET=netRheMac3
+makeOrthoAnnot
+
+## Select gaps in recipBest NOT in standard nets.
+bedops --difference panTro4_net_rbest.gapMerge.save netPanTro4.gapMerge.save | starch - > panTro4.one2many.bed.starch
+bedops --difference rheMac3_net_rbest.gapMerge.save netRheMac3.gapMerge.save | starch - > rheMac3.one2many.bed.starch
+

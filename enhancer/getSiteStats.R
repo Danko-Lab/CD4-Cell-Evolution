@@ -3,7 +3,9 @@ load("../annotations/fdr.RData")
 
 tss_aln <- fdr_df[grepl("dREG", ca$annot_type),]
 tss <- read.table("counttss.tsv.tmp")
-tss <- data.frame(tss[,1:20], tss_aln[match(tss$V4, tss_aln$name),31:39])
+tss <- data.frame(tss[,1:20], tss_aln[match(tss$V4, tss_aln$name),31:42])
+
+## Alignable fraction (V20) denotes a gap in either species.  Make sure gaps are in both.
 
 ## Classify as 'promoter'/ 'enhancer'
 stab <- rowMax(tss[,17:18])
@@ -18,6 +20,13 @@ tss$V19 <- class
 ## Count types of elements ...
 total <- summary(as.factor(tss$V19))
 unmap <- summary(as.factor(tss$V19[tss$V20 == 0]))
-chang <- summary(as.factor(tss$V19[tss$V20 > 0 & tss$HumanFDR < 0.01]))
+chang <- summary(as.factor(tss$V19[tss$V20 > 0 & tss$fdr_min < 0.01]))
 
+total
+unmap
+chang 
 
+unmap/total
+chang/total
+
+## HOWEVER! Note that these numbers seem to include 1:many orthologies, not just gaps.  These really should be removed.
