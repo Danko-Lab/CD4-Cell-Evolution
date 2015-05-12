@@ -104,11 +104,12 @@ function writeAnnotTss {
 ## Now get data from TSS defined by dREG.
 INTSS=~/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.dist.stability.tsv #HCM-U-PI.dREG-tss-clusters.tsv 
 writeAnnotTss 1
-bedops --element-of -1 $INTSS annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_TSS"}' | sort-bed - > dreg.tss ## Identify intersection with TSS at the 5' end of annotated genes.
-cat $GENESFULL | grep "protein_coding" > genespc.tmp
-cat genespc.tmp | bedops --element-of -1 $INTSS - | bedops --not-element-of -1 - annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_INGENE"}' | sort-bed - > ingene.tmp ## Also pull out those that are in gene annotations.
-bedops --not-element-of -1 $INTSS annottss.tsv | bedops --not-element-of -1 - genespc.tmp | awk 'BEGIN{OFS="\t"} {print $0,"dREG_ENH"}' | sort-bed - > enh.tmp ## Assume the remaining sites are enhancers.
-cat dreg.tss enh.tmp ingene.tmp | sort-bed - > $TSSSITES
+cat $INTSS | awk 'BEGIN{OFS="\t"} {print $0,"dREG_TSS"}' | sort-bed - > dreg.tss ## Replaced the below with this, as now classifying based on stability.
+#bedops --element-of -1 $INTSS annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_TSS"}' | sort-bed - > dreg.tss ## Identify intersection with TSS at the 5' end of annotated genes.
+#cat $GENESFULL | grep "protein_coding" > genespc.tmp
+#cat genespc.tmp | bedops --element-of -1 $INTSS - | bedops --not-element-of -1 - annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_INGENE"}' | sort-bed - > ingene.tmp ## Also pull out those that are in gene annotations.
+#bedops --not-element-of -1 $INTSS annottss.tsv | bedops --not-element-of -1 - genespc.tmp | awk 'BEGIN{OFS="\t"} {print $0,"dREG_ENH"}' | sort-bed - > enh.tmp ## Assume the remaining sites are enhancers.
+#cat dreg.tss enh.tmp ingene.tmp | sort-bed - > $TSSSITES
 rm enh.tmp ingene.tmp genespc.tmp
 makeIncrements $TSSSITES $TSSINCR
 

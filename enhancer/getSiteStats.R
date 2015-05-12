@@ -1,31 +1,23 @@
 ## This analysis focuses on lineage-specific changes that are currently active in hg19.
 load("../annotations/fdr.RData")
 
-## Currently, using dREG_TSS == promoters (proximal); dREG_ENH == enhancers (distal).
-#cat ../annotations/tsssites.tsv | grep "dREG_TSS" -c
-#cat ../annotations/tsssites.tsv | grep "dREG_ENH" -c
+tss_aln <- fdr_df[grepl("dREG", ca$annot_type),]
+tss <- read.table("counttss.tsv.tmp")
+tss <- data.frame(tss[,1:20], tss_aln[match(tss$V4, tss_aln$name),31:39])
 
+## Classify as 'promoter'/ 'enhancer'
+stab <- rowMax(tss[,17:18])
+dist <- tss[,13]
+class <- rep("tss", NROW(tss)) ## tss is then unclassified as a promoter or enhancer
+class[stab < 0.1 & dist < 500]  <- "Prox_Stab" ## Clearly protein coding promoter
+class[stab > 0.1  & dist > 10000] <- "Dist_UnSt" ## Clearly distal enhancer
+class[stab < 0.001  & dist > 10000] <- "Dist_Stab" ## Clearly stable, but distal
+summary(as.factor(class))
+tss$V19 <- class
 
-
-## Fraction of changes that are ... 
-getFracChanges <- function(prefix) {
-	dat_indx <- which(ca$type == "dREG_TSS")
-	dat <- ca[dat_indx,]
-	dat_all <- NROW(dat)
-
-	# unmappable
-        write.table(dat[,c(1:3)], file= pipe(" sort-bed - > tmp.bed"), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
-	dat_gap <- as.double(system("bedmap --count --fraction-ref 0.5 tmp.bed ../annotations/gapMerge | grep -c -v '^0$'", intern=TRUE)) 
-	print(dat_gap)
-
-	# complete gain/loss
-	as.double(system("cat ../annotations/tsssites.tsv | grep 'dREG_TSS' | sed s/NA/0/g | awk '($7>0.7 && $8<0.3 && $9<0.3)' | grep '' -c", intern=TRUE))	
-
-	# changed in activity
-	dat_chg <- sum(fdr_df$HumanFDR[dat_indx] < PVAL)
-	print(dat_chg)
-
-	# unchanged
-}
+## Count types of elements ...
+total <- summary(as.factor(tss$V19))
+unmap <- summary(as.factor(tss$V19[tss$V20 == 0]))
+chang <- summary(as.factor(tss$V19[tss$V20 > 0 & tss$HumanFDR < 0.01]))
 
 

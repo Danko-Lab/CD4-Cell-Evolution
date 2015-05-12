@@ -11,7 +11,7 @@ toLogical <- function(indx, expLength) {
 }
 
 ## Define TU types.
-  indx.eRNA <- grepl("dREG_ENH", fdr_df$type)
+  indx.eRNA <- grepl("Dist_UnSt", fdr_df$type)#"dREG_ENH", fdr_df$type)
   indx.lincRNA <- grepl("lincRNA|processed_transcript|sense_intronic|sense_overlapping", fdr_df$type)
   indx.unannot <- grepl("INTERGENIC|GENE_BadMatch|AS_BadMatch", fdr_df$type)
   indx.pseudogene.rep <- grepl("pseudogene|GERST_PG|PSEUDOGENE+REP", fdr_df$type)
