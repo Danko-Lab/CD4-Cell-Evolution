@@ -8,4 +8,4 @@ paste ../tss_caller/HCM-U-PI.dREG-tss-clusters.tsv proximity > HCM-U-PI.dREG-tss
 rm proximity tmp.dREG.bed
 
 ## Get info on whether gaps are human lineage-specifi.
-#bedops -i  ../annotations/panTro4_net_rbest.gapMerge.save ../annotations/rheMac3_net_rbest.gapMerge.save | bedmap --echo --bases counttss.tsv.tmp - | less
+bedops -i panTro4.one2many.bed.starch rheMac3.one2many.bed.starch | bedmap --echo --bases counttss.tsv.tmp - | sed "s/|/\t/g" > tss.tsv
