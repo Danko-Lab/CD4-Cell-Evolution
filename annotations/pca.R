@@ -24,6 +24,10 @@ summary(pca) # Prints variance summary for all principal components.
 #plot(pca$rotation[,1], pca$rotation[,2], pch=19, col=cols)
 pairs(pca$rotation[,1:5], col=cols, pch=pch)
 
+pdf("PC1.PC2.pdf")
+plot(y= pca$rotation[,1], x= pca$rotation[,2], col=cols, pch=pch, xlab="PC2", ylab="PC1")
+dev.off()
+
 ## 
 ## Correlate each PC w/ the expected effects of cell compositio on GE.
 

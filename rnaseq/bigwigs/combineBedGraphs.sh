@@ -96,7 +96,7 @@ function getRPKM {
 }
 
 getRPKM H-U $HCOUNTS ../../hg19.chromInfo
-getRPKM C-U $HCOUNTS ../../panTro4.chromInfo
-getRPKM M-U $HCOUNTS ../../rheMac3.chromInfo
+getRPKM C-U $CCOUNTS ../../panTro4.chromInfo
+getRPKM M-U $MCOUNTS ../../rheMac3.chromInfo
 
 

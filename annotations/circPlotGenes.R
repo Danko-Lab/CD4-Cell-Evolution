@@ -64,3 +64,6 @@ cd.circplot(rpkm_df[ca$name == "chr18_56338250_56435300", ], snU)
 
 
 cd.circplot(rpkm_df[ca$name == "chr15_67356550_67513750",],snU)
+
+## CXCR4
+cd.circplot(rpkm_df[ca$name == "chr2_136862150_136897250"])
