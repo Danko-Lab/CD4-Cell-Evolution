@@ -17,16 +17,15 @@ MMpi <- load.bigWig(paste(DATA_PATH, "M-PI_minus.hg19.rpkm.bw", sep=""))
 
 doit <- function(bed, HP, HM, CP, CM, MP, MM, stp, halfWindow, ...) {
 	bed <- bed[grep("Un|random", bed$V1, invert=TRUE),]
-	bed_rev <- bed; bed_rev[bed[,6] == "+",6] <- "-"; bed_rev[bed[,6] == "-",6] <- "+"
 
 	H_meta_p <- metaprofile.bigWig(bed, HP, HM, step=stp)
-	H_meta_m <- metaprofile.bigWig(bed_rev, HP, HM, step=stp)
+	H_meta_m <- metaprofile.bigWig(bed, HM, HP, step=stp)
 
         C_meta_p <- metaprofile.bigWig(bed, CP, CM, step=stp)
-        C_meta_m <- metaprofile.bigWig(bed_rev, CP, CM, step=stp)
+        C_meta_m <- metaprofile.bigWig(bed, CM, CP, step=stp)
 
         M_meta_p <- metaprofile.bigWig(bed, MP, MM, step=stp)
-        M_meta_m <- metaprofile.bigWig(bed_rev, MP, MM, step=stp)
+        M_meta_m <- metaprofile.bigWig(bed, MM, MP, step=stp)
 
         N = length(H_meta_p$middle)
         x = 1:N*stp ## ((1:N) - N/2)* stp
