@@ -1,4 +1,6 @@
 #!/usr/bin/bash
+## Corresponds to Evernote entry labeled Adding Chimp/ Rhesus Regulatory Elemnts that Don't Map ...
+##
 
 ## Write out bed files.
 bash writeBed.bsh 0.7 H-U.TSS.bedGraph.gz
