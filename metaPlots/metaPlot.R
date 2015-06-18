@@ -45,12 +45,14 @@ doit <- function(bed, HP, HM, CP, CM, MP, MM, stp, halfWindow, ...) {
 
 stp=100; halfWindow= 2500
 
+pdf("Myc.Meta.pdf")
+
 bed <- center.bed(read.table("myc.bed.gz"), upstreamWindow=halfWindow, downstreamWindow=halfWindow)
 doit(bed, HP, HM, CP, CM, MP, MM, stp=stp, halfWindow=halfWindow)
 doit(bed, HPpi, HMpi, CPpi, CMpi, MPpi, MMpi, stp=stp, halfWindow=halfWindow)
 
 bed <- center.bed(read.table("HMBOX.bed.gz"), upstreamWindow=halfWindow, downstreamWindow=halfWindow)
-doit(bed, stp=stp, halfWindow=halfWindow)
+doit(bed, HP, HM, CP, CM, MP, MM, stp=stp, halfWindow=halfWindow)
 doit(bed, HPpi, HMpi, CPpi, CMpi, MPpi, MMpi, stp=stp, halfWindow=halfWindow)
 
 gc <- fiveprime.bed(read.table("../annotations/gencode.v18.transcript.tsv"), upstreamWindow=halfWindow, downstreamWindow=halfWindow)
@@ -58,3 +60,4 @@ gc <- gc[sample(which(gc$V7 == "protein_coding"), 500),]
 doit(gc, HP, HM, CP, CM, MP, MM, stp=stp, halfWindow=halfWindow)
 doit(gc, HPpi, HMpi, CPpi, CMpi, MPpi, MMpi, stp=stp, halfWindow=halfWindow)
 
+dev.off()

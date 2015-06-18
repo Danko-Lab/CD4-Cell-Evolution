@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+wget http://hgdownload-test.cse.ucsc.edu/goldenPath/hg19/vsMm10/reciprocalBest/hg19.mm10.rbest.chain.gz
+wget http://hgdownload-test.cse.ucsc.edu/goldenPath/hg19/vsMm10/reciprocalBest/hg19.mm10.rbest.net.gz
+wget http://hgdownload-test.cse.ucsc.edu/goldenPath/hg19/vsMm10/reciprocalBest/mm10.hg19.rbest.chain.gz
+wget http://hgdownload-test.cse.ucsc.edu/goldenPath/hg19/vsMm10/reciprocalBest/mm10.hg19.rbest.net.gz
