@@ -17,6 +17,23 @@ class[stab < 0.001  & dist > 10000] <- "Dist_Stab" ## Clearly stable, but distal
 summary(as.factor(class))
 tss$V19 <- class
 
+## Scatterplots
+pdf("dist.stability.summaries.pdf")
+
+source("../lib/densScatterplot.R")
+#densScatterplot(dist, log(stab,10), xlim=c(0,50000))
+
+plot(dist, stab, log="y", xlim=c(0,30000), xlab="Distance to nearest gene [bp]", ylab="Predicted instability score")
+abline(v=500, col="red", lty="dotted")
+abline(v=10000, col="red", lty="dotted")
+abline(h= 0.001, col="red", lty="dotted")
+abline(h= 0.1, col="red", lty="dotted")
+
+hist(log(dist+1, 10))
+hist(log(stab, 10))
+
+dev.off()
+
 ## Change unscored to 0
 for(i in 7:12) { tss[is.na(tss[,i]),i] <- 0 }
 
