@@ -61,7 +61,7 @@ Labels <- c("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA",
                                                 "K562", "B-cell", "IMR90")
 
 ## Cleanup...
-ca <- ca[!is.na(ca[,11]),]
+ca <- ca[!is.na(ca[,11]),] ## Removes those which are not mappable/ orthologues in at least one species.
 ca <- ca[grep("random", ca$chrom, invert=TRUE),]
 
 

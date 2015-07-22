@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+
+for i in *.bed.gz
+do
+  python ~/bin/bed-metric/bed-metric.py $i --plot
+done

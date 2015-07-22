@@ -3,7 +3,7 @@ load("../annotations/fdr.RData")
 
 tss_aln <- fdr_df[grepl("dREG", ca$annot_type),]
 tss <- read.table("tss.tsv")
-tss <- data.frame(tss[,c(1:20,44)], tss_aln[match(tss$V4, tss_aln$name),31:42])
+tss <- data.frame(tss, tss_aln[match(tss$V4, tss_aln$name),c(9,31:42)])
 
 ## Alignable fraction (V20) denotes a gap in either species.  Make sure gaps are in both.
 
@@ -13,9 +13,9 @@ dist <- tss[,13]
 class <- rep("tss", NROW(tss)) ## tss is then unclassified as a promoter or enhancer
 class[stab < 0.1 & dist < 500]  <- "Prox_Stab" ## Clearly protein coding promoter
 class[stab > 0.1  & dist > 10000] <- "Dist_UnSt" ## Clearly distal enhancer
-class[stab < 0.001  & dist > 10000] <- "Dist_Stab" ## Clearly stable, but distal
+class[stab < 0.1  & dist > 125000] <- "Dist_Stab" ## Clearly stable, but distal
 summary(as.factor(class))
-tss$V19 <- class
+tss$V5 <- class
 
 ## Scatterplots
 pdf("dist.stability.summaries.pdf")
@@ -23,11 +23,16 @@ pdf("dist.stability.summaries.pdf")
 source("../lib/densScatterplot.R")
 #densScatterplot(dist, log(stab,10), xlim=c(0,50000))
 
+plot(dist, stab, log="y", xlab="Distance to nearest gene [bp]", ylab="Predicted instability score")
+abline(v=500, col="red", lty="dotted");abline(v=10000, col="red", lty="dotted");
+abline(h= 0.001, col="red", lty="dotted");abline(h= 0.1, col="red", lty="dotted")
+abline(v=250000, col="red", lty="dotted")
+
 plot(dist, stab, log="y", xlim=c(0,30000), xlab="Distance to nearest gene [bp]", ylab="Predicted instability score")
-abline(v=500, col="red", lty="dotted")
-abline(v=10000, col="red", lty="dotted")
-abline(h= 0.001, col="red", lty="dotted")
-abline(h= 0.1, col="red", lty="dotted")
+
+plot(dist, stab, log="y", xlim=c(0,30000), xlab="Distance to nearest gene [bp]", ylab="Predicted instability score")
+abline(v=500, col="red", lty="dotted");abline(v=10000, col="red", lty="dotted");
+abline(h= 0.001, col="red", lty="dotted");abline(h= 0.1, col="red", lty="dotted")
 
 hist(log(dist+1, 10))
 hist(log(stab, 10))
@@ -37,24 +42,32 @@ dev.off()
 ## Change unscored to 0
 for(i in 7:12) { tss[is.na(tss[,i]),i] <- 0 }
 
+## Look at species...
 ## Count types of elements ...
-total <- summary(as.factor(tss$V19))
-one2m <- summary(as.factor(tss$V19[tss$V44 > 0])) ## Possible 1:many orthology
-unmap <- summary(as.factor(tss$V19[tss$V44 == 0 & tss$V20 == 0])) ## INDEL
-chang <- summary(as.factor(tss$V19[tss$V44 == 0 & tss$V20 > 0 & tss$fdr_min < 0.05])) # 'High-confidence'
-lccng <- summary(as.factor(tss$V19[(tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & tss$V44 == 0 & tss$V20 > 0 & tss$fdr_min >= 0.05])) # 'Low-confidence'
+total <- summary(as.factor(tss$V5))
+one2m <- summary(as.factor(tss$V5[tss$V20 > 0])) ## Possible 1:many orthology
+unmap <- summary(as.factor(tss$V5[tss$V20 == 0 & is.na(tss$mapSize)])) ## INDEL
+lccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & tss$V20 == 0 & !is.na(tss$mapSize)])) # 'Low-confidence'
+chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7)])) # 'High-confidence'
+
+chang_U2PI <- summary(as.factor(tss$V5[tss$V20 > 0 & !is.na(tss$mapSize) & tss$U2PIFDR_H < 0.05]))
+lccng_U2PI <- summary(as.factor(tss$V5[tss$V20 > 0 & !is.na(tss$mapSize) & ((tss$V7 < 0.1 & tss$V10 > 0.7) | (tss$V7 > 0.7 & tss$V10 < 0.1))]))
 
 total
 one2m
 unmap
 chang
 lccng 
+chang_U2PI
+lccng_U2PI
 
 one2m/total ## Seems strange that there's such an enrichment in genes here ...
 unmap/(total - one2m)
-chang/(total - one2m)
-lccng/(total - one2m)
+chang/(total - one2m - unmap) ## ADDED unmap to these sites b/c need to factor out for paper.
+lccng/(total - one2m - unmap)
 
+chang_U2PI/(total - one2m - unmap)
+lccng_U2PI/(total - one2m - unmap)
 
 ## Create a barplot.
 require(ggplot2)
