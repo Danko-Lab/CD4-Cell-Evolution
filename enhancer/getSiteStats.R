@@ -15,7 +15,7 @@ class[stab < 0.1 & dist < 500]  <- "Prox_Stab" ## Clearly protein coding promote
 class[stab > 0.1  & dist > 10000] <- "Dist_UnSt" ## Clearly distal enhancer
 class[stab < 0.1  & dist > 125000] <- "Dist_Stab" ## Clearly stable, but distal
 summary(as.factor(class))
-tss$V5 <- class
+tss$V5 <- as.factor(class)
 
 ## Scatterplots
 pdf("dist.stability.summaries.pdf")
@@ -69,12 +69,43 @@ lccng/(total - one2m - unmap)
 chang_U2PI/(total - one2m - unmap)
 lccng_U2PI/(total - one2m - unmap)
 
+## Compare changes at superenhancers.
+SEtotal <- summary(as.factor(tss$V5[tss$V19 == 1]))
+SEone2m <- summary(as.factor(tss$V5[tss$V20 > 0 & tss$V19 == 1])) ## Possible 1:many orthology
+SEunmap <- summary(as.factor(tss$V5[tss$V20 == 0 & is.na(tss$mapSize) & tss$V19 == 1])) ## INDEL
+SElccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & tss$V20 == 0 & !is.na(tss$mapSize) & tss$V19 == 1])) # 'Low-confidence'
+SEchang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7) & tss$V19 == 1])) # 'High-confidence'
+
+SEone2m/SEtotal ## Seems strange that there's such an enrichment in genes here ...
+SEunmap/(SEtotal - SEone2m)
+SEchang/(SEtotal - SEone2m - SEunmap) ## ADDED unmap to these sites b/c need to factor out for paper.
+SElccng/(SEtotal - SEone2m - SEunmap)
+
+## Do SE change less frequently?
+testSE <- function(i) {
+ SEtot <- SEtotal[i]-SEone2m[i]
+ SEcon <- SEtotal[i]-SEone2m[i]-SEunmap[i]-SEchang[i]-SElccng[i]
+ print(paste("SE:", SEcon/SEtot))
+
+ tot <- total[i]-one2m[i]
+ con <- total[i]-one2m[i]-unmap[i]-chang[i]-lccng[i]
+ print(paste("ALL:", con/tot))
+
+ print(fisher.test(data.frame(c(SEtot, SEcon), c(tot, con))))
+}
+
+testSE(2) # enhancers
+testSE(3) # promoters
+
 ## Create a barplot.
 require(ggplot2)
 library(reshape2)
 
 dat <- data.frame(type= names(unmap), gap= unmap/(total - one2m), change= chang/(total - one2m), lc_change= lccng/(total - one2m), same=(total - one2m - unmap - chang - lccng)/(total - one2m))
 dat <- melt(dat)
+
+SEdat <- data.frame(type= names(SEunmap), gap= SEunmap/(SEtotal - SEone2m), change= SEchang/(SEtotal - SEone2m), lc_change= SElccng/(SEtotal - SEone2m), same=(SEtotal - SEone2m - SEunmap - SEchang - SElccng)/(SEtotal - SEone2m))
+SEdat <- melt(SEdat)
 
 a <-  ggplot(dat, aes(x=variable, y=value)) + xlab("") + ylab("Fraction of Transcripts Changed") +
         geom_bar(aes(fill=type), stat="identity",position=position_dodge(), colour="black") + scale_fill_brewer(palette = "Set3")
@@ -83,6 +114,7 @@ b <-  ggplot(dat, aes(x=type, y=value)) + xlab("") + ylab("Fraction of Transcrip
         geom_bar(aes(fill=variable), stat="identity",position=position_dodge(), colour="black") + scale_fill_brewer(palette = "Set3")
 
 c <-  qplot(x= factor(type), y= value, stat="identity", data= dat, geom="bar", fill=factor(variable))
+SEc<-  qplot(x= factor(type), y= value, stat="identity", data= SEdat, geom="bar", fill=factor(variable))
 
 
 pdf("enh.type.change.barplot.pdf")
@@ -118,4 +150,27 @@ dev.off()
 fact <- cut(tss$V13,c(-Inf,1,5,10,20,50,100,Inf)*1000)
 sapply(fact, function(i) { sum(tss$HumanFDR[fact == i] < 0.01)/sum(fact == i) })
 boxplot()
+
+
+########################################################
+## Evolutionary conservation->distance from genes.
+
+fracConserved <- function(tss) { ## defaults to ... 
+ total <- NROW(tss)
+ one2m <- sum(tss$V20 > 0) ## Possible 1:many orthology
+ unmap <- sum(tss$V20 == 0 & is.na(tss$mapSize)) ## INDEL
+ lccng <- sum((tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & tss$V20 == 0 & !is.na(tss$mapSize)) # 'Low-confidence'
+ chang <- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7)) # 'High-confidence'
+
+ tot <- total-one2m
+ con <- total-one2m-unmap-chang-lccng
+
+ return(con/tot)
+}
+fracConserved(tss[tss$V5 == "Dist_UnSt",])
+fracConserved(tss[tss$V5 == "Prox_Stab",])
+
+vect <- as.numeric(cut2(tss$V13, g=8))
+sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,])})
+
 
