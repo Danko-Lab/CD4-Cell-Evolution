@@ -155,22 +155,59 @@ boxplot()
 ########################################################
 ## Evolutionary conservation->distance from genes.
 
-fracConserved <- function(tss) { ## defaults to ... 
+fracConserved <- function(tss, ret="C") { ## defaults to ... 
  total <- NROW(tss)
  one2m <- sum(tss$V20 > 0) ## Possible 1:many orthology
  unmap <- sum(tss$V20 == 0 & is.na(tss$mapSize)) ## INDEL
  lccng <- sum((tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & tss$V20 == 0 & !is.na(tss$mapSize)) # 'Low-confidence'
  chang <- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7)) # 'High-confidence'
 
- tot <- total-one2m
- con <- total-one2m-unmap-chang-lccng
+ if(ret=="C") {
+  tot <- total-one2m
+  con <- total-one2m-unmap-chang-lccng
+ 
+  return(con/tot)
+ }
+ if(ret=="GL") {
+  tot <- total-one2m
+  lcc <- lccng
 
- return(con/tot)
+  return(lcc/tot)
+ }
+ if(ret=="CNG") {
+  tot <- total-one2m
+  cng <- chang
+
+  return(cng/tot)
+ }
 }
 fracConserved(tss[tss$V5 == "Dist_UnSt",])
 fracConserved(tss[tss$V5 == "Prox_Stab",])
 
-vect <- as.numeric(cut2(tss$V13, g=8))
-sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,])})
+#vect <- as.numeric(cut2(log(tss$V13), g=100)); summary(as.factor(vect))
+xaxis <- c(0, seq(3, 6, 0.02))
+vect <- as.numeric(cut2(log(tss$V13, 10), cuts=xaxis)); vect[is.na(vect)] <- 1; summary(as.factor(vect))
+dist <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,])})
+glc  <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,], "GL")})
+cng  <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,], "CNG")})
+
+pdf("ChangeOverDistance.pdf")
+ plot(10^xaxis[1:NROW(dist)], dist, type="p", xlab="Distance from TSS [bp]", ylab="Fraction conserved", xlim=10^c(3, 6), log="x", pch=19, cex=1.5)
+ plot(10^xaxis[1:NROW(dist)], glc, type="p", xlab="Distance from TSS [bp]", ylab="Fraction gain/ loss", xlim=10^c(3, 6), log="x", pch=19, cex=1.5)
+ plot(10^xaxis[1:NROW(dist)], cng, type="p", xlab="Distance from TSS [bp]", ylab="Fraction change", xlim=10^c(3, 6), log="x", pch=19, cex=1.5)
+dev.off()
+
+## Now based on expression level (max across species).
+exp_max <- rowMax(rpkm_df[,2:9])[match(tss$V4, tss_aln$name)]
+exp_vect <- as.numeric(cut2(exp_max, g=100))
+exp_vect[is.na(exp_vect)] <- 0
+conserved <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x,])})
+gainloss <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x,], "GL")})
+change   <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x,], "CNG")})
+
+plot(conserved, type="b")
+plot(gainloss,  type="b")
+plot(change,    type="b")
+
 
 
