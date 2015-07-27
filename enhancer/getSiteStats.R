@@ -42,8 +42,9 @@ dev.off()
 ## Change unscored to 0
 for(i in 7:12) { tss[is.na(tss[,i]),i] <- 0 }
 
+##################################################
 ## Look at species...
-## Count types of elements ...
+## Count types of elements ... and create discriptive plots.
 total <- summary(as.factor(tss$V5))
 one2m <- summary(as.factor(tss$V5[tss$V20 > 0])) ## Possible 1:many orthology
 unmap <- summary(as.factor(tss$V5[tss$V20 == 0 & is.na(tss$mapSize)])) ## INDEL
@@ -81,22 +82,6 @@ SEunmap/(SEtotal - SEone2m)
 SEchang/(SEtotal - SEone2m - SEunmap) ## ADDED unmap to these sites b/c need to factor out for paper.
 SElccng/(SEtotal - SEone2m - SEunmap)
 
-## Do SE change less frequently?
-testSE <- function(i) {
- SEtot <- SEtotal[i]-SEone2m[i]
- SEcon <- SEtotal[i]-SEone2m[i]-SEunmap[i]-SEchang[i]-SElccng[i]
- print(paste("SE:", SEcon/SEtot))
-
- tot <- total[i]-one2m[i]
- con <- total[i]-one2m[i]-unmap[i]-chang[i]-lccng[i]
- print(paste("ALL:", con/tot))
-
- print(fisher.test(data.frame(c(SEtot, SEcon), c(tot, con))))
-}
-
-testSE(2) # enhancers
-testSE(3) # promoters
-
 ## Create a barplot.
 require(ggplot2)
 library(reshape2)
@@ -118,15 +103,12 @@ SEc<-  qplot(x= factor(type), y= value, stat="identity", data= SEdat, geom="bar"
 
 
 pdf("enh.type.change.barplot.pdf")
-	a
-	b
-	c
+        a
+        b
+        c
 dev.off()
 
-
 ## Density scatterplots at promoters and enhancers
-
-for(i in 7:12) tss[is.na(tss[,i]),i] <- 0 ## Assign 'NA' scores to 0.
 source("../lib/densScatterplot.R")
 
 pdf("dreg.scatterplots.pdf")
@@ -151,16 +133,52 @@ fact <- cut(tss$V13,c(-Inf,1,5,10,20,50,100,Inf)*1000)
 sapply(fact, function(i) { sum(tss$HumanFDR[fact == i] < 0.01)/sum(fact == i) })
 boxplot()
 
+##########################################################
+## Questions ... :
+
+##########################################################
+## Do SE change less frequently?
+cmpFracConserved <- function(tss1, tss2, i=2) { ## defaults to enhancer (i=2) ... promoters (i=3)
+ total1 <- summary(as.factor(tss1$V5))
+ one2m1 <- summary(as.factor(tss1$V5[tss1$V20 > 0])) ## Possible 1:many orthology
+ unmap1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & is.na(tss1$mapSize)])) ## INDEL
+ lccng1 <- summary(as.factor(tss1$V5[(tss1$V7 < 0.1 | tss1$V8 < 0.1 | tss1$V9 < 0.1) & tss1$V20 == 0 & !is.na(tss1$mapSize)])) # 'Low-confidence'
+ chang1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < 0.05 & (tss1$V7 > 0.7 & tss1$V8 > 0.7 & tss1$V9 > 0.7)])) # 'High-confidence'
+ allcng1<- summary(as.factor(tss1$V5[(tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < 0.05)]))
+
+ tot1 <- total1[i]-one2m1[i]
+ con1 <- total1[i]-one2m1[i]-unmap1[i]-chang1[i]-lccng1[i]
+ print(paste("1: ", con1/tot1))
+
+ total2 <- summary(as.factor(tss2$V5))
+ one2m2 <- summary(as.factor(tss2$V5[tss2$V20 > 0])) ## Possible 1:many orthology
+ unmap2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & is.na(tss2$mapSize)])) ## INDEL
+ lccng2 <- summary(as.factor(tss2$V5[(tss2$V7 < 0.1 | tss2$V8 < 0.1 | tss2$V9 < 0.1) & tss2$V20 == 0 & !is.na(tss2$mapSize)])) # 'Low-confidence'
+ chang2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < 0.05 & (tss2$V7 > 0.7 & tss2$V8 > 0.7 & tss2$V9 > 0.7)])) # 'High-confidence'
+ allcng2<- summary(as.factor(tss2$V5[(tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < 0.05)]))
+
+ tot2 <- total2[i]-one2m2[i]
+ con2 <- total2[i]-one2m2[i]-unmap2[i]-chang2[i]-lccng2[i]
+ print(paste("2: ", con2/tot2))
+
+ print(fisher.test(data.frame(c(tot1, con1), c(tot2, con2))))
+}
+
+cmpFracConserved(tss, tss[tss$V19==1,], i=2) ## Enhancers
+cmpFracConserved(tss, tss[tss$V19==1,], i=3) ## Promoters
+
+
 
 ########################################################
 ## Evolutionary conservation->distance from genes.
-
+require(Hmisc)
 fracConserved <- function(tss, ret="C") { ## defaults to ... 
  total <- NROW(tss)
  one2m <- sum(tss$V20 > 0) ## Possible 1:many orthology
  unmap <- sum(tss$V20 == 0 & is.na(tss$mapSize)) ## INDEL
  lccng <- sum((tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & tss$V20 == 0 & !is.na(tss$mapSize)) # 'Low-confidence'
  chang <- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7)) # 'High-confidence'
+ allcng<- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05)
 
  if(ret=="C") {
   tot <- total-one2m
@@ -176,7 +194,7 @@ fracConserved <- function(tss, ret="C") { ## defaults to ...
  }
  if(ret=="CNG") {
   tot <- total-one2m
-  cng <- chang
+  cng <- chang #allcng ## A santiy check to make sure this shows the same trend as lccng.
 
   return(cng/tot)
  }
@@ -197,17 +215,33 @@ pdf("ChangeOverDistance.pdf")
  plot(10^xaxis[1:NROW(dist)], cng, type="p", xlab="Distance from TSS [bp]", ylab="Fraction change", xlim=10^c(3, 6), log="x", pch=19, cex=1.5)
 dev.off()
 
-## Now based on expression level (max across species).
-exp_max <- rowMax(rpkm_df[,2:9])[match(tss$V4, tss_aln$name)]
+##################################################################
+## Evolutionary conservation compared to max{expression across species}.
+## No correlation.  But to really test intensity, have to remove those sites that are intragenic.
+## Still no correlation...
+indx_match <- match(tss$V4, tss_aln$name)
+
+exp_max <- rowMax(rpkm_df[,2:9])[indx_match]
+type_max <- ca$annot_type[indx_match]
 exp_vect <- as.numeric(cut2(exp_max, g=100))
 exp_vect[is.na(exp_vect)] <- 0
-conserved <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x,])})
-gainloss <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x,], "GL")})
-change   <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x,], "CNG")})
+conserved <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x & type_max == "dREG_ENH",])})
+gainloss <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x & type_max == "dREG_ENH",], "GL")})
+change   <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x & type_max == "dREG_ENH",], "CNG")})
 
 plot(conserved, type="b")
 plot(gainloss,  type="b")
 plot(change,    type="b")
 
+###############################################################
+## Do looped enhancers change more slowly.  
+## Yep.
+loop <- read.table("tss.tsv.loop")
+fracConserved(tss[rowSums(loop[,5:6]) >  0 & tss$V5 == "Dist_UnSt",])  ## Conservation of looped REs.
+fracConserved(tss[rowSums(loop[,5:6]) == 0 & tss$V5 == "Dist_UnSt",])  ## Conservation of unlooped. 
 
+cmpFracConserved(tss[rowSums(loop[,5:6]) >  0,], tss[rowSums(loop[,5:6]) == 0,], i=2) ## Enhancers
+cmpFracConserved(tss[rowSums(loop[,5:6]) >  0,], tss[rowSums(loop[,5:6]) == 0,], i=3) ## Promoters
+
+## Is this more so than expected based on distance bias alone?
 

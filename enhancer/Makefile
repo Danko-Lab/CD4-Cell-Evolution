@@ -4,3 +4,4 @@ run_1:
 
 run_2:
 	R --no-save < getSiteStats.R
+	bash setupLoopAnalysis.bsh
