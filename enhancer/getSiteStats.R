@@ -163,6 +163,34 @@ cmpFracConserved <- function(tss1, tss2, i=2) { ## defaults to enhancer (i=2) ..
  print(paste("Numerical p-value ==>", ft$p.value))
 }
 
+fracConserved <- function(tss, ret="C") { ## defaults to ... 
+ total <- NROW(tss)
+ one2m <- sum(tss$V20 > 0) ## Possible 1:many orthology
+ unmap <- sum(tss$V20 == 0 & is.na(tss$mapSize)) ## INDEL
+ lccng <- sum((tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & tss$V20 == 0 & !is.na(tss$mapSize)) # 'Low-confidence'
+ chang <- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7)) # 'High-confidence'
+ allcng<- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05)
+
+ if(ret=="C") {
+  tot <- total-one2m
+  con <- total-one2m-unmap-chang-lccng
+
+  return(con/tot)
+ }
+ if(ret=="GL") {
+  tot <- total-one2m
+  lcc <- lccng
+
+  return(lcc/tot)
+ }
+ if(ret=="CNG") {
+  tot <- total-one2m
+  cng <- chang #allcng ## A santiy check to make sure this shows the same trend as lccng.
+
+  return(cng/tot)
+ }
+}
+
 cmpFracConserved(tss, tss[tss$V19==1,], i=2) ## Enhancers
 cmpFracConserved(tss, tss[tss$V19==1,], i=3) ## Promoters
 
@@ -184,7 +212,6 @@ for(i in 1:1000) {
 
 ## Plot the data as a barplot.
 pdf("SEBarplot.pdf")
-
  source("../lib/barplot.R")
  bars <- c(mean(cons_se), mean(cons_nose))
  errs <- c(sqrt(var(cons_se)), sqrt(var(cons_nose)))
@@ -194,38 +221,12 @@ dev.off()
 
 ########################################################
 ## Evolutionary conservation->distance from genes.
-require(Hmisc)
-fracConserved <- function(tss, ret="C") { ## defaults to ... 
- total <- NROW(tss)
- one2m <- sum(tss$V20 > 0) ## Possible 1:many orthology
- unmap <- sum(tss$V20 == 0 & is.na(tss$mapSize)) ## INDEL
- lccng <- sum((tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & tss$V20 == 0 & !is.na(tss$mapSize)) # 'Low-confidence'
- chang <- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7)) # 'High-confidence'
- allcng<- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05)
-
- if(ret=="C") {
-  tot <- total-one2m
-  con <- total-one2m-unmap-chang-lccng
- 
-  return(con/tot)
- }
- if(ret=="GL") {
-  tot <- total-one2m
-  lcc <- lccng
-
-  return(lcc/tot)
- }
- if(ret=="CNG") {
-  tot <- total-one2m
-  cng <- chang #allcng ## A santiy check to make sure this shows the same trend as lccng.
-
-  return(cng/tot)
- }
-}
 fracConserved(tss[tss$V5 == "Dist_UnSt",])
 fracConserved(tss[tss$V5 == "Prox_Stab",])
 
 #vect <- as.numeric(cut2(log(tss$V13), g=100)); summary(as.factor(vect))
+require(Hmisc)
+
 xaxis <- c(0, seq(3, 6, 0.02))
 vect <- as.numeric(cut2(log(tss$V13, 10), cuts=xaxis)); vect[is.na(vect)] <- 1; summary(as.factor(vect))
 dist <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,])})
@@ -288,7 +289,6 @@ for(i in 1:1000) {
 
 ## Plot the data as a barplot.
 pdf("LoopBarplot.pdf")
-
  source("../lib/barplot.R")
  bars <- c(mean(cons_looped), mean(cons_nonloop))
  errs <- c(sqrt(var(cons_looped)), sqrt(var(cons_nonloop)))
@@ -297,5 +297,9 @@ pdf("LoopBarplot.pdf")
 # drawBars(bars, errs, names) ## From the eRNA regression code in the dREG paper.  Does not work as well out of the box.
 dev.off()
 
+####################################################
+## How much are SE over-represented in the loop set?
+sum(tss$V19==1 & rowSums(loop[,5:6])>0)/ sum(tss$V19==1) ## 49% of SE loop.
+sum(tss$V19==0 & rowSums(loop[,5:6])>0)/ sum(tss$V19==0) ## 16% of all enhancers.
 
 
