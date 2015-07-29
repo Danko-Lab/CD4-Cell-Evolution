@@ -1,5 +1,6 @@
 ## This analysis focuses on lineage-specific changes that are currently active in hg19.
 load("../annotations/fdr.RData")
+source("../lib/normalizeSubsample.R")
 
 tss_aln <- fdr_df[grepl("dREG", ca$annot_type),]
 tss <- read.table("tss.tsv")
@@ -111,27 +112,23 @@ dev.off()
 ## Density scatterplots at promoters and enhancers
 source("../lib/densScatterplot.R")
 
-pdf("dreg.scatterplots.pdf")
- max_hc <- rowMax(tss[,c(7,8)])
- densScatterplot(tss$V7, tss$V8, xlab="Human Unt.", ylab="Chimpanzee Unt.", main="dREG Scores")
- densScatterplot(tss$V7[tss$V19 == "Prox_Stab" & max_hc>0.7], tss$V8[tss$V19 == "Prox_Stab" & max_hc>0.7], xlab="Human Unt.", ylab="Chimpanzee Unt.", main="dREG Scores")
- densScatterplot(tss$V7[tss$V19 == "Dist_UnSt" & max_hc>0.7], tss$V8[tss$V19 == "Dist_UnSt" & max_hc>0.7], xlab="Human Unt.", ylab="Chimpanzee Unt.", main="dREG Scores")
+#pdf("dreg.scatterplots.pdf")
+# max_hc <- rowMax(tss[,c(7,8)])
+# densScatterplot(tss$V7, tss$V8, xlab="Human Unt.", ylab="Chimpanzee Unt.", main="dREG Scores")
+# densScatterplot(tss$V7[tss$V19 == "Prox_Stab" & max_hc>0.7], tss$V8[tss$V19 == "Prox_Stab" & max_hc>0.7], xlab="Human Unt.", ylab="Chimpanzee Unt.", main="dREG Scores")
+# densScatterplot(tss$V7[tss$V19 == "Dist_UnSt" & max_hc>0.7], tss$V8[tss$V19 == "Dist_UnSt" & max_hc>0.7], xlab="Human Unt.", ylab="Chimpanzee Unt.", main="dREG Scores")
+#
+# max_hm <- rowMax(tss[,c(7,9)])
+# densScatterplot(tss$V7[max_hm>0.7], tss$V9[max_hm>0.7], xlab="Human Unt.", ylab="Rhesus Macaque Unt.", main="dREG Scores")
+# densScatterplot(tss$V7[tss$V19 == "Prox_Stab" & max_hm>0.7], tss$V9[tss$V19 == "Prox_Stab" & max_hm>0.7], xlab="Human Unt.", ylab="Rhesus Macaque Unt.", main="dREG Scores")
+# densScatterplot(tss$V7[tss$V19 == "Dist_UnSt" & max_hm>0.7], tss$V9[tss$V19 == "Dist_UnSt" & max_hm>0.7], xlab="Human Unt.", ylab="Rhesus Macaque Unt.", main="dREG Scores")
+#
+# max_up <- rowMax(tss[,c(7,10)])
+# densScatterplot(tss$V7, tss$V10, xlab="Human Unt.", ylab="Human PI", main="dREG Scores")
+# densScatterplot(tss$V7[tss$V19 == "Prox_Stab" & max_up>0.7], tss$V10[tss$V19 == "Prox_Stab" & max_up>0.7], xlab="Human Unt.", ylab="Human PI", main="dREG Scores")
+# densScatterplot(tss$V7[tss$V19 == "Dist_UnSt" & max_up>0.7], tss$V10[tss$V19 == "Dist_UnSt" & max_up>0.7], xlab="Human Unt.", ylab="Human PI", main="dREG Scores")
+#dev.off()
 
- max_hm <- rowMax(tss[,c(7,9)])
- densScatterplot(tss$V7[max_hm>0.7], tss$V9[max_hm>0.7], xlab="Human Unt.", ylab="Rhesus Macaque Unt.", main="dREG Scores")
- densScatterplot(tss$V7[tss$V19 == "Prox_Stab" & max_hm>0.7], tss$V9[tss$V19 == "Prox_Stab" & max_hm>0.7], xlab="Human Unt.", ylab="Rhesus Macaque Unt.", main="dREG Scores")
- densScatterplot(tss$V7[tss$V19 == "Dist_UnSt" & max_hm>0.7], tss$V9[tss$V19 == "Dist_UnSt" & max_hm>0.7], xlab="Human Unt.", ylab="Rhesus Macaque Unt.", main="dREG Scores")
-
- max_up <- rowMax(tss[,c(7,10)])
- densScatterplot(tss$V7, tss$V10, xlab="Human Unt.", ylab="Human PI", main="dREG Scores")
- densScatterplot(tss$V7[tss$V19 == "Prox_Stab" & max_up>0.7], tss$V10[tss$V19 == "Prox_Stab" & max_up>0.7], xlab="Human Unt.", ylab="Human PI", main="dREG Scores")
- densScatterplot(tss$V7[tss$V19 == "Dist_UnSt" & max_up>0.7], tss$V10[tss$V19 == "Dist_UnSt" & max_up>0.7], xlab="Human Unt.", ylab="Human PI", main="dREG Scores")
-dev.off()
-
-## Compare distance to conservation...
-fact <- cut(tss$V13,c(-Inf,1,5,10,20,50,100,Inf)*1000)
-sapply(fact, function(i) { sum(tss$HumanFDR[fact == i] < 0.01)/sum(fact == i) })
-boxplot()
 
 ##########################################################
 ## Questions ... :
@@ -161,12 +158,21 @@ cmpFracConserved <- function(tss1, tss2, i=2) { ## defaults to enhancer (i=2) ..
  con2 <- total2[i]-one2m2[i]-unmap2[i]-chang2[i]-lccng2[i]
  print(paste("2: ", con2/tot2))
 
- print(fisher.test(data.frame(c(tot1, con1), c(tot2, con2))))
+ ft <- fisher.test(data.frame(c(tot1, con1), c(tot2, con2)))
+ print(ft)
+ print(paste("Numerical p-value ==>", ft$p.value))
 }
 
 cmpFracConserved(tss, tss[tss$V19==1,], i=2) ## Enhancers
 cmpFracConserved(tss, tss[tss$V19==1,], i=3) ## Promoters
 
+## Is this more so than expected based on distance bias alone?
+sum(tss$V19==1 & tss$V5=="Dist_UnSt") ## Get the number of elements to use for selecting a reasonable number for re-sampling.
+sum(tss$V19==0 & tss$V5=="Dist_UnSt")
+
+ns <- norm.subsample(log(tss[tss$V19==1 & tss$V5=="Dist_UnSt","V13"]), log(tss[tss$V19==0 & tss$V5=="Dist_UnSt","V13"]), nBins=25, nsamp=1000, plot.cdf=TRUE)
+
+cmpFracConserved(tss[tss$V19==1 & tss$V5=="Dist_UnSt",][ns$s1,], tss[tss$V19==0 & tss$V5=="Dist_UnSt",][ns$s2,], i=2) ## Enhancers
 
 
 ########################################################
@@ -229,9 +235,13 @@ conserved <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == 
 gainloss <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x & type_max == "dREG_ENH",], "GL")})
 change   <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x & type_max == "dREG_ENH",], "CNG")})
 
-plot(conserved, type="b")
-plot(gainloss,  type="b")
-plot(change,    type="b")
+cor.test(conserved, c(1:NROW(conserved))) ## p= (for manuscript)
+
+pdf("ChangeOverActivity.pdf")
+ plot(conserved, type="b")
+ plot(gainloss,  type="b")
+ plot(change,    type="b")
+dev.off()
 
 ###############################################################
 ## Do looped enhancers change more slowly.  
@@ -244,4 +254,47 @@ cmpFracConserved(tss[rowSums(loop[,5:6]) >  0,], tss[rowSums(loop[,5:6]) == 0,],
 cmpFracConserved(tss[rowSums(loop[,5:6]) >  0,], tss[rowSums(loop[,5:6]) == 0,], i=3) ## Promoters
 
 ## Is this more so than expected based on distance bias alone?
+sum(rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt") ## Get the number of elements to use for selecting a reasonable number for re-sampling.
+sum(rowSums(loop[,5:6]) == 0 & tss$V5=="Dist_UnSt")
+
+ns <- norm.subsample(log(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt","V13"]), log(tss[rowSums(loop[,5:6]) == 0 & tss$V5=="Dist_UnSt","V13"]), nBins=25, nsamp=1000, plot.cdf=TRUE)
+
+santiyChecks <- function() { ## Sanity checks to make sure that re-sampling worked.
+ require(vioplot)
+ vioplot(log(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt","V13"]+1,10), 
+	log(tss[rowSums(loop[,5:6]) ==  0 & tss$V5=="Dist_UnSt","V13"]+1,10),
+	log(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt","V13"][ns$s1]+1,10), 
+	log(tss[rowSums(loop[,5:6]) ==  0 & tss$V5=="Dist_UnSt","V13"][ns$s2]+1,10))
+
+
+ summary(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt","V13"]) ## Before.
+ summary(tss[rowSums(loop[,5:6]) ==  0 & tss$V5=="Dist_UnSt","V13"])
+ summary(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt","V13"][ns$s1]) ## Resampled.
+ summary(tss[rowSums(loop[,5:6]) ==  0 & tss$V5=="Dist_UnSt","V13"][ns$s2])
+}
+
+## Then test ...
+cmpFracConserved(tss[rowSums(loop[,5:6]) >  0,][ns$s1,], tss[rowSums(loop[,5:6]) == 0,][ns$s2,], i=2)
+
+## Bootstrap the subsampling to create error bars.
+cons_looped <- double()
+cons_nonloop<- double()
+for(i in 1:1000) {
+ ns <- norm.subsample(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt","V13"], tss[rowSums(loop[,5:6]) == 0 & tss$V5=="Dist_UnSt","V13"], nsamp=1000)
+ cons_looped <- c(cons_looped, fracConserved(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt",][ns$s1,]))
+ cons_nonloop<- c(cons_nonloop,fracConserved(tss[rowSums(loop[,5:6]) == 0 & tss$V5=="Dist_UnSt",][ns$s2,]))
+}
+
+## Plot the data as a barplot.
+pdf("LoopBarplot.pdf")
+
+ source("../lib/barplot.R")
+ bars <- c(mean(cons_looped), mean(cons_nonloop))
+ errs <- c(sqrt(var(cons_looped)), sqrt(var(cons_nonloop)))
+ names<- c("Looped", "No loop")
+ cd.barplot(bars, errs, names, fill=TRUE)
+# drawBars(bars, errs, names) ## From the eRNA regression code in the dREG paper.  Does not work as well out of the box.
+dev.off()
+
+
 
