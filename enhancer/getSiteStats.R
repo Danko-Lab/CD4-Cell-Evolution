@@ -171,9 +171,26 @@ sum(tss$V19==1 & tss$V5=="Dist_UnSt") ## Get the number of elements to use for s
 sum(tss$V19==0 & tss$V5=="Dist_UnSt")
 
 ns <- norm.subsample(log(tss[tss$V19==1 & tss$V5=="Dist_UnSt","V13"]), log(tss[tss$V19==0 & tss$V5=="Dist_UnSt","V13"]), nBins=25, nsamp=1000, plot.cdf=TRUE)
-
 cmpFracConserved(tss[tss$V19==1 & tss$V5=="Dist_UnSt",][ns$s1,], tss[tss$V19==0 & tss$V5=="Dist_UnSt",][ns$s2,], i=2) ## Enhancers
 
+## Bootstrap the subsampling to create error bars.
+cons_se  <- double()
+cons_nose<- double()
+for(i in 1:1000) {
+ ns <- norm.subsample(log(tss[tss$V19==1 & tss$V5=="Dist_UnSt","V13"]), log(tss[tss$V19==0 & tss$V5=="Dist_UnSt","V13"]), nsamp=1000)
+ cons_se  <- c(cons_se,  fracConserved(tss[tss$V19==1 & tss$V5=="Dist_UnSt",][ns$s1,]))
+ cons_nose<- c(cons_nose,fracConserved(tss[tss$V19==0 & tss$V5=="Dist_UnSt",][ns$s2,]))
+}
+
+## Plot the data as a barplot.
+pdf("SEBarplot.pdf")
+
+ source("../lib/barplot.R")
+ bars <- c(mean(cons_se), mean(cons_nose))
+ errs <- c(sqrt(var(cons_se)), sqrt(var(cons_nose)))
+ names<- c("SE", "No SE")
+ cd.barplot(bars, errs, names, fill=TRUE)
+dev.off()
 
 ########################################################
 ## Evolutionary conservation->distance from genes.
@@ -258,29 +275,13 @@ sum(rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt") ## Get the number of element
 sum(rowSums(loop[,5:6]) == 0 & tss$V5=="Dist_UnSt")
 
 ns <- norm.subsample(log(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt","V13"]), log(tss[rowSums(loop[,5:6]) == 0 & tss$V5=="Dist_UnSt","V13"]), nBins=25, nsamp=1000, plot.cdf=TRUE)
-
-santiyChecks <- function() { ## Sanity checks to make sure that re-sampling worked.
- require(vioplot)
- vioplot(log(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt","V13"]+1,10), 
-	log(tss[rowSums(loop[,5:6]) ==  0 & tss$V5=="Dist_UnSt","V13"]+1,10),
-	log(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt","V13"][ns$s1]+1,10), 
-	log(tss[rowSums(loop[,5:6]) ==  0 & tss$V5=="Dist_UnSt","V13"][ns$s2]+1,10))
-
-
- summary(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt","V13"]) ## Before.
- summary(tss[rowSums(loop[,5:6]) ==  0 & tss$V5=="Dist_UnSt","V13"])
- summary(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt","V13"][ns$s1]) ## Resampled.
- summary(tss[rowSums(loop[,5:6]) ==  0 & tss$V5=="Dist_UnSt","V13"][ns$s2])
-}
-
-## Then test ...
 cmpFracConserved(tss[rowSums(loop[,5:6]) >  0,][ns$s1,], tss[rowSums(loop[,5:6]) == 0,][ns$s2,], i=2)
 
 ## Bootstrap the subsampling to create error bars.
 cons_looped <- double()
 cons_nonloop<- double()
 for(i in 1:1000) {
- ns <- norm.subsample(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt","V13"], tss[rowSums(loop[,5:6]) == 0 & tss$V5=="Dist_UnSt","V13"], nsamp=1000)
+ ns <- norm.subsample(log(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt","V13"]), log(tss[rowSums(loop[,5:6]) == 0 & tss$V5=="Dist_UnSt","V13"]), nsamp=1000)
  cons_looped <- c(cons_looped, fracConserved(tss[rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt",][ns$s1,]))
  cons_nonloop<- c(cons_nonloop,fracConserved(tss[rowSums(loop[,5:6]) == 0 & tss$V5=="Dist_UnSt",][ns$s2,]))
 }
