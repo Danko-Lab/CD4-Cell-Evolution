@@ -303,18 +303,32 @@ pdf("LoopBarplot.pdf")
 # drawBars(bars, errs, names) ## From the eRNA regression code in the dREG paper.  Does not work as well out of the box.
 dev.off()
 
-###################################################3
+#################################################################
 ## Do more loops make a promtoer more likely to be conserved?
 
 getCex <- function(n) { y=0.0138*n+0.1; y[y>3] <- 3; y[y<0.1] <- 0.1; y }
 n <- summary(as.factor(rowSums(loop[,5:6])))
 nloops <- 0:12
 
+## Correlation between promoter conservation and the number of chromatin loops to a promoter ...
 loop_cons <- sapply(nloops, function(i) {fracConserved(tss[rowSums(loop[,5:6]) == i & tss$V5=="Prox_Stab",])})  ## Conservation of unlooped. 
-cor.test(c(0:12), loop_cons)
 loop_cons_df <- data.frame(nloops= 0:12, conservation= loop_cons, n= summary(as.factor(rowSums(loop[,5:6]))), t0=rep(NA), sd=rep(NA))
-corr(loop_cons_df[,1:2], w = n/sum(n))
+cor.test(c(0:12), loop_cons)
+indx <- !is.na(loop_cons)
+corr(loop_cons_df[indx,1:2], w = n[indx]/sum(n[indx]))
 
+## Evaluate significance of this weighted correlation using a label swap.
+## Note that this is not quire right, because boot is going to sample with replacement.  
+## Real label-swap samples without replacemenet.
+loop_swap <- boot(data= rowSums(loop[,5:6]), R=1000, statistic= function(a,i) {
+	loop_cons <- sapply(nloops, function(x) {fracConserved(tss[a[i] == x & tss$V5=="Prox_Stab",])})  ## Conservation of unlooped. 
+	loop_cons_df <- data.frame(nloops= 0:12, conservation= loop_cons, n= summary(as.factor(rowSums(loop[,5:6]))), t0=rep(NA), sd=rep(NA))
+	indx <- !is.na(loop_cons)
+	corr(loop_cons_df[indx,1:2], w = n[indx]/sum(n[indx]))
+}) ## Here, using boot to swap labels.
+sum(loop_swap$t >= loop_swap$t0)/NROW(loop_swap$t)
+
+## Use bootstrap to get a confidence for each conservation fraction.
 for(x in nloops) {
   data <- tss[tss$V5=="Prox_Stab" & rowSums(loop[,5:6]) == x,]
   if(NROW(data) > 0) {
@@ -328,8 +342,16 @@ use <- !is.na(loop_cons_df$t0)
 pdf("NumberOfLoops.Promoter.pdf")
   plot(0:12, loop_cons, pch=19, cex=3*getCex(n), xlab= "Number of loops to promoter", ylab= "Fraction conserved")
   cd.barplot(loop_cons_df$t0[use], loop_cons_df$sd[use], as.character(nloops)[use], fill=TRUE, order=FALSE)
+  plot(loop_swap)
 dev.off()
 
+cmpFracConserved(tss[rowSums(loop[,5:6]) > 0 & rowSums(loop[,5:6]) <= 1,], tss[rowSums(loop[,5:6]) >= 3,], i=3) ## Promoters
+cmpFracConserved(tss[rowSums(loop[,5:6]) > 0 & rowSums(loop[,5:6]) <= 2,], tss[rowSums(loop[,5:6]) >= 3,], i=3) ## Promoters
+
+## Do differences in expression explain loop correlation?
+expr <- rowSums(rpkm_df[,2:9])
+loop_expr <- sapply(nloops, function(i) {mean(expr[rowSums(loop[,5:6]) == i & tss$V5=="Prox_Stab"])})  ## Conservation of unlooped. 
+plot(loop_expr)
 
 ####################################################
 ## How much are SE over-represented in the loop set?
