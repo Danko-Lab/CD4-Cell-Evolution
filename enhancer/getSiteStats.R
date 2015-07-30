@@ -311,6 +311,8 @@ sum(tss$V19==0 & rowSums(loop[,5:6])>0)/ sum(tss$V19==0) ## 16% of all enhancers
 sum(tss$V19==1 & rowSums(loop[,5:6])>0)/ sum(rowSums(loop[,5:6])>0) ## 17% of loops part of a SE.
 sum(tss$V19==1 & rowSums(loop[,5:6])==0)/ sum(rowSums(loop[,5:6])==0) ## 5% of non-looped.
 
+
+
 ########################################################################
 ## Compare looped and SEs in scatterplot. 
 

@@ -13,8 +13,8 @@ cat second | bedmap --echo --indicator --echo-map - tss.tmp | grep "|1|" | sed "
 
 ## Get info on whether enhancers for a loop ...
 cat tss.tsv | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4}' > tss.tsv.reduced
-cat tss.tsv.reduced | bedmap --indicator - first  > tss.tsv.first
-cat tss.tsv.reduced | bedmap --indicator - second > tss.tsv.second
+cat tss.tsv.reduced | bedmap --count - first  > tss.tsv.first
+cat tss.tsv.reduced | bedmap --count - second > tss.tsv.second
 paste tss.tsv.reduced tss.tsv.first tss.tsv.second > tss.tsv.loop
 
 ## ... and whether that is to a TSS.
