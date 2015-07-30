@@ -1,10 +1,13 @@
 ## Barplot
 
-cd.barplot<- function(data, error, names, fill) {
+cd.barplot<- function(data, error, names, fill, order=TRUE) {
   lab <- pretty(c(0,1), n=5)
 
   ## Reorder.
-  ord <- order(data)
+  if(order)
+	ord <- order(data)
+  else
+	ord <- 1:NROW(data)
   data <- data[ord]
   names <- names[ord]
   error <- error[ord]

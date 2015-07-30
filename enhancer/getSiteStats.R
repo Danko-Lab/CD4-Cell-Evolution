@@ -233,10 +233,15 @@ dist <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,])})
 glc  <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,], "GL")})
 cng  <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,], "CNG")})
 
+getCex <- function(n) { y=0.0138888*n+0.1; y[y>3] <- 3; y[y<0.1] <- 0.1; y }
+n <- sapply(1:max(vect), function(x) {NROW(tss[vect == x,])})
+
+## Last point is [>=xaxis]. Each other point is [<point].
+
 pdf("ChangeOverDistance.pdf")
- plot(10^xaxis[1:NROW(dist)], dist, type="p", xlab="Distance from TSS [bp]", ylab="Fraction conserved", xlim=10^c(3, 6), log="x", pch=19, cex=1.5)
- plot(10^xaxis[1:NROW(dist)], glc, type="p", xlab="Distance from TSS [bp]", ylab="Fraction gain/ loss", xlim=10^c(3, 6), log="x", pch=19, cex=1.5)
- plot(10^xaxis[1:NROW(dist)], cng, type="p", xlab="Distance from TSS [bp]", ylab="Fraction change", xlim=10^c(3, 6), log="x", pch=19, cex=1.5)
+ plot(10^xaxis, dist[1:NROW(xaxis)], type="p", xlab="Distance from TSS [bp]", ylab="Fraction conserved", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n))
+ plot(10^xaxis, glc[1:NROW(xaxis)], type="p", xlab="Distance from TSS [bp]", ylab="Fraction gain/ loss", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n))
+ plot(10^xaxis, cng[1:NROW(xaxis)], type="p", xlab="Distance from TSS [bp]", ylab="Fraction change", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n))
 dev.off()
 
 ##################################################################
@@ -245,7 +250,7 @@ dev.off()
 ## Still no correlation...
 indx_match <- match(tss$V4, tss_aln$name)
 
-exp_max <- rowMax(rpkm_df[,2:9])[indx_match]
+exp_max <- rowSums(rpkm_df[,2:9])[indx_match] # rowMax(rpkm_df[,2:9])[indx_match]
 type_max <- ca$annot_type[indx_match]
 exp_vect <- as.numeric(cut2(exp_max, g=100))
 exp_vect[is.na(exp_vect)] <- 0
@@ -301,5 +306,52 @@ dev.off()
 ## How much are SE over-represented in the loop set?
 sum(tss$V19==1 & rowSums(loop[,5:6])>0)/ sum(tss$V19==1) ## 49% of SE loop.
 sum(tss$V19==0 & rowSums(loop[,5:6])>0)/ sum(tss$V19==0) ## 16% of all enhancers.
+
+########################################################################
+## Compare looped and SEs in scatterplot. 
+
+xaxis <- c(0, seq(3, 6, 0.2))
+
+vect <- as.numeric(cut2(log(tss$V13, 10), cuts=xaxis)); vect[is.na(vect)] <- 1; summary(as.factor(vect))
+dist <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,])})
+dist_se <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x & tss$V19 == 1,])})
+dist_loop <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x & rowSums(loop[,5:6]) >  0,])})
+
+## Size points based on 'n'
+getCex <- function(n) { y=0.0138888*n+0.1; y[y>3] <- 3; y[y<0.1] <- 0.1; y }
+n <- sapply(1:max(vect), function(x) {NROW(tss[vect == x,])})
+n_se <- sapply(1:max(vect), function(x) {NROW(tss[vect == x & tss$V19 == 1,])})
+n_loop <- sapply(1:max(vect), function(x) {NROW(tss[vect == x & rowSums(loop[,5:6]) >  0,])})
+
+
+## Create barplot
+xaxis <- c(0,seq(3, 6, 1))
+
+vect <- as.numeric(cut2(log(tss$V13, 10), cuts=xaxis)); vect[is.na(vect)] <- 1; summary(as.factor(vect))
+b_dist <- boot(data= tss, R=1000, statistic= function(a, i) {sapply(1:max(vect), function(x) {fracConserved(a[i,][vect == x,])})})
+b_dist_se <- boot(data= tss[tss$V19 == 1,], R=1000, statistic= function(a, i) {sapply(1:max(vect), function(x) {fracConserved(a[i,][vect[tss$V19 == 1] == x,])})})
+b_dist_loop <- boot(data= tss[rowSums(loop[,5:6]) >  0,], R=1000, statistic= function(a, i) {sapply(1:max(vect), function(x) {fracConserved(a[i,][vect[rowSums(loop[,5:6]) > 0] == x,])})})
+
+idx <- 3:5 #summary(cut2(log(tss$V13, 10), cuts=xaxis)) ## We want idx: 3 ([3.00,4.00)) - 5 ([5.00,6.00))
+names<- paste(rep(c("[1-10)", "[10-100)", "[100-1000)"),3), c(rep("all", 4), rep("se", 4), rep("loop", 4)))
+bars <- c(b_dist$t0[idx], b_dist_se$t0[idx], b_dist_loop$t0[idx])
+serr <- c(sapply(1:NROW(b_dist$t0) , function(x) {sd(b_dist$t[,x], na.rm=TRUE)})[idx], 
+	sapply(1:NROW(b_dist_se$t0) , function(x) {sd(b_dist_se$t[,x], na.rm=TRUE)})[idx],
+	sapply(1:NROW(b_dist_loop$t0) , function(x) {sd(b_dist_loop$t[,x], na.rm=TRUE)})[idx])
+
+ord <- c(seq(1,9,3), seq(1,9,3)+1, seq(1,9,3)+2)
+cd.barplot(bars[ord], serr[ord], names[ord], fill=TRUE, order=FALSE)
+
+pdf("Distance_SE_loop.pdf")
+ ## Scatterplot
+ plot(10^xaxis[1:NROW(dist)], dist, type="p", xlab="Distance from TSS [bp]", ylab="Fraction conserved", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n), ylim=c(0,0.8))
+ points(10^xaxis[1:NROW(dist)], dist_loop, col="dark red", type="p", pch=19, cex=getCex(n_loop))
+ points(10^xaxis[1:NROW(dist)], dist_se, col="dark green", type="p", pch=19, cex=getCex(n_se))
+
+ ## Barplot
+ cd.barplot(bars[ord], serr[ord], names[ord], fill=TRUE, order=FALSE)
+dev.off()
+
+
 
 
