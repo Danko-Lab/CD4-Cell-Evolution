@@ -303,6 +303,34 @@ pdf("LoopBarplot.pdf")
 # drawBars(bars, errs, names) ## From the eRNA regression code in the dREG paper.  Does not work as well out of the box.
 dev.off()
 
+###################################################3
+## Do more loops make a promtoer more likely to be conserved?
+
+getCex <- function(n) { y=0.0138*n+0.1; y[y>3] <- 3; y[y<0.1] <- 0.1; y }
+n <- summary(as.factor(rowSums(loop[,5:6])))
+nloops <- 0:12
+
+loop_cons <- sapply(nloops, function(i) {fracConserved(tss[rowSums(loop[,5:6]) == i & tss$V5=="Prox_Stab",])})  ## Conservation of unlooped. 
+cor.test(c(0:12), loop_cons)
+loop_cons_df <- data.frame(nloops= 0:12, conservation= loop_cons, n= summary(as.factor(rowSums(loop[,5:6]))), t0=rep(NA), sd=rep(NA))
+corr(loop_cons_df[,1:2], w = n/sum(n))
+
+for(x in nloops) {
+  data <- tss[tss$V5=="Prox_Stab" & rowSums(loop[,5:6]) == x,]
+  if(NROW(data) > 0) {
+   bt <- boot(data= tss[tss$V5=="Prox_Stab" & rowSums(loop[,5:6]) == x,], R=1000, statistic= function(a, i) {fracConserved(a[i,])})
+   loop_cons_df$t0[x+1] <- bt$t0
+   loop_cons_df$sd[x+1] <- sd(bt$t, na.rm=TRUE)
+  }
+}
+
+use <- !is.na(loop_cons_df$t0)
+pdf("NumberOfLoops.Promoter.pdf")
+  plot(0:12, loop_cons, pch=19, cex=3*getCex(n), xlab= "Number of loops to promoter", ylab= "Fraction conserved")
+  cd.barplot(loop_cons_df$t0[use], loop_cons_df$sd[use], as.character(nloops)[use], fill=TRUE, order=FALSE)
+dev.off()
+
+
 ####################################################
 ## How much are SE over-represented in the loop set?
 sum(tss$V19==1 & rowSums(loop[,5:6])>0)/ sum(tss$V19==1) ## 49% of SE loop.
@@ -334,9 +362,9 @@ n_loop <- sapply(1:max(vect), function(x) {NROW(tss[vect == x & rowSums(loop[,5:
 xaxis <- c(0,seq(3, 6, 1))
 
 vect <- as.numeric(cut2(log(tss$V13, 10), cuts=xaxis)); vect[is.na(vect)] <- 1; summary(as.factor(vect))
-b_dist <- boot(data= tss, R=1000, statistic= function(a, i) {sapply(1:max(vect), function(x) {fracConserved(a[i,][vect == x,])})})
-b_dist_se <- boot(data= tss[tss$V19 == 1,], R=1000, statistic= function(a, i) {sapply(1:max(vect), function(x) {fracConserved(a[i,][vect[tss$V19 == 1] == x,])})})
-b_dist_loop <- boot(data= tss[rowSums(loop[,5:6]) >  0,], R=1000, statistic= function(a, i) {sapply(1:max(vect), function(x) {fracConserved(a[i,][vect[rowSums(loop[,5:6]) > 0] == x,])})})
+b_dist <- boot(data= tss, R=1000, statistic= function(a, i) {sapply(1:max(vect), function(x) {fracConserved(a[i,][vect[i] == x,])})}) ## NOTE: Right order here?
+b_dist_se <- boot(data= tss[tss$V19 == 1,], R=1000, statistic= function(a, i) {sapply(1:max(vect), function(x) {fracConserved(a[i,][vect[tss$V19 == 1][i] == x,])})})
+b_dist_loop <- boot(data= tss[rowSums(loop[,5:6]) >  0,], R=1000, statistic= function(a, i) {sapply(1:max(vect), function(x) {fracConserved(a[i,][vect[rowSums(loop[,5:6]) > 0][i] == x,])})})
 
 idx <- 3:5 #summary(cut2(log(tss$V13, 10), cuts=xaxis)) ## We want idx: 3 ([3.00,4.00)) - 5 ([5.00,6.00))
 names<- paste(rep(c("[1-10)", "[10-100)", "[100-1000)"),3), c(rep("all", 3), rep("se", 3), rep("loop", 3)))
