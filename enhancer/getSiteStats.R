@@ -237,11 +237,12 @@ getCex <- function(n) { y=0.0138888*n+0.1; y[y>3] <- 3; y[y<0.1] <- 0.1; y }
 n <- sapply(1:max(vect), function(x) {NROW(tss[vect == x,])})
 
 ## Last point is [>=xaxis]. Each other point is [<point].
+idx <- 3:NROW(xaxis) ## As below, index 3 encodes [1000,10^3.02)
 
 pdf("ChangeOverDistance.pdf")
- plot(10^xaxis, dist[1:NROW(xaxis)], type="p", xlab="Distance from TSS [bp]", ylab="Fraction conserved", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n))
- plot(10^xaxis, glc[1:NROW(xaxis)], type="p", xlab="Distance from TSS [bp]", ylab="Fraction gain/ loss", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n))
- plot(10^xaxis, cng[1:NROW(xaxis)], type="p", xlab="Distance from TSS [bp]", ylab="Fraction change", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n))
+ plot(10^xaxis[idx], dist[idx], type="p", xlab="Distance from TSS [bp]", ylab="Fraction conserved", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n[idx]))
+ plot(10^xaxis[idx], glc[idx], type="p", xlab="Distance from TSS [bp]", ylab="Fraction gain/ loss", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n[idx]))
+ plot(10^xaxis[idx], cng[idx], type="p", xlab="Distance from TSS [bp]", ylab="Fraction change", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n[idx]))
 dev.off()
 
 ##################################################################
@@ -333,14 +334,13 @@ b_dist_se <- boot(data= tss[tss$V19 == 1,], R=1000, statistic= function(a, i) {s
 b_dist_loop <- boot(data= tss[rowSums(loop[,5:6]) >  0,], R=1000, statistic= function(a, i) {sapply(1:max(vect), function(x) {fracConserved(a[i,][vect[rowSums(loop[,5:6]) > 0] == x,])})})
 
 idx <- 3:5 #summary(cut2(log(tss$V13, 10), cuts=xaxis)) ## We want idx: 3 ([3.00,4.00)) - 5 ([5.00,6.00))
-names<- paste(rep(c("[1-10)", "[10-100)", "[100-1000)"),3), c(rep("all", 4), rep("se", 4), rep("loop", 4)))
+names<- paste(rep(c("[1-10)", "[10-100)", "[100-1000)"),3), c(rep("all", 3), rep("se", 3), rep("loop", 3)))
 bars <- c(b_dist$t0[idx], b_dist_se$t0[idx], b_dist_loop$t0[idx])
 serr <- c(sapply(1:NROW(b_dist$t0) , function(x) {sd(b_dist$t[,x], na.rm=TRUE)})[idx], 
 	sapply(1:NROW(b_dist_se$t0) , function(x) {sd(b_dist_se$t[,x], na.rm=TRUE)})[idx],
 	sapply(1:NROW(b_dist_loop$t0) , function(x) {sd(b_dist_loop$t[,x], na.rm=TRUE)})[idx])
 
 ord <- c(seq(1,9,3), seq(1,9,3)+1, seq(1,9,3)+2)
-cd.barplot(bars[ord], serr[ord], names[ord], fill=TRUE, order=FALSE)
 
 pdf("Distance_SE_loop.pdf")
  ## Scatterplot
