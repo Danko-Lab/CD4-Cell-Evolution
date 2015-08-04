@@ -29,21 +29,21 @@ condition <- species
 condition[species == "H"] <- "Human"
 condition[species != "H"] <- "NHP"
 pdf("MAPlotHuman.pdf")
-hs    <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="Human", condB="NHP", q.cut=PVAL, lfc=FOLD, plotMA=TRUE, remove.pc=3)
+hs    <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="Human", condB="NHP", q.cut=PVAL, lfc=FOLD, plotMA=TRUE, geneIDs= c("SGPP2", "ANPEP", "CD9")) #, remove.pc=3)
 dev.off()
-hs_pi <- runLimmaQuantile(counts[,dindx_pi], condition[dindx_pi], genes, condA="Human", condB="NHP", q.cut=PVAL, lfc=FOLD, remove.pc=3)
+hs_pi <- runLimmaQuantile(counts[,dindx_pi], condition[dindx_pi], genes, condA="Human", condB="NHP", q.cut=PVAL, lfc=FOLD) #, remove.pc=3)
 
 condition <- species
 condition[species == "C"] <- "Chimp"
 condition[species != "C"] <- "PRIMATES"
-cs <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="Chimp", condB="PRIMATES", q.cut=PVAL, lfc=FOLD, remove.pc=3)
-cs_pi <- runLimmaQuantile(counts[,dindx_pi], condition[dindx_pi], genes, condA="Chimp", condB="PRIMATES", q.cut=PVAL, lfc=FOLD, remove.pc=3)
+cs <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="Chimp", condB="PRIMATES", q.cut=PVAL, lfc=FOLD)#, remove.pc=3)
+cs_pi <- runLimmaQuantile(counts[,dindx_pi], condition[dindx_pi], genes, condA="Chimp", condB="PRIMATES", q.cut=PVAL, lfc=FOLD)#, remove.pc=3)
 
 condition <- species
 condition[species == "M"] <- "RM"
 condition[species != "M"] <- "PRIMATES"
-ms <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="RM", condB="PRIMATES", q.cut=PVAL, lfc=FOLD, remove.pc=3) 
-ms_pi <- runLimmaQuantile(counts[,dindx_pi], condition[dindx_pi], genes, condA="RM", condB="PRIMATES", q.cut=PVAL, lfc=FOLD, remove.pc=3)
+ms <- runLimmaQuantile(counts[,dindx_u], condition[dindx_u], genes, condA="RM", condB="PRIMATES", q.cut=PVAL, lfc=FOLD)#, remove.pc=3) 
+ms_pi <- runLimmaQuantile(counts[,dindx_pi], condition[dindx_pi], genes, condA="RM", condB="PRIMATES", q.cut=PVAL, lfc=FOLD)#, remove.pc=3)
 
 condition <- treatment
 hs_tfc <- runLimmaQuantile(counts[,dindx_h], condition[dindx_h], genes, condA="U", condB="PI", q.cut=PVAL, lfc=FOLD) 

@@ -25,9 +25,19 @@ removePC <- function(dat, i, plot.pc=TRUE) {
   return(adj_df)
 }
 
+addlab <- function(gene_ID, ...) {
+ idx<-sapply(gene_ID, function(gene_ID) {
+  ig <- which(genes$mgi == gene_ID)
+  io <- ig[which.min(fit2$p.value[ig])]
+  text(tab$AveExpr[io], tab$logFC[io], labels= gene_ID, cex= 0.7, pos= 3, ...)
+  io
+ })
+ return(data.frame(Gene= gene_ID, AveExpr= tab$AveExpr[idx], logFC= tab$logFC[idx], adj.P.Val= tab$adj.P.Val[idx]))
+}
+
 runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB, 
                              q.cut=0.01, lfc=0.0, lib.size=colSums(count.dat),
-                             useVoom=FALSE, plotMA=FALSE, remove.pc=NULL){
+                             useVoom=FALSE, plotMA=FALSE, remove.pc=NULL, geneIDs= NULL){
   require(limma)
   ## updated limma from 3.12.1 to 3.12.3 to 3.14.1 CGD: Now to 3.18.13
   if(! packageDescription("limma")$Version >= "3.18.13"){
@@ -63,11 +73,20 @@ runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB,
   tab<-topTable(fit2, adjust = "BH", number=nrow(fit2), sort.by='none')
 
   if(plotMA) {
-#   plotMA(fit2, array=2, status=as.factor(decideTests(fit2)[,2]), col=c("black", "red", "blue"))
-   status <- as.character(p.adjust(fit2$p.value, method="fdr")<PVAL)
-#   status[genes[,4] == "chr5_140005300_140013300"] <- "zCD14"
-   plotMA(fit2, array=2, status=status, col=c("black", "red", "blue"))
-   abline(h=0, col="blue")
+   require(edgeR)
+   status <- c(p.adjust(fit2$p.value, method="fdr")<PVAL)
+   maPlot(logAbundance= tab$AveExpr, logFC= tab$logFC, de.tags= status, pch=19)
+
+   if(!is.null(geneIDs)) {
+     maPlot(logAbundance= tab$AveExpr, logFC= tab$logFC, de.tags= status, pch=19)
+     data_MA2 <- addlab(geneIDs)
+
+     maPlot(logAbundance= data_MA2$AveExpr, logFC= data_MA2$logFC, de.tags= data_MA2$adj.P.Val<PVAL, 
+			xlim= c(min(tab$AveExpr), max(tab$AveExpr)), ylim= c(min(tab$logFC), max(tab$logFC)), pch=19)
+     data_MA2 <- addlab(geneIDs)
+   }
+#   plotMA(fit2, array=2, status=status, col=c("black", "red"))
+#   abline(h=0, col="white")
 
 #   plotMDS(dat,top=500,labels=species,gene.selection="common")
   }
