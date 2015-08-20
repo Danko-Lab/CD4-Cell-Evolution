@@ -25,7 +25,7 @@ removePC <- function(dat, i, plot.pc=TRUE) {
   return(adj_df)
 }
 
-addlab <- function(gene_ID, ...) {
+addlab <- function(gene_ID, fit2, tab, ...) {
  idx<-sapply(gene_ID, function(gene_ID) {
   ig <- which(genes$mgi == gene_ID)
   io <- ig[which.min(fit2$p.value[ig])]
@@ -84,11 +84,11 @@ runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB,
 
    if(!is.null(geneIDs)) {
      maPlot(logAbundance= tab$AveExpr, logFC= tab$logFC, de.tags= status, smooth.scatter=TRUE, deCol= cols[status], pch=19)
-     data_MA2 <- addlab(geneIDs)
+     data_MA2 <- addlab(geneIDs, fit2, tab)
 
      maPlot(logAbundance= data_MA2$AveExpr, logFC= data_MA2$logFC, de.tags= data_MA2$adj.P.Val<PVAL, 
 			xlim= c(min(tab$AveExpr), max(tab$AveExpr)), ylim= c(min(tab$logFC), max(tab$logFC)), pch=19)
-     data_MA2 <- addlab(geneIDs)
+     data_MA2 <- addlab(geneIDs, fit2, tab)
    }
 #   plotMA(fit2, array=2, status=status, col=c("black", "red"))
 #   abline(h=0, col="white")

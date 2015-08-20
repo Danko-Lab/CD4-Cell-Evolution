@@ -66,7 +66,7 @@ fdr_t <- cbind(hs$tab$adj.P.Val, cs$tab$adj.P.Val, ms$tab$adj.P.Val,
                 hs_tfc$tab$adj.P.Val, cs_tfc$tab$adj.P.Val, ms_tfc$tab$adj.P.Val, 
 		tfc$tab$adj.P.Val) ## Each dataset should have a 1% FDR (within the dataset).
 
-colnames(fdr_t) <- c("HumanFDR", "ChimpFDR", "MacaqueFDR", "HumanFDR_PI", "ChimpFDR_PI", "MacaqueFDR_PI", "U2PIFDR_H", "U2PIFDDR_C", "U2PIFDR_M", "U2PIFDR")
+colnames(fdr_t) <- c("HumanFDR", "ChimpFDR", "MacaqueFDR", "HumanFDR_PI", "ChimpFDR_PI", "MacaqueFDR_PI", "U2PIFDR_H", "U2PIFDR_C", "U2PIFDR_M", "U2PIFDR")
 
 fc_t  <- cbind(hs$tab$logFC, cs$tab$logFC, ms$tab$logFC,  
                 hs_pi$tab$logFC, cs_pi$tab$logFC, ms_pi$tab$logFC,  
