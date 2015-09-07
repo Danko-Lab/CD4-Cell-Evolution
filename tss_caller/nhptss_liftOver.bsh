@@ -8,7 +8,8 @@ function liftToHg19 {
 
    ## Use liftOver.  Other options: -tab -minMatch=0.1
    gunzip $f
-   liftOver $ngz $MAPCHAIN $j\_hg19.bedGraph $j\_unmap.bedGraph
+   CrossMap.py bed $MAPCHAIN $ngz $j\_hg19.bedGraph
+   #liftOver $ngz $MAPCHAIN $j\_hg19.bedGraph $j\_unmap.bedGraph
    gzip $ngz $j\_hg19.bedGraph $j\_unmap.bedGraph
  done
 }
@@ -18,10 +19,10 @@ rm *hg19*.bedGraph.gz *unmap*.bedGraph.gz
 
 ## Chimpanzee
 FILES=`ls C*.bedGraph.gz`
-MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.panTro4/panTro4.hg19.rbest.chain.gz # Use rbest
+MAPCHAIN=~/NHP/makeRecipBest/hg19.panTro4/panTro4.hg19.rbest.chain.gz # Use rbest
 liftToHg19
 
 ## Rhesus Macaque
 FILES=`ls M*.bedGraph.gz`
-MAPCHAIN=/usr/projects/GROseq/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.chain.gz # Use rbest
+MAPCHAIN=~/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.chain.gz # Use rbest
 liftToHg19

@@ -30,6 +30,9 @@ cd.circplot(rpkm_df[ca$name == "chr12_6308800_6352600", ], snU) ## CD9.  Quite c
 cd.circplot(rpkm_df[ca$name == "chr12_2173350_2176350", ], snU)
 cd.circplot(rpkm_df[ca$name == "chr5_140005300_140013300", ], snU) ## CD14.  Might be biased, but looks right on all accounts.
 
+pdf("ANTXR2.pdf")
+cd.circplot(rpkm_df[ca$name == "chr4_80795150_81000800", ], snU) ## ANTXR2.  Quite clear.
+dev.off()
 
 ## Not a clean case on the browser, but looks good from availiable data.
 cd.circplot(rpkm_df[ca$name == "chr14_104327650_104338350", ], snU)

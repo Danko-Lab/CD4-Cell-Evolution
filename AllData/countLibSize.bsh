@@ -6,6 +6,7 @@ CD4JUR=../../CD4/Alignments
 ALIGN1=../Alignments_1stPrep
 ALIGN2=../Alignments_2ndPrep
 ALIGN3=../Alignments_3rdPrep
+ALIGN4=../Alignments_4thPrep
 
 function countLib {
   genome=`zcat $1 | grep "chrM" -v | grep "rRNA" -v -c` ## Get counts of genomic mapping (non-rRNA).
@@ -37,6 +38,9 @@ countLib $ALIGN2/C3-PI.bed.gz
 
 countLib $ALIGN3/C4-U.bed.gz
 countLib $ALIGN3/C4-PI.bed.gz
+
+countLib $ALIGN4/C5-U.bed.gz
+countLib $ALIGN4/C5-PI.bed.gz
 
 ## rHE. mAC.
 countLib $ALIGN1/M1-U.bed.gz

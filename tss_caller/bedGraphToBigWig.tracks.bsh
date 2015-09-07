@@ -19,10 +19,10 @@ done
 
 for file in "C-U.TSS.bedGraph.gz" "C-PI.TSS.bedGraph.gz"
 do
-  convert $file ../panTro4.chromInfo.txt
+  convert $file ../panTro4.chromInfo
 done
 
 for file in "M-U.TSS.bedGraph.gz" "M-PI.TSS.bedGraph.gz"
 do
-  convert $file ../rheMac3.chromInfo.txt
+  convert $file ../rheMac3.chromInfo
 done

@@ -6,6 +6,7 @@ CD4JUR=../../CD4/Alignments
 ALIGN1=../Alignments_1stPrep
 ALIGN2=../Alignments_2ndPrep
 ALIGN3=../Alignments_3rdPrep
+ALIGN4=../Alignments_4thPrep
 
 #twoBitInfo /gbdb/hg19/hg19.2bit chromInfo.hg19
 function makeBigWig {
@@ -55,6 +56,9 @@ cp $ALIGN2/C3*.hg19.bw .
 
 ## C4
 cp $ALIGN3/C4*.hg19.bw .
+
+## C5
+cp $ALIGN4/C5*.hg19.bw .
 
 ## M1
 cp $ALIGN1/M1*.hg19.bw .

@@ -16,15 +16,15 @@ normBw H-U_minus 95359834
 normBw H-PI_plus 114089069
 normBw H-PI_minus 114089069
 
-normBw C-U_plus.hg19 84228667
-normBw C-U_minus.hg19 84228667
+normBw C-U_plus.hg19 128889582
+normBw C-U_minus.hg19 128889582
  
-normBw C-PI_plus.hg19 78246777
-normBw C-PI_minus.hg19 78246777
+normBw C-PI_plus.hg19 127253302
+normBw C-PI_minus.hg19 127253302
 
-normBw M-U_plus.hg19 83059274
-normBw M-U_minus.hg19 83059274
+normBw M-U_plus.hg19 114547647
+normBw M-U_minus.hg19 114547647
 
-normBw M-PI_plus.hg19 58202348
-normBw M-PI_minus.hg19 58202348
+normBw M-PI_plus.hg19 93520070
+normBw M-PI_minus.hg19 93520070
 

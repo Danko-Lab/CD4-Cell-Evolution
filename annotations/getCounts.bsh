@@ -82,13 +82,13 @@ getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
-export COUNTFILE=C2.count.bed
-export BWPLUS=$BWPATH/C2-U.bed.gz_plus.hg19.bw
-export BWMINUS=$BWPATH/C2-U.bed.gz_minus.hg19.bw
-getCounts $GENEBODIES $INCREMENTS $COUNTALL
-getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
-#getPauseCounts $PAUSESITES $COUNTPAUSE
-getCounts $TSSSITES $TSSINCR $COUNTTSS
+#export COUNTFILE=C2.count.bed
+#export BWPLUS=$BWPATH/C2-U.bed.gz_plus.hg19.bw
+#export BWMINUS=$BWPATH/C2-U.bed.gz_minus.hg19.bw
+#getCounts $GENEBODIES $INCREMENTS $COUNTALL
+#getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
+##getPauseCounts $PAUSESITES $COUNTPAUSE
+#getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=C3.count.bed
 export BWPLUS=$BWPATH/C3-U.bed.gz_plus.hg19.bw
@@ -101,6 +101,14 @@ getCounts $TSSSITES $TSSINCR $COUNTTSS
 export COUNTFILE=C4.count.bed
 export BWPLUS=$BWPATH/C4-U.bed.gz_plus.hg19.bw
 export BWMINUS=$BWPATH/C4-U.bed.gz_minus.hg19.bw
+getCounts $GENEBODIES $INCREMENTS $COUNTALL
+getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
+#getPauseCounts $PAUSESITES $COUNTPAUSE
+getCounts $TSSSITES $TSSINCR $COUNTTSS
+
+export COUNTFILE=C5.count.bed
+export BWPLUS=$BWPATH/C5-U_plus.hg19.bw
+export BWMINUS=$BWPATH/C5-U_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
@@ -163,13 +171,13 @@ getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
-export COUNTFILE=C2.pi.count.bed
-export BWPLUS=$BWPATH/C2-PI.bed.gz_plus.hg19.bw
-export BWMINUS=$BWPATH/C2-PI.bed.gz_minus.hg19.bw
-getCounts $GENEBODIES $INCREMENTS $COUNTALL
-getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
-#getPauseCounts $PAUSESITES $COUNTPAUSE
-getCounts $TSSSITES $TSSINCR $COUNTTSS
+#export COUNTFILE=C2.pi.count.bed
+#export BWPLUS=$BWPATH/C2-PI.bed.gz_plus.hg19.bw
+#export BWMINUS=$BWPATH/C2-PI.bed.gz_minus.hg19.bw
+#getCounts $GENEBODIES $INCREMENTS $COUNTALL
+#getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
+##getPauseCounts $PAUSESITES $COUNTPAUSE
+#getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=C3.pi.count.bed
 export BWPLUS=$BWPATH/C3-PI.bed.gz_plus.hg19.bw
@@ -182,6 +190,14 @@ getCounts $TSSSITES $TSSINCR $COUNTTSS
 export COUNTFILE=C4.pi.count.bed
 export BWPLUS=$BWPATH/C4-PI.bed.gz_plus.hg19.bw
 export BWMINUS=$BWPATH/C4-PI.bed.gz_minus.hg19.bw
+getCounts $GENEBODIES $INCREMENTS $COUNTALL
+getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
+#getPauseCounts $PAUSESITES $COUNTPAUSE
+getCounts $TSSSITES $TSSINCR $COUNTTSS
+
+export COUNTFILE=C5.pi.count.bed
+export BWPLUS=$BWPATH/C5-PI_plus.hg19.bw
+export BWMINUS=$BWPATH/C5-PI_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
@@ -206,6 +222,23 @@ getCounts $TSSSITES $TSSINCR $COUNTTSS
 export COUNTFILE=M3.pi.count.bed
 export BWPLUS=$BWPATH/M3-PI.bed.gz_plus.hg19.bw
 export BWMINUS=$BWPATH/M3-PI.bed.gz_minus.hg19.bw
+getCounts $GENEBODIES $INCREMENTS $COUNTALL
+getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
+#getPauseCounts $PAUSESITES $COUNTPAUSE
+getCounts $TSSSITES $TSSINCR $COUNTTSS
+
+## Mouse and rat.
+export COUNTFILE=mouse.count.bed
+export BWPLUS=/local/storage/projects/evol_stability/data/CD4_Mouse_plus.bw
+export BWMINUS=/local/storage/projects/evol_stability/data/CD4_Mouse_minus.bw
+getCounts $GENEBODIES $INCREMENTS $COUNTALL
+getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
+#getPauseCounts $PAUSESITES $COUNTPAUSE
+getCounts $TSSSITES $TSSINCR $COUNTTSS
+
+export COUNTFILE=rat.groseq.bed
+export BWPLUS=/local/storage/projects/evol_stability/data/CD4_Rat_plus.bw
+export BWMINUS=/local/storage/projects/evol_stability/data/CD4_Rat_minus.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
