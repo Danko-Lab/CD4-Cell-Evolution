@@ -1,7 +1,7 @@
 ##
 ##
 load("fdr.RData")
-PVAL <- 0.01
+PVAL <- 0.05
 EXPR <- 5e-5
 
 toLogical <- function(indx, expLength) {
@@ -22,7 +22,7 @@ toLogical <- function(indx, expLength) {
 
   ## Adjust data to normalize for expression levels ...
   source("../lib/normalizeSubsample.R")
-  indx.good.df <- c(12:19,21:27)
+  indx.good.df <- c(12:20,22:29)
   #head(fdr_df[,indx.good.df])
   data_sums <- log(rowSums(fdr_df[,indx.good.df])+1)
   lnorm <- list(indx.eRNA= data_sums[indx.eRNA], 
@@ -34,14 +34,14 @@ toLogical <- function(indx, expLength) {
 		indx.uas= data_sums[indx.uas],
 		indx.srna= data_sums[indx.srna])
   ns <- norm.subsample.n(lnorm, plot.cdf=TRUE, dist=data_sums[indx.eRNA])
-  indx.eRNA <- toLogical(which(indx.eRNA)[ns[[1]]])
-  indx.lincRNA <- toLogical(which(indx.lincRNA)[ns[[2]]])
-  indx.unannot <- toLogical(which(indx.unannot)[ns[[3]]])
-  indx.pseudogene.rep <- toLogical(which(indx.pseudogene.rep)[ns[[4]]])
-  indx.protein_coding <- toLogical(which(indx.protein_coding)[ns[[5]]])
-  indx.antisense <- toLogical(which(indx.antisense)[ns[[6]]])
-  indx.uas <- toLogical(which(indx.uas)[ns[[7]]])
-  indx.srna <- toLogical(which(indx.srna)[ns[[8]]])
+  indx.eRNA <- toLogical(which(indx.eRNA))#[ns[[1]]])
+  indx.lincRNA <- toLogical(which(indx.lincRNA))#[ns[[2]]])
+  indx.unannot <- toLogical(which(indx.unannot))#[ns[[3]]])
+  indx.pseudogene.rep <- toLogical(which(indx.pseudogene.rep))#[ns[[4]]])
+  indx.protein_coding <- toLogical(which(indx.protein_coding))#[ns[[5]]])
+  indx.antisense <- toLogical(which(indx.antisense))#[ns[[6]]])
+  indx.uas <- toLogical(which(indx.uas))#[ns[[7]]])
+  indx.srna <- toLogical(which(indx.srna))#[ns[[8]]])
 
 ## UNDO THIS ONE!
   indx.pseudogene.rep <- grepl("pseudogene|GERST_PG|PSEUDOGENE+REP", fdr_df$type)
