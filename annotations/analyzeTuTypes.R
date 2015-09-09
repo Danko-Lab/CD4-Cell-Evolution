@@ -1,8 +1,8 @@
 ##
 ##
 load("fdr.RData")
-PVAL <- 0.05
-EXPR <- 5e-5
+PVAL <- 0.01
+EXPR <- 0#5e-5
 
 toLogical <- function(indx, expLength) {
   var <- rep(FALSE, expLength)
@@ -25,15 +25,15 @@ toLogical <- function(indx, expLength) {
   indx.good.df <- c(12:20,22:29)
   #head(fdr_df[,indx.good.df])
   data_sums <- log(rowSums(fdr_df[,indx.good.df])+1)
-  lnorm <- list(indx.eRNA= data_sums[indx.eRNA], 
-		indx.lincRNA= data_sums[indx.lincRNA], 
-		indx.unannot= data_sums[indx.unannot], 
-		indx.pseudogene.rep= data_sums[indx.pseudogene.rep], 
-		indx.protein_coding= data_sums[indx.protein_coding],
-		indx.antisense= data_sums[indx.antisense],
-		indx.uas= data_sums[indx.uas],
-		indx.srna= data_sums[indx.srna])
-  ns <- norm.subsample.n(lnorm, plot.cdf=TRUE, dist=data_sums[indx.eRNA])
+#  lnorm <- list(indx.eRNA= data_sums[indx.eRNA], 
+#		indx.lincRNA= data_sums[indx.lincRNA], 
+#		indx.unannot= data_sums[indx.unannot], 
+#		indx.pseudogene.rep= data_sums[indx.pseudogene.rep], 
+#		indx.protein_coding= data_sums[indx.protein_coding],
+#		indx.antisense= data_sums[indx.antisense],
+#		indx.uas= data_sums[indx.uas],
+#		indx.srna= data_sums[indx.srna])
+#  ns <- norm.subsample.n(lnorm, plot.cdf=TRUE, dist=data_sums[indx.eRNA])
   indx.eRNA <- toLogical(which(indx.eRNA))#[ns[[1]]])
   indx.lincRNA <- toLogical(which(indx.lincRNA))#[ns[[2]]])
   indx.unannot <- toLogical(which(indx.unannot))#[ns[[3]]])

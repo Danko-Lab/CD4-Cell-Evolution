@@ -318,12 +318,12 @@ decode_hmm <- function(chrom, hmm, full.data, train.data, missing.lst, step = 50
 
 # svn switch --relocate $SVN_ROOT/phast/trunk svn+ssh://cgd24@compgen.bscb.cornell.edu/usr/local/svnroot/phast/trunk .
  # Data: H1, C3, R2.
- Hp <- load.bigWig("/usr/projects/GROseq/CD4/Alignments/CD4-U_plus.bw")
- Hm <- load.bigWig("/usr/projects/GROseq/CD4/Alignments/CD4-U_minus.bw")
- Cp <- load.bigWig("/usr/projects/GROseq/NHP/Alignments_3rdPrep/C4-U.bed.gz_plus.hg19.bw")
- Cm <- load.bigWig("/usr/projects/GROseq/NHP/Alignments_3rdPrep/C4-U.bed.gz_minus.hg19.bw")
- Mp <- load.bigWig("/usr/projects/GROseq/NHP/Alignments_3rdPrep/M3-U.bed.gz_plus.hg19.bw")
- Mm <- load.bigWig("/usr/projects/GROseq/NHP/Alignments_3rdPrep/M3-U.bed.gz_minus.hg19.bw")
+ Hp <- load.bigWig("/local/storage/projects/CD4/Alignments/CD4-U_plus.bw")
+ Hm <- load.bigWig("/local/storage/projects/CD4/Alignments/CD4-U_minus.bw")
+ Cp <- load.bigWig("/local/storage/projects/NHP/Alignments_3rdPrep/C4-U.bed.gz_plus.hg19.bw")
+ Cm <- load.bigWig("/local/storage/projects/NHP/Alignments_3rdPrep/C4-U.bed.gz_minus.hg19.bw")
+ Mp <- load.bigWig("/local/storage/projects/NHP/Alignments_3rdPrep/M3-U.bed.gz_plus.hg19.bw")
+ Mm <- load.bigWig("/local/storage/projects/NHP/Alignments_3rdPrep/M3-U.bed.gz_minus.hg19.bw")
 
  all.data = make.data("chr22", list(Hp, Cp, Mp), list(Hm, Cm, Mm))
 

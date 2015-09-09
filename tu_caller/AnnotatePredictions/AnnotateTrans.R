@@ -8,7 +8,7 @@ TYPE <- rep("NA", NROW(E2))
 CLASS <- rep("NA", NROW(E2))
 
 ## Read in annotation files...
-PATH <- "/usr/projects/GROseq/NHP/tu_caller/AnnotatePredictions/GENCODE/"
+PATH <- "/local/storage/projects/NHP/tu_caller/AnnotatePredictions/GENCODE/"
 
 ## GENCODE Annotations
 refGenes <- read.table(paste(PATH,"GENCODE.Overlap.bed", sep=""))

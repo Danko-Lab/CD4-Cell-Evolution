@@ -23,9 +23,9 @@ getCounts <- function(bwPlus, bwMinus, bed6=bed) {
  bed6.region.bpQuery.bigWig(bw.plus= bwp, bw.minus= bwm, bed6= bed6)
 }
 
-Hc <- getCounts("/usr/projects/GROseq/NHP/AllData/All_Merge/H-U_plus.bw", "/usr/projects/GROseq/NHP/AllData/All_Merge/H-U_minus.bw") ## Human
-Cc <- getCounts("/usr/projects/GROseq/NHP/AllData/All_Merge/C-U_plus.hg19.bw", "/usr/projects/GROseq/NHP/AllData/All_Merge/C-U_minus.hg19.bw") ## Chimp
-Mc <- getCounts("/usr/projects/GROseq/NHP/AllData/All_Merge/M-U_plus.hg19.bw", "/usr/projects/GROseq/NHP/AllData/All_Merge/M-U_minus.hg19.bw") ## Rhesus
+Hc <- getCounts("/local/storage/projects/NHP/AllData/All_Merge/H-U_plus.bw", "/local/storage/projects/NHP/AllData/All_Merge/H-U_minus.bw") ## Human
+Cc <- getCounts("/local/storage/projects/NHP/AllData/All_Merge/C-U_plus.hg19.bw", "/local/storage/projects/NHP/AllData/All_Merge/C-U_minus.hg19.bw") ## Chimp
+Mc <- getCounts("/local/storage/projects/NHP/AllData/All_Merge/M-U_plus.hg19.bw", "/local/storage/projects/NHP/AllData/All_Merge/M-U_minus.hg19.bw") ## Rhesus
 
 ## Compute the threshold number of reads in this window.
 e_rpkb <- 0.04*1e8/10751533*1000/endWindow ## 0.04 taken from Core Waterfall Lis, 10751533 was their library size.  1e8 is (roughly) the NHP library sizes.
@@ -46,7 +46,7 @@ addBack <- a[tss5p & expr3p, ]
 addBack$length <- addBack[,3]-addBack[,2]
 addBack <- addBack[order(addBack$length, decreasing=TRUE),]
 
-source("/usr/projects/GROseq/NHP/lib/CountUnique.R")
+source("/local/storage/projects/NHP/lib/CountUnique.R")
 addBack <- addBack[is.firstUnique(addBack),]
 NROW(addBack)
 write.table(addBack, "annot/addBack.bed", row.names=FALSE, col.names=FALSE, sep="\t", quote=FALSE)
