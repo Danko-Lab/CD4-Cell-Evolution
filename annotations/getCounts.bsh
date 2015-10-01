@@ -227,23 +227,6 @@ getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
-## Mouse and rat.
-export COUNTFILE=mouse.count.bed
-export BWPLUS=/local/storage/projects/evol_stability/data/CD4_Mouse_plus.bw
-export BWMINUS=/local/storage/projects/evol_stability/data/CD4_Mouse_minus.bw
-getCounts $GENEBODIES $INCREMENTS $COUNTALL
-getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
-#getPauseCounts $PAUSESITES $COUNTPAUSE
-getCounts $TSSSITES $TSSINCR $COUNTTSS
-
-export COUNTFILE=rat.groseq.bed
-export BWPLUS=/local/storage/projects/evol_stability/data/CD4_Rat_plus.bw
-export BWMINUS=/local/storage/projects/evol_stability/data/CD4_Rat_minus.bw
-getCounts $GENEBODIES $INCREMENTS $COUNTALL
-getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
-#getPauseCounts $PAUSESITES $COUNTPAUSE
-getCounts $TSSSITES $TSSINCR $COUNTTSS
-
 ## Other cell types.
 export COUNTFILE=K562.count.bed
 export BWPLUS=/local/storage/data/hg19/k562/proseq/K562_unt.sort.bed.gz_plus.bw
@@ -268,4 +251,23 @@ getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
+
+## Mouse and rat.
+#export COUNTFILE=mouse.count.bed
+#export BWPLUS=/local/storage/projects/evol_stability/data/CD4_Mouse_plus.bw
+#export BWMINUS=/local/storage/projects/evol_stability/data/CD4_Mouse_minus.bw
+#getCounts $GENEBODIES $INCREMENTS $COUNTALL
+#getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
+##getPauseCounts $PAUSESITES $COUNTPAUSE
+#getCounts $TSSSITES $TSSINCR $COUNTTSS
+#
+#export COUNTFILE=rat.groseq.bed
+#export BWPLUS=/local/storage/projects/evol_stability/data/CD4_Rat_plus.bw
+#export BWMINUS=/local/storage/projects/evol_stability/data/CD4_Rat_minus.bw
+#getCounts $GENEBODIES $INCREMENTS $COUNTALL
+#getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
+##getPauseCounts $PAUSESITES $COUNTPAUSE
+#getCounts $TSSSITES $TSSINCR $COUNTTSS
+
+
 

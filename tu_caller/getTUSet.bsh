@@ -40,10 +40,12 @@ bedops --not-element-of -1 annot/g.minus.operon.bed annot/fpm.minus.bed > annot/
 # Get start sites which overlap dREG (0.7).
 bufSize=1000
 dreg=../tss_caller/HCM-U-PI.dREG-tss-clusters.tsv
-cat annot/brk.plus.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$2+1}' | sort-bed - | closestBed -t first -d -a stdin -b $dreg | \
-	awk 'BEGIN{OFS="\t"} ($16<'"$bufSize"') {print $4,$5-1,$5}' |  sort-bed - > annot/brk.plus.dreg.tss.bed
-cat annot/brk.minus.bed | awk 'BEGIN{OFS="\t"} {print $1,$3,$3+1}' | sort-bed - | closestBed -t last -d -a stdin -b $dreg | \
-	awk 'BEGIN{OFS="\t"} ($16<'"$bufSize"') {print $4,$6-1,$6}' | sort-bed - > annot/brk.minus.dreg.tss.bed
+cat $dreg | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4}'  > tmp.dreg
+
+cat annot/brk.plus.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$2+1}' | sort-bed - | closestBed -t first -d -a stdin -b tmp.dreg | \
+	awk 'BEGIN{OFS="\t"} ($8<'"$bufSize"') {print $4,$5-1,$5}' |  sort-bed - > annot/brk.plus.dreg.tss.bed
+cat annot/brk.minus.bed | awk 'BEGIN{OFS="\t"} {print $1,$3,$3+1}' | sort-bed - | closestBed -t last -d -a stdin -b tmp.dreg | \
+	awk 'BEGIN{OFS="\t"} ($8<'"$bufSize"') {print $4,$6-1,$6}' | sort-bed - > annot/brk.minus.dreg.tss.bed
 
 # Break TU at each of these sites.  Use all TU, and break/ merge in just one step!
 bedops --difference annot/A.plus.bed annot/brk.plus.dreg.tss.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$1"_"$2"_"$3,"0","+"}' > annot/A.brk.bed
@@ -76,7 +78,6 @@ cat ../annotations/gencode.v18.transcript.tsv | awk '($6=="-") {print $0}' | sor
 # Get annotations that overlap a dREG site.
 
 #  Get distance to nearest dREG site.
-cat $dreg | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4}'  > tmp.dreg
 cat annot/gc.plus.tsv | awk 'BEGIN{OFS="\t"} {print $1,$2,$2+1}' | sort-bed - | closestBed -t first -d -a stdin -b tmp.dreg | \
 	awk '{print $4,$5,$6,$8}' > annot/tssdist.plus.tsv
 cat annot/gc.minus.tsv | awk 'BEGIN{OFS="\t"} {print $1,$3,$3+1}' | sort-bed - | closestBed -t first -d -a stdin -b tmp.dreg | \

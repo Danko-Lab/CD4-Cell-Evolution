@@ -43,6 +43,12 @@ dev.off()
 ## Change unscored to 0
 for(i in 7:12) { tss[is.na(tss[,i]),i] <- 0 }
 
+## H-C
+lccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V8 < 0.1) & tss$V20 == 0 & !is.na(tss$mapSize)])) # 'Low-confidence'
+chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7)])) # 'High-confidence'
+
+
+
 ##################################################
 ## Look at species...
 ## Count types of elements ... and create discriptive plots.
