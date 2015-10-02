@@ -1,3 +1,5 @@
+## Exclude Chimp enhancer-discovery bias.
+
 ## This analysis focuses on lineage-specific changes that are currently active in hg19.
 load("../annotations/fdr.RData")
 source("../lib/normalizeSubsample.R")
@@ -45,11 +47,12 @@ dev.off()
 ## Change unscored to 0
 for(i in 7:12) { tss[is.na(tss[,i]),i] <- 0 }
 
-## H-C
-lccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V8 < 0.1) & tss$V20 == 0 & !is.na(tss$mapSize)])) # 'Low-confidence'
-chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7)])) # 'High-confidence'
+tss$fdr_min <- rowMin(tss[,c("HumanFDR", "MacaqueFDR")])
+tss$fdr_min[is.infinite(tss$fdr_min)] <- NA
 
-
+## NOTE: MUST remove sites inactive in human || rhesus, or have large biased denominator.
+excl_idx <- !(tss$V7 < 0.7 & tss$V9 < 0.7) ## tss$V8 > 0.7 & 
+tss <- tss[excl_idx,]
 
 ##################################################
 ## Look at species...
@@ -57,8 +60,8 @@ chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_m
 total <- summary(as.factor(tss$V5))
 one2m <- summary(as.factor(tss$V5[tss$V20 > 0])) ## Possible 1:many orthology
 unmap <- summary(as.factor(tss$V5[tss$V20 == 0 & is.na(tss$mapSize)])) ## INDEL
-lccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss$V20 == 0 & !is.na(tss$mapSize)])) # 'Low-confidence'
-chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7)])) # 'High-confidence'
+lccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V9 < 0.1) & (tss$V7 > 0.7 | tss$V9 > 0.7) & tss$V20 == 0 & !is.na(tss$mapSize)])) # 'Low-confidence'
+chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V9 > 0.7)])) # 'High-confidence'
 hctot <- summary(as.factor(tss$V5[tss$V20 == 0 & tss$fdr_min < 0.05  & !is.na(tss$mapSize)])) # 'HC all'
 
 chang_U2PI <- summary(as.factor(tss$V5[tss$V20 > 0 & !is.na(tss$mapSize) & tss$U2PIFDR_H < 0.05]))
@@ -85,8 +88,8 @@ lccng_U2PI/(total - one2m - unmap)
 SEtotal <- summary(as.factor(tss$V5[tss$V19 == 1]))
 SEone2m <- summary(as.factor(tss$V5[tss$V20 > 0 & tss$V19 == 1])) ## Possible 1:many orthology
 SEunmap <- summary(as.factor(tss$V5[tss$V20 == 0 & is.na(tss$mapSize) & tss$V19 == 1])) ## INDEL
-SElccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss$V20 == 0 & !is.na(tss$mapSize) & tss$V19 == 1])) # 'Low-confidence'
-SEchang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7) & tss$V19 == 1])) # 'High-confidence'
+SElccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V9 < 0.1) & (tss$V7 > 0.7 | tss$V9 > 0.7) & tss$V20 == 0 & !is.na(tss$mapSize) & tss$V19 == 1])) # 'Low-confidence'
+SEchang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V9 > 0.7) & tss$V19 == 1])) # 'High-confidence'
 
 SEone2m/SEtotal ## Seems strange that there's such an enrichment in genes here ...
 SEunmap/(SEtotal - SEone2m)
@@ -122,24 +125,6 @@ dev.off()
 ## Density scatterplots at promoters and enhancers
 source("../lib/densScatterplot.R")
 
-#pdf("dreg.scatterplots.pdf")
-# max_hc <- rowMax(tss[,c(7,8)])
-# densScatterplot(tss$V7, tss$V8, xlab="Human Unt.", ylab="Chimpanzee Unt.", main="dREG Scores")
-# densScatterplot(tss$V7[tss$V19 == "Prox_Stab" & max_hc>0.7], tss$V8[tss$V19 == "Prox_Stab" & max_hc>0.7], xlab="Human Unt.", ylab="Chimpanzee Unt.", main="dREG Scores")
-# densScatterplot(tss$V7[tss$V19 == "Dist_UnSt" & max_hc>0.7], tss$V8[tss$V19 == "Dist_UnSt" & max_hc>0.7], xlab="Human Unt.", ylab="Chimpanzee Unt.", main="dREG Scores")
-#
-# max_hm <- rowMax(tss[,c(7,9)])
-# densScatterplot(tss$V7[max_hm>0.7], tss$V9[max_hm>0.7], xlab="Human Unt.", ylab="Rhesus Macaque Unt.", main="dREG Scores")
-# densScatterplot(tss$V7[tss$V19 == "Prox_Stab" & max_hm>0.7], tss$V9[tss$V19 == "Prox_Stab" & max_hm>0.7], xlab="Human Unt.", ylab="Rhesus Macaque Unt.", main="dREG Scores")
-# densScatterplot(tss$V7[tss$V19 == "Dist_UnSt" & max_hm>0.7], tss$V9[tss$V19 == "Dist_UnSt" & max_hm>0.7], xlab="Human Unt.", ylab="Rhesus Macaque Unt.", main="dREG Scores")
-#
-# max_up <- rowMax(tss[,c(7,10)])
-# densScatterplot(tss$V7, tss$V10, xlab="Human Unt.", ylab="Human PI", main="dREG Scores")
-# densScatterplot(tss$V7[tss$V19 == "Prox_Stab" & max_up>0.7], tss$V10[tss$V19 == "Prox_Stab" & max_up>0.7], xlab="Human Unt.", ylab="Human PI", main="dREG Scores")
-# densScatterplot(tss$V7[tss$V19 == "Dist_UnSt" & max_up>0.7], tss$V10[tss$V19 == "Dist_UnSt" & max_up>0.7], xlab="Human Unt.", ylab="Human PI", main="dREG Scores")
-#dev.off()
-
-
 ##########################################################
 ## Questions ... :
 
@@ -149,8 +134,8 @@ cmpFracConserved <- function(tss1, tss2, i=2) { ## defaults to enhancer (i=2) ..
  total1 <- summary(as.factor(tss1$V5))
  one2m1 <- summary(as.factor(tss1$V5[tss1$V20 > 0])) ## Possible 1:many orthology
  unmap1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & is.na(tss1$mapSize)])) ## INDEL
- lccng1 <- summary(as.factor(tss1$V5[(tss1$V7 < 0.1 | tss1$V8 < 0.1 | tss1$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss1$V20 == 0 & !is.na(tss1$mapSize)])) # 'Low-confidence'
- chang1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < 0.05 & (tss1$V7 > 0.7 & tss1$V8 > 0.7 & tss1$V9 > 0.7)])) # 'High-confidence'
+ lccng1 <- summary(as.factor(tss1$V5[(tss1$V7 < 0.1 | tss1$V9 < 0.1) & (tss$V7 > 0.7 | tss$V9 > 0.7) & tss1$V20 == 0 & !is.na(tss1$mapSize)])) # 'Low-confidence'
+ chang1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < 0.05 & (tss1$V7 > 0.7 & tss1$V9 > 0.7)])) # 'High-confidence'
  allcng1<- summary(as.factor(tss1$V5[(tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < 0.05)]))
 
  tot1 <- total1[i]-one2m1[i]
@@ -160,8 +145,8 @@ cmpFracConserved <- function(tss1, tss2, i=2) { ## defaults to enhancer (i=2) ..
  total2 <- summary(as.factor(tss2$V5))
  one2m2 <- summary(as.factor(tss2$V5[tss2$V20 > 0])) ## Possible 1:many orthology
  unmap2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & is.na(tss2$mapSize)])) ## INDEL
- lccng2 <- summary(as.factor(tss2$V5[(tss2$V7 < 0.1 | tss2$V8 < 0.1 | tss2$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss2$V20 == 0 & !is.na(tss2$mapSize)])) # 'Low-confidence'
- chang2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < 0.05 & (tss2$V7 > 0.7 & tss2$V8 > 0.7 & tss2$V9 > 0.7)])) # 'High-confidence'
+ lccng2 <- summary(as.factor(tss2$V5[(tss2$V7 < 0.1 | tss2$V9 < 0.1) & (tss$V7 > 0.7 | tss$V9 > 0.7) & tss2$V20 == 0 & !is.na(tss2$mapSize)])) # 'Low-confidence'
+ chang2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < 0.05 & (tss2$V7 > 0.7 & tss2$V9 > 0.7)])) # 'High-confidence'
  allcng2<- summary(as.factor(tss2$V5[(tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < 0.05)]))
 
  tot2 <- total2[i]-one2m2[i]
@@ -177,9 +162,9 @@ fracConserved <- function(tss, ret="C") { ## defaults to ...
  total <- NROW(tss)
  one2m <- sum(tss$V20 > 0) ## Possible 1:many orthology
  unmap <- sum(tss$V20 == 0 & is.na(tss$mapSize)) ## INDEL
- lccng <- sum((tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss$V20 == 0 & !is.na(tss$mapSize)) # 'Low-confidence'
- chang <- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7)) # 'High-confidence'
- allcng<- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05)
+ lccng <- sum((tss$V7 < 0.1 | tss$V9 < 0.1) & (tss$V7 > 0.7 | tss$V9 > 0.7) & tss$V20 == 0 & !is.na(tss$mapSize)) # 'Low-confidence'
+ chang <- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.01 & (tss$V7 > 0.7 & tss$V9 > 0.7)) # 'High-confidence'
+ allcng<- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.01)
 
  if(ret=="C") {
   tot <- total-one2m
@@ -281,6 +266,8 @@ dev.off()
 ## Do looped enhancers change more slowly.  
 ## Yep.
 loop <- read.table("tss.tsv.loop")
+loop <- loop[excl_idx,]
+
 fracConserved(tss[rowSums(loop[,5:6]) >  0 & tss$V5 == "Dist_UnSt",])  ## Conservation of looped REs.
 fracConserved(tss[rowSums(loop[,5:6]) == 0 & tss$V5 == "Dist_UnSt",])  ## Conservation of unlooped. 
 
