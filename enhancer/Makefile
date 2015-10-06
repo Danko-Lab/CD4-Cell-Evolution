@@ -3,5 +3,5 @@ run_1:
 	R --no-save < classifySites.R ## This is now done in tss_detector/
 
 run_2:
-	R --no-save < getSiteStats.R
 	bash setupLoopAnalysis.bsh
+	R --no-save < getSiteStats.R
