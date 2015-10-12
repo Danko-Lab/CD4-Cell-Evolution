@@ -3,7 +3,7 @@
 # For each gene that changes in a branch-specific fashion, identifies
 # the set of enhancers nearby.
 
-
+## This currently uses JUST the antisense direction of transcription in gene bodies...
 function makeSimFile {
  indir=../annotations/chage_expr/
  infile=$1.change-U
@@ -23,7 +23,7 @@ makeSimFile H
 makeSimFile C
 makeSimFile M
 
-## JUST Consider upstream enhancers
+## JUST Consider upstream enhancers.
 
 function makeUpsFile {
  indir=../annotations/chage_expr/
@@ -41,9 +41,9 @@ function makeUpsFile {
  bedmap --echo --mean tmp/$infile.tsspc  tmp/$infile.enh | sed "s/|/\t/g" | sed "s/NAN/NA/g" > tmp/$infile.tsspc.enh
 }
 
-makeUpsFile H
-makeUpsFile C
-makeUpsFile M
+#makeUpsFile H
+#makeUpsFile C
+#makeUpsFile M
 
 
 
