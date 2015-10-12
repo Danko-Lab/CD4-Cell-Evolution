@@ -7,11 +7,15 @@
 source("../lib/getOverlap.R")
 
 ##Prepare loops.
-dist<- 5000
+#dist<- 500 # 15000
 loops <- read.table("/local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz")
-loops1<- loops; loops1[,3] <- loops[,2]+dist
-loops2<- loops; loops2[,2] <- loops[,3]-dist
-
+loopdist <- function(i) { ## Get the actual distance in the detected loop interaction.
+ loop1 <- sapply(strsplit(as.character(loops$V4), split=";"), function(x) {x[[i]]})
+ sapply(strsplit(loop1, split="-"), function(x) {as.double(x[[2]])-as.double(x[[1]])})
+}
+loops1<- loops; loops1[,3] <- loops[,2]+loopdist(1) #+dist
+loops2<- loops; loops2[,2] <- loops[,3]-loopdist(2) #-dist
+hist(log(loops[,3]-loops[,2], 10), 20) ## Summary stats on loop distances.
 
 ############
 ## Get enhancers interacting with changed promoters...
@@ -54,11 +58,13 @@ enh_pro_change <- rbind(getEnhInt("H", 21, post_enh= ".change-U.tsv"),
 			getEnhInt("C", 22, post_enh= ".change-U.tsv"), 
 			getEnhInt("M", 23, post_enh= ".change-U.tsv")) #Conditional on both promoter and enhancer change.
 cor.test(enh_pro_change$pro, enh_pro_change$enh)
-plot(enh_pro_change$pro, enh_pro_change$enh, xlab= "Gene Expression", ylab="Mean Enhancers", pch=19)
+plot(enh_pro_change$pro, enh_pro_change$enh, xlab= "Gene Expression", ylab="Sum Enhancers", pch=19)
 
 enh_pro_change <- rbind(getEnhInt("H", 21), 
                         getEnhInt("C", 22), 
                         getEnhInt("M", 23)) #Conditional on both promoter and enhancer change.
+cor.test(enh_pro_change$pro, enh_pro_change$enh)
+plot(enh_pro_change$pro, enh_pro_change$enh, xlab= "Gene Expression", ylab="Sum Enhancers", pch=19)
 
 
 pdf("gene_enhancer_correlation.pdf")
