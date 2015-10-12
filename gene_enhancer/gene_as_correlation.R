@@ -11,7 +11,7 @@ print(cor.test(as$V5, as$V7, method="spearman"))
 
 plot(as$V5, as$V7, xlab= "Gene Expression", ylab="UAS Expression", pch=19)
 
-pdf("gene_uas_correlation.pdf")
+pdf("gene_as_correlation.pdf")
  plot(as$V5, as$V7, xlab= "Gene Expression", ylab="UAS Expression", pch=19)
 
  source("../lib/densScatterplot.R")

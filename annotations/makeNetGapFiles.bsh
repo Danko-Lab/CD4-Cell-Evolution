@@ -104,7 +104,7 @@ function writeAnnotTss {
 ## Now get data from TSS defined by dREG.
 INTSS=~/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.dist.stability.tsv #HCM-U-PI.dREG-tss-clusters.tsv 
 writeAnnotTss 1
-cat $INTSS | awk 'BEGIN{OFS="\t"} {print $0,"dREG_TSS"}' | sort-bed - > dreg.tss ## Replaced the below with this, as now classifying based on stability.
+#cat $INTSS | awk 'BEGIN{OFS="\t"} {print $0,"dREG_TSS"}' | sort-bed - > dreg.tss ## Replaced the below with this, as now classifying based on stability.
 bedops --element-of -1 $INTSS annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_TSS"}' | sort-bed - > dreg.tss ## Identify intersection with TSS at the 5' end of annotated genes.
 cat $GENESFULL | grep "protein_coding" > genespc.tmp
 cat genespc.tmp | bedmap --echo --echo-map --indicator $INTSS - | grep "|1" | sed "s/|/\t/g" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,$5,($24=="-"?"+":"-"),$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18}' | bedops --not-element-of -1 - annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_INGENE"}' | sort-bed - > ingene.tmp ## Also pull out those that are in gene annotations. ... unlike the next line, this version swaps the strand to only count reads on the opposite strand of the annotated gene.
