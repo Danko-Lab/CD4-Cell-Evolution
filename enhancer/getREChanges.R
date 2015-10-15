@@ -31,6 +31,12 @@ indx_hg19_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V7 < 0.1 & tss$V8 >
 
 write.table(tss[indx_hg19_gain | indx_hg19_loss,], "hg19.gain.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
+              ##     1:1 ortholog,  mappable,             complete gain/ loss,                            gain/ loss in magnitude.
+indx_rheMac3_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V9 > 0.7 & tss$V8 < 0.1 & tss$V7 < 0.1) | (tss$MacaqueFDR < 0.05 & tss$MacaqueFC > 0))
+indx_rheMac3_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V9 < 0.1 & tss$V8 > 0.7 & tss$V7 > 0.7) | (tss$MacaqueFDR < 0.05 & tss$MacaqueFC < 0))
+
+write.table(tss[indx_rheMac3_gain | indx_rheMac3_loss,], "rheMac3.gain.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+
 
 ## Data playtime!
 

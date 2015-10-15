@@ -85,11 +85,15 @@ dev.off()
  tres <- tres[grep("dREG", tres$V10),]
 
  ## Get TSS of changed, annotated protein coding genes.
- HC <- read.table(paste("../annotations/chage_expr/",prefix,post_pro, sep=""))
+ HC <- read.table(paste("../annotations/chage_expr/H.change-U.all.tsv", sep=""))
  genes <- HC[HC$V7 == "protein_coding",]
  tss   <- genes
  tss[tss[,6] == "+",2] <- tss[tss[,6] == "+",2]-250; tss[tss[,6] == "+",3] <- tss[tss[,6] == "+",2]+1
  tss[tss[,6] == "-",3] <- tss[tss[,6] == "-",3]+251; tss[tss[,6] == "-",2] <- tss[tss[,6] == "-",3]-1
+
+ ## Get genes that loop.
+ indx1 <- getOverlap(tres[i,], loops1)
+ indx2 <- getOverlap(tres[i,], loops2)
 
  
 

@@ -94,6 +94,37 @@ enh_pro_change <- rbind(getLoopNearby("H", 21),
                         getLoopNearby("M", 23))
 cor.test(enh_pro_change$pro, enh_pro_change$enh)
 plot(enh_pro_change$pro, enh_pro_change$enh, xlab= "Gene Expression", ylab="Mean Enhancers", pch=19)
+
+require(vioplot)
 vioplot(enh_pro_change$enh[enh_pro_change$pro < 0 & !is.nan(enh_pro_change$enh)], enh_pro_change$enh[enh_pro_change$pro > 0 & !is.nan(enh_pro_change$enh)]); abline(h=0)
+
+## LM:
+gl <- glm(pro~near+loop+uas, data=enh_pro_change)
+cor.test(predict(gl), enh_pro_change$pro)
+
+cor.test(enh_pro_change$pro, enh_pro_change$enh)
+
+## Data for all...
+indx <- (enh_pro_change$near!=0 & enh_pro_change$uas!=0)# & enh_pro_change$loop!=0)
+indx2<- (enh_pro_change$near!=0 & enh_pro_change$uas!=0 & enh_pro_change$loop!=0)
+
+indx2<- (enh_pro_change$near!=0 & enh_pro_change$uas!=0 & enh_pro_change$loop!=0)
+cor.test(enh_pro_change$pro[indx2], enh_pro_change$enh[indx2])
+plot(enh_pro_change$pro[indx2], enh_pro_change$enh[indx2])
+
+## LM:
+indx<- enh_pro_change$uas!=0
+cor.test(enh_pro_change$pro[indx], enh_pro_change$enh[indx])
+plot(enh_pro_change$pro[indx], enh_pro_change$enh[indx])
+
+sm_cng <- enh_pro_change[indx,]
+
+train <- sample(c(1:NROW(sm_cng)), NROW(sm_cng)*0.9)
+test  <- rep(TRUE, NROW(sm_cng)); test[train] <- FALSE; test <- which(test)
+
+gl <- glm(pro~near+loop+uas, data=sm_cng[train,])
+cor.test(predict(gl, sm_cng[test,]), sm_cng$pro[test])
+
+
 
 
