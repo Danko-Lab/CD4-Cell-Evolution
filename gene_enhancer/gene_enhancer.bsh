@@ -13,10 +13,10 @@ function makeSimFile {
  ## Focus on protein-coding genes.  Get TSS.
  cat $indir/$infile.tsv | awk '($7 == "protein_coding") {print $0}' | awk 'BEGIN{OFS="\t"} ($6 == "+"){print $1,$2-'"$fudge"',$2+1-'"$fudge"',$4,$5,$6} ($6 == "-"){print $1,$3+'"$fudge"',$3+1+'"$fudge"',$4,$5,$6}' | sort-bed - > tmp/$infile.tsspc
 
- cat $indir/$infile.all.tsv | grep "dREG_TSS\|dREG_ENH\|dREG_INGENE" | sort-bed - > tmp/$infile.enh # dREG_ENH\|dREG_INGENE\|dREG_TSS
+ cat $indir/$infile.all.tsv | grep "dREG_ENH\|dREG_INGENE" | sort-bed - > tmp/$infile.enh # dREG_ENH\|dREG_INGENE\|dREG_TSS
  
  ## Get the set of all enahcners nearby the TSS of each gene.
- bedmap --range $dist --echo --mean --echo-map-score --echo-overlap-size tmp/$infile.tsspc  tmp/$infile.enh | grep "|1$" -v | sed "s/|/\t/g" | sed "s/NAN/NA/g" > tmp/$infile.tsspc.enh
+ bedmap --range $dist --echo --mean tmp/$infile.tsspc  tmp/$infile.enh | grep "|1$" -v | sed "s/|/\t/g" | sed "s/NAN/NA/g" > tmp/$infile.tsspc.enh
 }
 
 makeSimFile H

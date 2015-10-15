@@ -50,6 +50,15 @@ pdf("Human.Differences_In_Induction.pdf")
  ## Add labels.
 dev.off()
 
+## Write out REs for Zhong.
+write.table(fdr_df[ishumspec & (fdr_df$annot_type=="dREG_ENH" | fdr_df$annot_type=="dREG_INGENE" | fdr_df$annot_type=="dREG_TSS"),], "Human.IndChange.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(fdr_df[ishumspec & fdr_df$U2PIFC_H < 0 & (fdr_df$annot_type=="dREG_ENH" | fdr_df$annot_type=="dREG_INGENE" | fdr_df$annot_type=="dREG_TSS"),], "Human.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(fdr_df[ishumspec & fdr_df$U2PIFC_H > 0 & (fdr_df$annot_type=="dREG_ENH" | fdr_df$annot_type=="dREG_INGENE" | fdr_df$annot_type=="dREG_TSS"),], "Human.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+
+
+#################
+## EXPERIMENTAL
+
 ## Which genes are they?
 fdr_df[ishumspec & abs(fdr_df$U2PIFC_H) > 5 ,]
 fdr_df[ishumspec & abs(fdr_df$U2PIFC_H) > 5 & fdr_df$type == "protein_coding",]
