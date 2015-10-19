@@ -14,11 +14,11 @@ for f in $FILES
 
    ## Remove rRNA and reverse the strand (PRO-seq).
    zcat $f | grep "rRNA" -v | \
-         awk 'BEGIN{OFS="\t"} {print $1,$2,($2+1),$4,$5,$6=="+"?"-":"+"}' | gzip > $g.nr.rs.bed.gz
+         awk 'BEGIN{OFS="\t"} {print $1,$2,($2+1),$4,$5,$6=="+"?"-":"+"}' | sort -k 1,1 | gzip > $g.nr.rs.bed.gz
  
    ## Convert to bedGraph ... Can't gzip these, unfortunately.
-   bedtools genomecov -bg -i $g.nr.rs.bed.gz -g $CHINFO -strand + > $g\_plus.bedGraph
-   bedtools genomecov -bg -i $g.nr.rs.bed.gz -g $CHINFO -strand - > $g\_minus.bedGraph
+   bedtools genomecov -bg -i $g.nr.rs.bed.gz -g $CHINFO -strand + | sort-bed - > $g\_plus.bedGraph
+   bedtools genomecov -scale -1.0 -bg -i $g.nr.rs.bed.gz -g $CHINFO -strand - | sort-bed - > $g\_minus.bedGraph
  
    ## Then to bigWig
    bedGraphToBigWig $g\_plus.bedGraph $CHINFO $g\_plus.bw
@@ -33,18 +33,24 @@ function liftToHg19 {
    f=`echo $i | cut -d \. -f 1`
    echo $f
 
+   ## Force each entry to represent precisely one base.
+#   cat $f\_plus.bedGraph | perl ~/NHP/lib/bedGraph2Wig.pl | perl ~/NHP/lib/wig2bedGraph.pl + | less
+#   cat $f\_minus.bedGraph | perl ~/NHP/lib/bedGraph2Wig.pl | perl ~/NHP/lib/wig2bedGraph.pl -  
+
    ## Convert to bedGraph
-   cat $f\_plus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4,"+"}' > $f.bedGraph
-   cat $f\_minus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4,"-"}' >> $f.bedGraph
+   cat $f\_plus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4,"+"}' > $f.tmp.bedGraph
+   cat $f\_minus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4,"-"}' >> $f.tmp.bedGraph
+   cat $f.tmp.bedGraph | sort-bed - | gzip > $f.bedGraph.gz
 
    ## Use liftOver.  Other options: -tab -minMatch=0.1
-   liftOver $f.bedGraph $MAPCHAIN $f.hg19.bedGraph $UNMAPPED
-   rm $f.bedGraph
+   CrossMap.py bed $MAPCHAIN $f.bedGraph.gz $f.hg19.bedGraph
+   #liftOver $f.bedGraph $MAPCHAIN $f.hg19.bedGraph unmap
+   #rm $f.tmp.bedGraph.gz $f.bedGraph.gz
    gzip $f.hg19.bedGraph
 
    ## Split back into separate files.
-   zcat $f.hg19.bedGraph.gz | grep "\+$" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$5}' | sort-bed - > $f\_plus.hg19.bedGraph
-   zcat $f.hg19.bedGraph.gz | grep "\-$" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$5}' | sort-bed - > $f\_minus.hg19.bedGraph
+   zcat $f.hg19.bedGraph.gz | grep -v "random" | grep "\+$" | awk 'function abs(x){return ((x < 0.0) ? -x : x)} BEGIN{OFS="\t"} {print $1,$2,$3,abs($5)}' | sort-bed - > $f\_plus.hg19.bedGraph
+   zcat $f.hg19.bedGraph.gz | grep -v "random" | grep "\-$" | awk 'function abs(x){return ((x < 0.0) ? -x : x)} BEGIN{OFS="\t"} {print $1,$2,$3,-1*abs($5)}' | sort-bed - > $f\_minus.hg19.bedGraph
 
    ## Convert bedGarph to bigWig
    bedGraphToBigWig $f\_plus.hg19.bedGraph $CHINFOhg $f\_plus.hg19.bw
@@ -58,21 +64,33 @@ rm *.wig.gz *.bw *.bedGraph *.bedGraph.gz *.nr.rs.* *tmp* tmp
 UNMAPPED=tmp
 CHINFOhg=../../hg19.chromInfo
 
+## Human
 FILES=`ls H*.bed.gz`
 CHINFO=../../hg19.chromInfo
 makeBigWig
 
+## Chimpanzee
 FILES=`ls C*.bed.gz`
 CHINFO=../../panTro4.chromInfo
 makeBigWig
+
 MAPCHAIN=~/NHP/makeRecipBest/hg19.panTro4/panTro4.hg19.rbest.chain.gz # Use rbest
+FILES=`ls C-U.bed.gz`
+liftToHg19 &
+FILES=`ls C-PI.bed.gz`
 liftToHg19 &
 
+## Rhesus Macaque
 FILES=`ls M*.bed.gz`
 CHINFO=../../rheMac3.chromInfo
 makeBigWig
+
 MAPCHAIN=~/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.chain.gz # Use rbest
+FILES=`ls M-U.bed.gz`
 liftToHg19 &
+FILES=`ls M-PI.bed.gz`
+liftToHg19 &
+
 
 ## Cleanup.
 #rm *.nr.rs.* tmp *.bedGraph *.bedGraph.gz

@@ -102,13 +102,14 @@ function writeAnnotTss {
 
 
 ## Now get data from TSS defined by dREG.
-INTSS=~/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.tsv  # /usr/projects/GROseq/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.tsv
+INTSS=~/NHP/tss_caller/HCM-U-PI.dREG-tss-clusters.dist.stability.tsv #HCM-U-PI.dREG-tss-clusters.tsv 
 writeAnnotTss 1
-bedops --element-of -1 $INTSS annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_TSS"}' | sort-bed - > dreg.tss ## Identify intersection with TSS at the 5' end of annotated genes.
-cat $GENESFULL | grep "protein_coding" > genespc.tmp
-cat genespc.tmp | bedops --element-of -1 $INTSS - | bedops --not-element-of -1 - annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_INGENE"}' | sort-bed - > ingene.tmp ## Also pull out those that are in gene annotations.
-bedops --not-element-of -1 $INTSS annottss.tsv | bedops --not-element-of -1 - genespc.tmp | awk 'BEGIN{OFS="\t"} {print $0,"dREG_ENH"}' | sort-bed - > enh.tmp ## Assume the remaining sites are enhancers.
-cat dreg.tss enh.tmp ingene.tmp | sort-bed - > $TSSSITES
+cat $INTSS | awk 'BEGIN{OFS="\t"} {print $0,"dREG_TSS"}' | sort-bed - > dreg.tss ## Replaced the below with this, as now classifying based on stability.
+#bedops --element-of -1 $INTSS annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_TSS"}' | sort-bed - > dreg.tss ## Identify intersection with TSS at the 5' end of annotated genes.
+#cat $GENESFULL | grep "protein_coding" > genespc.tmp
+#cat genespc.tmp | bedops --element-of -1 $INTSS - | bedops --not-element-of -1 - annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_INGENE"}' | sort-bed - > ingene.tmp ## Also pull out those that are in gene annotations.
+#bedops --not-element-of -1 $INTSS annottss.tsv | bedops --not-element-of -1 - genespc.tmp | awk 'BEGIN{OFS="\t"} {print $0,"dREG_ENH"}' | sort-bed - > enh.tmp ## Assume the remaining sites are enhancers.
+#cat dreg.tss enh.tmp ingene.tmp | sort-bed - > $TSSSITES
 rm enh.tmp ingene.tmp genespc.tmp
 makeIncrements $TSSSITES $TSSINCR
 
@@ -134,9 +135,11 @@ done
 rm dreg.tss pauseSites.new.tmp
 
 ## Now merge pause sites ... and associate each annotation in annottss.tsv with the nearest pause site (within 1kb).
-bedtools merge -s -i pauseSites.tmp | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0",$4}' > $PAUSESITES.merge
-bedtools window -w 1000 -sm -a $PAUSESITES.merge -b annottss.tsv | awk 'BEGIN{OFS="\t"} ($15 < 1000) {print $1,$2,$3,$10,$5,$6,$13,$14}' | sort-bed - > $PAUSESITES
-rm $PAUSESITES.merge pauseSites.tmp annottss.tsv
+bedtools merge -S + -i pauseSites.tmp | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0","+"}' > $PAUSESITES.merge.tmp
+bedtools merge -S - -i pauseSites.tmp | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0","-"}' >> $PAUSESITES.merge.tmp
+sort-bed $PAUSESITES.merge.tmp > $PAUSESITES.merge
+bedtools window -w 1000 -sm -a $PAUSESITES.merge -b annottss.tsv | awk 'BEGIN{OFS="\t"} ($19 < 1000) {print $1,$2,$3,$10,$5,$6,$17,$18}' | sort-bed - > $PAUSESITES
+rm $PAUSESITES.merge pauseSites.tmp annottss.tsv $PAUSESITES.merge.tmp 
 
 makeIncrements $PAUSESITES $PAUSEINCR ## So many falling outside of align-able regions.  Seems safest to treat them comparabally.
 

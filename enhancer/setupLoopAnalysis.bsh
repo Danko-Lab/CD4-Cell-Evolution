@@ -1,0 +1,23 @@
+#!/usr/bin/bash
+
+#########################################
+## Prep files for loop determination.
+loopsize=5000 ## Assume rough constant size.  Most are big ==> 2-10kb...
+zcat ../tss_caller/refGene.hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$6=="+"?$2:$3-1,$6=="+"?$2+1:$3,$4,$5,$6}' | sort-bed - > tss.tmp
+
+zcat /local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$2+'"$loopsize"',$4}' | sort-bed - > first
+cat first |  bedmap --echo --indicator --echo-map - tss.tmp | grep "|1|" | sed "s/|1|/\t/g" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,$8}' > first.tss
+
+zcat /local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$3-'"$loopsize"',$3,$4}' | sort-bed - > second
+cat second | bedmap --echo --indicator --echo-map - tss.tmp | grep "|1|" | sed "s/|1|/\t/g" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,$8}' > second.tss
+
+## Get info on whether enhancers for a loop ...
+cat tss.tsv | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4}' > tss.tsv.reduced
+cat tss.tsv.reduced | bedmap --count - first  > tss.tsv.first
+cat tss.tsv.reduced | bedmap --count - second > tss.tsv.second
+paste tss.tsv.reduced tss.tsv.first tss.tsv.second > tss.tsv.loop
+
+## ... and whether that is to a TSS.
+
+
+rm tss.tsv.reduced tss.tsv.first tss.tsv.second first first.tss second second.tss

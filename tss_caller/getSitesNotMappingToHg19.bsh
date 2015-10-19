@@ -1,0 +1,56 @@
+#!/usr/bin/bash
+## Corresponds to Evernote entry labeled Adding Chimp/ Rhesus Regulatory Elemnts that Don't Map ...
+##
+
+## Write out bed files.
+bash writeBed.bsh 0.7 H-U.TSS.bedGraph.gz
+bash writeBed.bsh 0.7 C-U.TSS.bedGraph.gz
+bash writeBed.bsh 0.7 M-U.TSS.bedGraph.gz
+bash writeBed.bsh 0.7 H-PI.TSS.bedGraph.gz
+bash writeBed.bsh 0.7 C-PI.TSS.bedGraph.gz
+bash writeBed.bsh 0.7 M-PI.TSS.bedGraph.gz
+
+## Merge U and PI.
+gunzip *.bedGraph.gz.bed.gz
+bedops --merge H-U.TSS.bedGraph.gz.bed H-PI.TSS.bedGraph.gz.bed | gzip > H-U-PI.bed.gz
+bedops --merge C-U.TSS.bedGraph.gz.bed C-PI.TSS.bedGraph.gz.bed | gzip > C-U-PI.bed.gz
+bedops --merge M-U.TSS.bedGraph.gz.bed M-PI.TSS.bedGraph.gz.bed | gzip > M-U-PI.bed.gz
+gzip *.bedGraph.gz.bed
+
+## Get counts.
+zcat H-U-PI.bed.gz | grep "" -c
+zcat C-U-PI.bed.gz | grep "" -c
+zcat M-U-PI.bed.gz | grep "" -c
+
+## Get gaps in species genomes (no need to use rbest) ...
+function makeOrthoAnnot {
+## Get gap data.
+hgsql $1 -e "select qName,qStart,qEnd,type,level from netHg19 where level like 2 AND qEnd > qStart" | grep "^c" | sort-bed - > $1.netHg19.L2.bed
+hgsql $1 -e "select qName,qStart,qEnd,type,level from netHg19 where level like 3 AND qEnd > qStart" | grep "^c" | sort-bed - > $1.netHg19.L3.bed
+hgsql $1 -e "select qName,qStart,qEnd,type,level from netHg19 where level like 4 AND qEnd > qStart" | grep "^c" | sort-bed - > $1.netHg19.L4.bed
+hgsql $1 -e "select qName,qStart,qEnd,type,level from netHg19 where level like 5 AND qEnd > qStart" | grep "^c" | sort-bed - > $1.netHg19.L5.bed
+hgsql $1 -e "select qName,qStart,qEnd,type,level from netHg19 where level like 6 AND qEnd > qStart" | grep "^c" | sort-bed - > $1.netHg19.L6.bed
+
+bedops --difference $1.netHg19.L2.bed $1.netHg19.L3.bed > $1.netHg19.Gap2.bed ## Gets those in L2 which aren't in L3 ...
+bedops --difference $1.netHg19.L4.bed $1.netHg19.L5.bed > $1.netHg19.Gap3.bed ## Gets those in L2 which aren't in L3 ...
+
+bedops --merge $1.netHg19.Gap2.bed $1.netHg19.Gap3.bed $1.netHg19.L6.bed > $1.netHg19.gapMerge.save ## Add back gaps in L4 ...
+
+rm $1.netHg19*.bed
+}
+
+####
+## Make GAPS
+makeOrthoAnnot panTro4
+makeOrthoAnnot rheMac3
+
+
+## Align with gaps, and add to the number of align-able.
+#zcat C-U-PI.bed.gz | bedmap --fraction-ref 1 --echo --indicator - panTro4.netHg19.gapMerge.save | less
+#zcat C-U-PI.bed.gz | bedmap --echo --indicator - panTro4.netHg19.gapMerge.save | less
+
+zcat C-U-PI.bed.gz | bedmap --fraction-ref 1 --echo --indicator - panTro4.netHg19.gapMerge.save | grep "|1" -c  ## 1,651
+zcat M-U-PI.bed.gz | bedmap --fraction-ref 1 --echo --indicator - rheMac3.netHg19.gapMerge.save | grep "|1" -c ## 3,912
+
+
+

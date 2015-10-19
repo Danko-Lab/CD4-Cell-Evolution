@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+cat /local/storage/data/hg19/cd4/superenhancers/BI_CD4p_CD25-_CD45RAp_Naive.csv | sed "s/,/\t/g" | awk '($7 == 1) {print $2,$3,$4}' | sort-bed - | bedmap --echo --indicator ../tss_caller/HCM-U-PI.dREG-tss-clusters.dist.stability.tsv - | sed "s/|/\t/g" > HCM-U-PI.dREG-tss-clusters.tmp.tsv
+
+## Get info on whether gaps are human lineage-specific.
+bedops -i panTro4.one2many.bed.starch rheMac3.one2many.bed.starch | bedmap --echo --bases HCM-U-PI.dREG-tss-clusters.tmp.tsv - | sed "s/|/\t/g" > tss.tsv
+
+rm HCM-U-PI.dREG-tss-clusters.tmp.tsv

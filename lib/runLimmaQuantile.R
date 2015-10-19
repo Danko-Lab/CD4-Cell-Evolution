@@ -25,9 +25,22 @@ removePC <- function(dat, i, plot.pc=TRUE) {
   return(adj_df)
 }
 
+addlab <- function(gene_ID, ...) {
+ idx<-sapply(gene_ID, function(gene_ID) {
+  ig <- which(genes$mgi == gene_ID)
+  io <- ig[which.min(fit2$p.value[ig])]
+  if(NROW(io)>0) { 
+	text(tab$AveExpr[io], tab$logFC[io], labels= gene_ID, cex= 0.7, pos= 3, ...)
+	io
+  }
+ })
+ idx <- unlist(idx); idx <- idx[!is.null(idx)]
+ return(data.frame(Gene= genes$mgi[idx], AveExpr= tab$AveExpr[idx], logFC= tab$logFC[idx], adj.P.Val= tab$adj.P.Val[idx]))
+}
+
 runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB, 
                              q.cut=0.01, lfc=0.0, lib.size=colSums(count.dat),
-                             useVoom=FALSE, plotMA=FALSE, remove.pc=NULL){
+                             useVoom=FALSE, plotMA=FALSE, remove.pc=NULL, geneIDs= NULL){
   require(limma)
   ## updated limma from 3.12.1 to 3.12.3 to 3.14.1 CGD: Now to 3.18.13
   if(! packageDescription("limma")$Version >= "3.18.13"){
@@ -63,11 +76,22 @@ runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB,
   tab<-topTable(fit2, adjust = "BH", number=nrow(fit2), sort.by='none')
 
   if(plotMA) {
-#   plotMA(fit2, array=2, status=as.factor(decideTests(fit2)[,2]), col=c("black", "red", "blue"))
-   status <- as.character(p.adjust(fit2$p.value, method="fdr")<PVAL)
-   status[genes[,4] == "chr5_140005300_140013300"] <- "zCD14"
-   plotMA(fit2, array=2, status=status, col=c("black", "red", "blue"))
-   abline(h=0, col="blue")
+   require(edgeR)
+   status <- c(p.adjust(fit2$p.value, method="fdr")<PVAL)
+   cols <- rep("orange", NROW(genes)); cols[genes$type == "protein_coding"] <- "red"
+   cols[genes$type == "Dist_UnSt" | genes$type == "tss" | genes$type == "Prox_Stab"] <- "dark green"
+   maPlot(logAbundance= tab$AveExpr, logFC= tab$logFC, de.tags= status, deCol= cols[status], pch=19)
+
+   if(!is.null(geneIDs)) {
+     maPlot(logAbundance= tab$AveExpr, logFC= tab$logFC, de.tags= status, smooth.scatter=TRUE, deCol= cols[status], pch=19)
+     data_MA2 <- addlab(geneIDs)
+
+     maPlot(logAbundance= data_MA2$AveExpr, logFC= data_MA2$logFC, de.tags= data_MA2$adj.P.Val<PVAL, 
+			xlim= c(min(tab$AveExpr), max(tab$AveExpr)), ylim= c(min(tab$logFC), max(tab$logFC)), pch=19)
+     data_MA2 <- addlab(geneIDs)
+   }
+#   plotMA(fit2, array=2, status=status, col=c("black", "red"))
+#   abline(h=0, col="white")
 
 #   plotMDS(dat,top=500,labels=species,gene.selection="common")
   }
@@ -82,12 +106,12 @@ runLimmaQuantile <- function(count.dat, conditions, genes, condA, condB,
   val1=apply(counts.limma[,which(conditions==condA)],1,mean)
   val2=apply(counts.limma[,which(conditions==condB)],1,mean)
 
-  tab=tab[,c("P.Value","adj.P.Val","logFC")]
+  tab=tab[,c("P.Value","adj.P.Val","logFC", "AveExpr")]
   tab=as.matrix(cbind(tab,val1,val2))
   nam1=paste("mean_",condA,sep="")
   nam2=paste("mean_",condB,sep="")
-  colnames(tab)[4]=nam1
-  colnames(tab)[5]=nam2
+  colnames(tab)[5]=nam1
+  colnames(tab)[6]=nam2
   tab= cbind(genes, tab)
 
   return(list(tab=tab,res=res,counts=counts.limma))

@@ -1,0 +1,41 @@
+#!/usr/bin/bash
+scratch=/workdir
+
+function liftToHg19 {
+   f=$scratch/$FILES
+   echo $f
+
+   ## Convert to bedGraph
+   bigWigToBedGraph $FILES.plus.bigWig $f\_plus.bedGraph
+   bigWigToBedGraph $FILES.minus.bigWig $f\_minus.bedGraph
+
+   ## Convert to bedGraph
+   cat $f\_plus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4,"+"}' > $f.tmp.bedGraph
+   cat $f\_minus.bedGraph | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4,"-"}' >> $f.tmp.bedGraph
+   cat $f.tmp.bedGraph | sort-bed - | gzip > $f.bedGraph.gz
+
+   ## Use liftOver.  Other options: -tab -minMatch=0.1
+   CrossMap.py bed $MAPCHAIN $f.bedGraph.gz $f.hg19.bedGraph
+   gzip $f.hg19.bedGraph
+
+   ## Split back into separate files.
+   zcat $f.hg19.bedGraph.gz | grep -v "random" | grep "\+$" | awk 'function abs(x){return ((x < 0.0) ? -x : x)} BEGIN{OFS="\t"} {print $1,$2,$3,abs($5)}' | sort-bed - > $f\_plus.hg19.bedGraph
+   zcat $f.hg19.bedGraph.gz | grep -v "random" | grep "\-$" | awk 'function abs(x){return ((x < 0.0) ? -x : x)} BEGIN{OFS="\t"} {print $1,$2,$3,-1*abs($5)}' | sort-bed - > $f\_minus.hg19.bedGraph
+
+   ## Convert bedGarph to bigWig
+   bedGraphToBigWig $f\_plus.hg19.bedGraph $CHINFOhg $FILES\_plus.fpkm.hg19.bw
+   bedGraphToBigWig $f\_minus.hg19.bedGraph $CHINFOhg $FILES\_minus.fpkm.hg19.bw
+}
+
+
+CHINFOhg=../../../hg19.chromInfo
+
+FILES=C-U.rnaseq.rpkm #C-U.rnaseq
+MAPCHAIN=~/NHP/makeRecipBest/hg19.panTro4/panTro4.hg19.rbest.chain.gz # Use rbest
+liftToHg19
+
+
+FILES=M-U.rnaseq.rpkm #M-U.rnaseq
+MAPCHAIN=~/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.chain.gz # Use rbest
+liftToHg19
+

@@ -47,12 +47,12 @@ function getPauseCounts {
 #
 #}
 
-BWPATH=/usr/projects/GROseq/NHP/AllData
+BWPATH=/local/storage/projects/NHP/AllData
 
 ## Get counts, and place this in 'score'.
 export COUNTFILE=J.count.bed
-export BWPLUS=/usr/projects/GROseq/CD4/Alignments/J-U_plus.bw
-export BWMINUS=/usr/projects/GROseq/CD4/Alignments/J-U_minus.bw
+export BWPLUS=/local/storage/projects/CD4/Alignments/J-U_plus.bw
+export BWMINUS=/local/storage/projects/CD4/Alignments/J-U_minus.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
@@ -132,8 +132,8 @@ getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 ## PI.
 export COUNTFILE=J.pi.count.bed
-export BWPLUS=/usr/projects/GROseq/CD4/Alignments/J-PI_plus.bw
-export BWMINUS=/usr/projects/GROseq/CD4/Alignments/J-PI_minus.bw
+export BWPLUS=/local/storage/projects/CD4/Alignments/J-PI_plus.bw
+export BWMINUS=/local/storage/projects/CD4/Alignments/J-PI_minus.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
@@ -213,24 +213,24 @@ getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 ## Other cell types.
 export COUNTFILE=K562.count.bed
-export BWPLUS=/usr/data/GROseq.parser/hg19/k562/proseq/K562_unt.sort.bed.gz_plus.bw
-export BWMINUS=/usr/data/GROseq.parser/hg19/k562/proseq/K562_unt.sort.bed.gz_minus.bw
+export BWPLUS=/local/storage/data/hg19/k562/proseq/K562_unt.sort.bed.gz_plus.bw
+export BWMINUS=/local/storage/data/hg19/k562/proseq/K562_unt.sort.bed.gz_minus.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=GM12878.groseq.bed
-export BWPLUS=/usr/data/GROseq.parser/hg19/gm12878/groseq/groseq_plus.bigWig
-export BWMINUS=/usr/data/GROseq.parser/hg19/gm12878/groseq/groseq_minus.bigWig
+export BWPLUS=/local/storage/data/hg19/gm12878/groseq/groseq_plus.bigWig
+export BWMINUS=/local/storage/data/hg19/gm12878/groseq/groseq_minus.bigWig
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=IMR90.groseq.bed
-export BWPLUS=/usr/data/GROseq.parser/hg19/imr90/groseq/groseq_plus.bigWig
-export BWMINUS=/usr/data/GROseq.parser/hg19/imr90/groseq/groseq_minus.bigWig
+export BWPLUS=/local/storage/data/hg19/imr90/groseq/groseq_plus.bigWig
+export BWMINUS=/local/storage/data/hg19/imr90/groseq/groseq_minus.bigWig
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE

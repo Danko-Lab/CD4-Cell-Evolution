@@ -17,16 +17,15 @@ MMpi <- load.bigWig(paste(DATA_PATH, "M-PI_minus.hg19.rpkm.bw", sep=""))
 
 doit <- function(bed, HP, HM, CP, CM, MP, MM, stp, halfWindow, ...) {
 	bed <- bed[grep("Un|random", bed$V1, invert=TRUE),]
-	bed_rev <- bed; bed_rev[bed[,6] == "+",6] <- "-"; bed_rev[bed[,6] == "-",6] <- "+"
 
 	H_meta_p <- metaprofile.bigWig(bed, HP, HM, step=stp)
-	H_meta_m <- metaprofile.bigWig(bed_rev, HP, HM, step=stp)
+	H_meta_m <- metaprofile.bigWig(bed, HM, HP, step=stp)
 
         C_meta_p <- metaprofile.bigWig(bed, CP, CM, step=stp)
-        C_meta_m <- metaprofile.bigWig(bed_rev, CP, CM, step=stp)
+        C_meta_m <- metaprofile.bigWig(bed, CM, CP, step=stp)
 
         M_meta_p <- metaprofile.bigWig(bed, MP, MM, step=stp)
-        M_meta_m <- metaprofile.bigWig(bed_rev, MP, MM, step=stp)
+        M_meta_m <- metaprofile.bigWig(bed, MM, MP, step=stp)
 
         N = length(H_meta_p$middle)
         x = 1:N*stp ## ((1:N) - N/2)* stp
@@ -46,12 +45,14 @@ doit <- function(bed, HP, HM, CP, CM, MP, MM, stp, halfWindow, ...) {
 
 stp=100; halfWindow= 2500
 
+pdf("Myc.Meta.pdf")
+
 bed <- center.bed(read.table("myc.bed.gz"), upstreamWindow=halfWindow, downstreamWindow=halfWindow)
 doit(bed, HP, HM, CP, CM, MP, MM, stp=stp, halfWindow=halfWindow)
 doit(bed, HPpi, HMpi, CPpi, CMpi, MPpi, MMpi, stp=stp, halfWindow=halfWindow)
 
 bed <- center.bed(read.table("HMBOX.bed.gz"), upstreamWindow=halfWindow, downstreamWindow=halfWindow)
-doit(bed, stp=stp, halfWindow=halfWindow)
+doit(bed, HP, HM, CP, CM, MP, MM, stp=stp, halfWindow=halfWindow)
 doit(bed, HPpi, HMpi, CPpi, CMpi, MPpi, MMpi, stp=stp, halfWindow=halfWindow)
 
 gc <- fiveprime.bed(read.table("../annotations/gencode.v18.transcript.tsv"), upstreamWindow=halfWindow, downstreamWindow=halfWindow)
@@ -59,3 +60,4 @@ gc <- gc[sample(which(gc$V7 == "protein_coding"), 500),]
 doit(gc, HP, HM, CP, CM, MP, MM, stp=stp, halfWindow=halfWindow)
 doit(gc, HPpi, HMpi, CPpi, CMpi, MPpi, MMpi, stp=stp, halfWindow=halfWindow)
 
+dev.off()

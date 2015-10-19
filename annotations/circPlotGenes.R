@@ -64,3 +64,15 @@ cd.circplot(rpkm_df[ca$name == "chr18_56338250_56435300", ], snU)
 
 
 cd.circplot(rpkm_df[ca$name == "chr15_67356550_67513750",],snU)
+
+## CXCR4
+cd.circplot(rpkm_df[ca$name == "chr2_136862150_136897250"], snU)
+
+## Candidates for Post-Transcriptional Regulation
+pdf("/home/cgd24/work/evol_rnaseq/PrimaryTXN.pdf")
+cd.circplot(rpkm_df[ca$name == "chr7_148844000_148892549",1:8], snU[1:8])
+cd.circplot(rpkm_df[ca$name == "chr1_47799400_47884950",1:8], snU[1:8])
+cd.circplot(rpkm_df[ca$name == "chr2_232570750_232585500",1:8], snU[1:8])
+dev.off()
+
+

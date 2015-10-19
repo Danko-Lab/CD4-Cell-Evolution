@@ -9,16 +9,26 @@ gap <- read.table("genes.inGap")[!is.na(ca[,11]),] ## Read gap data.
 ca <- ca[!is.na(ca[,11]),]
 
 ## Get pause counts.
-ps <- read.table("countpause.tsv")
-ps[,7] <- paste(ps[,7],"_PauseSite", sep="")
-ps <- cbind(ps[,1:9], "ps", ps[,10:NCOL(ps)])
-colnames(ps) <- colnames(ca)
+#ps <- read.table("countpause.tsv")
+#ps[,7] <- paste(ps[,7],"_PauseSite", sep="")
+#ps <- cbind(ps[,1:9], "ps", ps[,10:NCOL(ps)])
+#colnames(ps) <- colnames(ca)
 
 ## Get dREG counts.
 ts <- read.table("counttss.tsv")
 ts[,5] <- rowMax(ts[7:12])
-ts <- cbind(ts[,1:6], ts[,13],  ts[,c(4,14:NCOL(ts))])
-ts <- cbind(ts[,1:9], "tss", ts[,10:NCOL(ts)])
+
+## Rough classes...
+stab <- rowMax(ts[,17:18])
+dist <- ts[,13]
+
+class <- rep("tss", NROW(ts)) ## tss is then unclassified as a promoter or enhancer
+class[stab < 0.1 & dist < 500]  <- "Prox_Stab" ## Clearly protein coding promoter
+class[stab > 0.1  & dist > 10000] <- "Dist_UnSt" ## Clearly distal enhancer
+summary(as.factor(class))
+
+ts <- cbind(ts[,1:6], class, ts[,c(4,20,19,21:NCOL(ts))])
+#ts <- cbind(ts[,1:9], "tss", ts[,10:NCOL(ts)])
 colnames(ts) <- colnames(ca)
 
 ## Join em
@@ -51,7 +61,7 @@ Labels <- c("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA",
                                                 "K562", "B-cell", "IMR90")
 
 ## Cleanup...
-ca <- ca[!is.na(ca[,11]),]
+ca <- ca[!is.na(ca[,11]),] ## Removes those which are not mappable/ orthologues in at least one species.
 ca <- ca[grep("random", ca$chrom, invert=TRUE),]
 
 
