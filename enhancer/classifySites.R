@@ -1,5 +1,3 @@
-#!/usr/bin/bash
-
 ## Classifies sites as either (1) Promoter == proximal, stable.
 ##            :OR:            (2) Enhancer == distal (>10kb), unstable.
 
@@ -11,13 +9,33 @@ tss <- read.table("../tss_caller/HCM-U-PI.dREG-tss-clusters.tsv")
 
 ## Classify sites as stable or unstable ... based on hg19.
 require(stabilityHMM)
+require(twoBit)
+require(rqhmm)
 
-source("../lib/hmm.ss5.pa.common.R", chdir=TRUE)
+hg19 <- "~/storage/data/hg19/hg19.2bit"
 seqLen= 1000
 
-tss_hg19 <- read.table("curated_tss.bed")
-dna_hg19 <- make.ss5.pA.hmm.data(collect.sequence(hg19, tss_hg19, seq.length = seqLen))
-stabScore <- unstable.score(hmm= res, data= dna_hg19, n.threads = 1)
+seqs <- collectSequences(hg19, tss, seq.length = seqLen)
+mData <- prepareData(seqs)
+pl_Scores <- unstableScore(mData)
+#modelPathSummary(mData)
+
 
 ## Then classify sites as proximal/ distal based on RefGene annotations (don't want enhancer TU in the annotations).
 
+
+## Sanity check.
+refGene <- read.table("~/tmp/refGene.hg19.chr21.bed.gz")
+hg19 <- "~/storage/data/hg19/hg19.2bit"
+seqLen= 1000
+
+seqs <- collectSequences(hg19, refGene, seq.length = seqLen)
+mData <- prepareData(seqs)
+gene_Scores <- unstableScore(mData)
+
+hist(gene_Scores)
+
+## Get outliers.
+cbind(refGene, gene_Scores)[gene_Scores > 0.8,]
+
+## Checked by hand, they look like the real deal.
