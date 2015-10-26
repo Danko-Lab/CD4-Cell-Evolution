@@ -39,13 +39,13 @@ ca <- rbind(ca, ts)  ## Don't use pause sites here!! Analyze these separately.
 names(ca) <- c("chrom", "chromStart", "chromEnd", "name", "score", "strand", "type", "mgi", "mapSize", "annot_type",
                         "Jurkat", "Human 1", "Human 2", "Human 3", "Chimp 3", "Chimp 4", "Chimp 5", "R. Macaque 1", "R. Macaque 2", "R. Macaque 3",
                         "PI Jurkat ", "PI Human 1", "PI Human 2", "PI Human 3", "PI Chimp 3", "PI Chimp 4", "PI Chimp 5", "PI R. Macaque 1", "PI R. Macaque 2", "PI R. Macaque 3",
-                        "K562", "GM12878", "IMR90") #, "Mouse", "Rat")
+                        "K562", "GM12878", "IMR90", "Mouse", "Rat")
 Condition <- as.factor(c("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", 
                                                 "U", "U", "U", "U", "U", "U", "U", "U", "U", "U",
-                                                "PI", "PI", "PI", "PI", "PI", "PI", "PI", "PI", "PI", "PI", "U", "U", "U")) #, "U", "U"))
+                                                "PI", "PI", "PI", "PI", "PI", "PI", "PI", "PI", "PI", "PI", "U", "U", "U", "U", "U"))
 Species  <- as.factor(c("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", 
                                                 "Human", "Human", "Human", "Human", "Chimp", "Chimp", "Chimp", "RMacaque", "RMacaque", "RMacaque",
-                                                "Human", "Human", "Human", "Human", "Chimp", "Chimp", "Chimp", "RMacaque", "RMacaque", "RMacaque", "Human", "Human", "Human")) #, "Mouse", "Rat"))
+                                                "Human", "Human", "Human", "Human", "Chimp", "Chimp", "Chimp", "RMacaque", "RMacaque", "RMacaque", "Human", "Human", "Human", "Mouse", "Rat"))
 Labels <- c("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA",
                                                 "Jurkat u", "Human u", "Human u", "Human u", "Chimp u", "Chimp u", "Chimp u",  "Rhe Mac u", "Rhe Mac u", "Rhe Mac u",
                                                 expression(paste("Jurkat ", pi, sep="")),
@@ -58,7 +58,7 @@ Labels <- c("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA",
                                                 expression(paste("R Mac ", pi, sep="")),
                                                 expression(paste("R Mac ", pi, sep="")),
                                                 expression(paste("R Mac ", pi, sep="")),
-                                                "K562", "B-cell", "IMR90" )#, "Mouse u", "Rat u")
+                                                "K562", "B-cell", "IMR90" , "Mouse u", "Rat u")
 
 ## Cleanup...
 ca <- ca[!is.na(ca[,11]),] ## Removes those which are not mappable/ orthologues in at least one species.
@@ -66,9 +66,9 @@ ca <- ca[grep("random", ca$chrom, invert=TRUE),]
 
 
 ## Used for getting useful subsets of the data.
-indx.all <- c(11:33)## ALL
-indx.unt <- c(11:20,31:33)## ONLY UNTREATED.
-indx.good <- c(11:27,29:33) ## "Good?!"  Remove M1-PI
+indx.all <- c(11:35)## ALL
+indx.unt <- c(11:20,31:35)## ONLY UNTREATED.
+indx.good <- c(11:27,29:35) ## "Good?!"  Remove M1-PI
 
 # Get RPKM
 rpkm_df <- as.matrix(ca[,indx.good]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI

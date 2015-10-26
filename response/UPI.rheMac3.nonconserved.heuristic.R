@@ -13,7 +13,9 @@ summary(isresp)
 ## Take anything that's changed in human, not in rhesus or chimp.
 MAXNEG <- 0.5
 isrhespec <- fdr_df$U2PIFDR_M < PVAL & (fdr_df$U2PIFDR_C > MAXNEG & fdr_df$U2PIFDR_H > MAXNEG)
+isrheloss <- fdr_df$U2PIFDR_M > MAXNEG & (fdr_df$U2PIFDR_C < PVAL & fdr_df$U2PIFDR_H < PVAL)
 summary(isrhespec)
+summary(isrheloss)
 
 pdf("RMacaque.Differences_In_Induction.pdf")
  ## Sanity checks...
@@ -27,15 +29,17 @@ pdf("RMacaque.Differences_In_Induction.pdf")
 
  plot(fdr_df$U2PIFC_M[isresp] ~ rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")])[isresp], pch=19, xlab="Mean Human-Chimp", ylab="R. Macaque")
  points(fdr_df$U2PIFC_M[isrhespec] ~ rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")])[isrhespec], pch=19, col="red")
+ points(fdr_df$U2PIFC_M[isrheloss] ~ rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")])[isrheloss], pch=19, col="blue")
  abline(h=0); abline(v=0)
 
  ## Add labels.
 dev.off()
 
 ## Write out REs for Zhong.
-write.table(fdr_df[isrhespec & (fdr_df$annot_type=="dREG_ENH" | fdr_df$annot_type=="dREG_INGENE" | fdr_df$annot_type=="dREG_TSS"),], "RMacaque.IndChange.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
-write.table(fdr_df[isrhespec & fdr_df$U2PIFC_M < 0 & (fdr_df$annot_type=="dREG_ENH" | fdr_df$annot_type=="dREG_INGENE" | fdr_df$annot_type=="dREG_TSS"),], "RMacaque.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
-write.table(fdr_df[isrhespec & fdr_df$U2PIFC_M > 0 & (fdr_df$annot_type=="dREG_ENH" | fdr_df$annot_type=="dREG_INGENE" | fdr_df$annot_type=="dREG_TSS"),], "RMacaque.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+istss <- (fdr_df$annot_type=="dREG_ENH" | fdr_df$annot_type=="dREG_INGENE" | fdr_df$annot_type=="dREG_TSS")
+write.table(fdr_df[isrhespec & istss,], "RMacaque.IndChange.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(fdr_df[((isrhespec & fdr_df$U2PIFC_M < 0) | (isrheloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")]) < 0)) & istss,], "RMacaque.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(fdr_df[((isrhespec & fdr_df$U2PIFC_M > 0) | (isrheloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")]) > 0)) & istss,], "RMacaque.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 
 #################

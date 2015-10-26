@@ -40,6 +40,8 @@ getLoopNearby <- function(prefix="H", column=21, post_pro= ".change-U.tsv", post
 
  as <- read.table(paste("../annotations/chage_expr/",prefix,post_enh, sep="")) ## post_enh b/c usually want regardless of change.
  as <- as[as$V7 == "ups_antisense", ]
+ as[,2] <- as[,2] - 1000 ## Look nearby ... up to 1kb.
+ as[,3] <- as[,3] + 1000
 
  ## Find out which loops intersect.
  enh_pro_change <- NULL

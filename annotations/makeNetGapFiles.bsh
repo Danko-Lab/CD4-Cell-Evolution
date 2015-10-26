@@ -4,6 +4,8 @@ rm *.tmp
 export GENCODE_TSV=transcriptionUnits.tsv
 export CHIMP_NET=panTro4_net_rbest     # netPanTro4
 export RHESUS_NET=rheMac3_net_rbest    # netRheMac3
+export MOUSE_NET=mm10_net_rbest
+export RAT_NET=rn6_net_rbest
 
 export PROM=250 ## 1000
 export MAXLEN=60000 ## Max length in base pairs.
@@ -47,12 +49,16 @@ function makeOrthoAnnot {
 ####
 ## Make GAPS
 export NET=$CHIMP_NET
-#makeOrthoAnnot
+makeOrthoAnnot
 export NET=$RHESUS_NET
-#makeOrthoAnnot
+makeOrthoAnnot
+export NET=$RAT_NET
+makeOrthoAnnot
+export NET=$MOUSE_NET
+makeOrthoAnnot
 
 ## Combine gaps and mappability loci in hg19 coordinates.
-bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save $NOMAPLOCI > gapMerge
+bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save $MOUSE_NET.gapMerge.save $RAT_NET.gapMerge.save $NOMAPLOCI > gapMerge
 #rm *.save
 
 ######################################

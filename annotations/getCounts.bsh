@@ -253,21 +253,21 @@ getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 ## Mouse and rat.
-#export COUNTFILE=mouse.count.bed
-#export BWPLUS=/local/storage/projects/evol_stability/data/CD4_Mouse_plus.bw
-#export BWMINUS=/local/storage/projects/evol_stability/data/CD4_Mouse_minus.bw
-#getCounts $GENEBODIES $INCREMENTS $COUNTALL
-#getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
-##getPauseCounts $PAUSESITES $COUNTPAUSE
-#getCounts $TSSSITES $TSSINCR $COUNTTSS
-#
-#export COUNTFILE=rat.groseq.bed
-#export BWPLUS=/local/storage/projects/evol_stability/data/CD4_Rat_plus.bw
-#export BWMINUS=/local/storage/projects/evol_stability/data/CD4_Rat_minus.bw
-#getCounts $GENEBODIES $INCREMENTS $COUNTALL
-#getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
-##getPauseCounts $PAUSESITES $COUNTPAUSE
-#getCounts $TSSSITES $TSSINCR $COUNTTSS
+export COUNTFILE=mouse.count.bed
+export BWPLUS=/local/storage/projects/evol_stability/data/CD4_Mouse_plus.hg19.bw
+export BWMINUS=/local/storage/projects/evol_stability/data/CD4_Mouse_minus.hg19.bw
+getCounts $GENEBODIES $INCREMENTS $COUNTALL
+getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
+#getPauseCounts $PAUSESITES $COUNTPAUSE
+getCounts $TSSSITES $TSSINCR $COUNTTSS
+
+export COUNTFILE=rat.groseq.bed
+export BWPLUS=/local/storage/projects/evol_stability/data/CD4_Rat_plus.hg19.bw
+export BWMINUS=/local/storage/projects/evol_stability/data/CD4_Rat_minus.hg19.bw
+getCounts $GENEBODIES $INCREMENTS $COUNTALL
+getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
+#getPauseCounts $PAUSESITES $COUNTPAUSE
+getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 
 

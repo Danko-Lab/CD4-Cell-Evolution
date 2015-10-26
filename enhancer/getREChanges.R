@@ -37,6 +37,13 @@ indx_rheMac3_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V9 < 0.1 & tss$V
 
 write.table(tss[indx_rheMac3_gain | indx_rheMac3_loss,], "rheMac3.gain.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
+              ##     1:1 ortholog,  mappable,             complete gain/ loss,                            gain/ loss in magnitude.
+indx_panTro4_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V8 > 0.7 & tss$V9 < 0.1 & tss$V7 < 0.1) | (tss$ChimpFDR < 0.05 & tss$ChimpFC > 0))
+indx_panTro4_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V8 < 0.1 & tss$V9 > 0.7 & tss$V7 > 0.7) | (tss$ChimpFDR < 0.05 & tss$ChimpFC < 0))
+
+write.table(tss[indx_panTro4_gain | indx_panTro4_loss,], "panTro4.gain.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+
+
 
 ## Data playtime!
 
