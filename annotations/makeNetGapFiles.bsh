@@ -58,7 +58,8 @@ export NET=$MOUSE_NET
 makeOrthoAnnot
 
 ## Combine gaps and mappability loci in hg19 coordinates.
-bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save $MOUSE_NET.gapMerge.save $RAT_NET.gapMerge.save $NOMAPLOCI > gapMerge
+##bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save $MOUSE_NET.gapMerge.save $RAT_NET.gapMerge.save $NOMAPLOCI > gapMerge
+bedops --merge $CHIMP_NET.gapMerge.save $RHESUS_NET.gapMerge.save $NOMAPLOCI > gapMerge ## Excluding mouse/rat nets (most analyses).
 #rm *.save
 
 ######################################
