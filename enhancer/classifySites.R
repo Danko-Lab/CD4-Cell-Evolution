@@ -19,6 +19,17 @@ tss_centers_minus[,6] <- rep("-")
 require(stabilityHMM)
 require(twoBit)
 require(rqhmm)
+<<<<<<< HEAD
+
+hg19 <- "~/storage/data/hg19/hg19.2bit"
+seqLen= 1000
+
+seqs <- collectSequences(hg19, tss, seq.length = seqLen)
+mData <- prepareData(seqs)
+pl_Scores <- unstableScore(mData)
+#modelPathSummary(mData)
+
+=======
 
 hg19 <- "/local/storage/data/hg19/hg19.2bit"
 seqLen= 400
@@ -34,6 +45,7 @@ seqs <- collectSequences(hg19, tss_centers_minus, seq.length = seqLen)
 mData <- prepareData(seqs)
 mn_Scores <- unstableScore(mData)
 #modelPathSummary(mData)
+>>>>>>> d5c0702fe42f1d98ce3524d8d0a2a20b91cb71a9
 
 ## Then classify sites as proximal/ distal based on RefGene annotations (don't want enhancer TU in the annotations).
 stab_tss <- cbind(tss, tss_centers[,1:3], pl_Scores, mn_Scores)
@@ -73,3 +85,19 @@ densScatterplot(stab_tss[stable_prox,7]-stab_tss[stable_prox,9], stab_tss[stable
 densScatterplot(stab_tss[unstable_dist,7]-stab_tss[unstable_dist,9], stab_tss[unstable_dist,7]-stab_tss[unstable_dist,10], xlab="species")
 
 
+
+## Sanity check.
+refGene <- read.table("~/tmp/refGene.hg19.chr21.bed.gz")
+hg19 <- "~/storage/data/hg19/hg19.2bit"
+seqLen= 1000
+
+seqs <- collectSequences(hg19, refGene, seq.length = seqLen)
+mData <- prepareData(seqs)
+gene_Scores <- unstableScore(mData)
+
+hist(gene_Scores)
+
+## Get outliers.
+cbind(refGene, gene_Scores)[gene_Scores > 0.8,]
+
+## Checked by hand, they look like the real deal.
