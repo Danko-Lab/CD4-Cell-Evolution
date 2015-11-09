@@ -11,9 +11,9 @@ isresp <- fdr_df$U2PIFDR_H < PVAL & fdr_df$U2PIFDR_C < PVAL & fdr_df$U2PIFDR_M <
 summary(isresp)
 
 ## Take anything that's changed in human, not in rhesus or chimp.
-MAXNEG <- 0.5
-isrhespec <- fdr_df$U2PIFDR_M < PVAL & (fdr_df$U2PIFDR_C > MAXNEG & fdr_df$U2PIFDR_H > MAXNEG)
-isrheloss <- fdr_df$U2PIFDR_M > MAXNEG & (fdr_df$U2PIFDR_C < PVAL & fdr_df$U2PIFDR_H < PVAL)
+MAXNEG <- 0.25
+isrhespec <- fdr_df$U2PIFDR_M < PVAL & (fdr_df$U2PIFDR_C > MAXNEG & fdr_df$U2PIFDR_H > MAXNEG) & abs(fdr_df$U2PIFC_M) > 1 & abs(fdr_df$U2PIFC_C) < 0.75 & abs(fdr_df$U2PIFC_H) < 0.75
+isrheloss <- fdr_df$U2PIFDR_M > MAXNEG & (fdr_df$U2PIFDR_C < PVAL & fdr_df$U2PIFDR_H < PVAL) & ((fdr_df$U2PIFC_H>1 & fdr_df$U2PIFC_C>1)|(fdr_df$U2PIFC_H< -1 & fdr_df$U2PIFC_C< -1)) & abs(fdr_df$U2PIFC_M) < 0.75
 summary(isrhespec)
 summary(isrheloss)
 
@@ -32,6 +32,11 @@ pdf("RMacaque.Differences_In_Induction.pdf")
  points(fdr_df$U2PIFC_M[isrheloss] ~ rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")])[isrheloss], pch=19, col="blue")
  abline(h=0); abline(v=0)
 
+ ## Check for bias in direction.
+ require(vioplot)
+ vioplot(rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")])[isresp & fdr_df$U2PIFC_M<0], rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")])[isresp & fdr_df$U2PIFC_M>0]); abline(h=0)
+ vioplot(rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")])[isrhespec & fdr_df$U2PIFC_M<0], rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")])[isrhespec & fdr_df$U2PIFC_M>0]); abline(h=0) ## There's some residual bias in direction.
+
  ## Add labels.
 dev.off()
 
@@ -41,5 +46,7 @@ write.table(fdr_df[isrhespec & istss,], "RMacaque.IndChange.bed", row.names=FALS
 write.table(fdr_df[((isrhespec & fdr_df$U2PIFC_M < 0) | (isrheloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")]) < 0)) & istss,], "RMacaque.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 write.table(fdr_df[((isrhespec & fdr_df$U2PIFC_M > 0) | (isrheloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")]) > 0)) & istss,], "RMacaque.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
+#write.table(fdr_df[((isrhespec & fdr_df$U2PIFC_M < 0)) & istss,], "RMacaque.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+#write.table(fdr_df[((isrhespec & fdr_df$U2PIFC_M > 0)) & istss,], "RMacaque.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 #################

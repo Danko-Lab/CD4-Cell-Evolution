@@ -29,9 +29,9 @@ dev.off()
 
 
 ## Take anything that's changed in human, not in rhesus or chimp.
-MAXNEG <- 0.5
-ishumspec <- fdr_df$U2PIFDR_H < PVAL & (fdr_df$U2PIFDR_C > MAXNEG & fdr_df$U2PIFDR_M > MAXNEG)
-ishumloss <- fdr_df$U2PIFDR_H > MAXNEG & (fdr_df$U2PIFDR_C < PVAL & fdr_df$U2PIFDR_M < PVAL)
+MAXNEG <- 0.25
+ishumspec <- fdr_df$U2PIFDR_H < PVAL & (fdr_df$U2PIFDR_C > MAXNEG & fdr_df$U2PIFDR_M > MAXNEG) & abs(fdr_df$U2PIFC_H) > 1 & abs(fdr_df$U2PIFC_C) < 0.75 & abs(fdr_df$U2PIFC_M) < 0.75
+ishumloss <- fdr_df$U2PIFDR_H > MAXNEG & (fdr_df$U2PIFDR_C < PVAL & fdr_df$U2PIFDR_M < PVAL) & ((fdr_df$U2PIFC_M>1 & fdr_df$U2PIFC_C>1)|(fdr_df$U2PIFC_M< -1 & fdr_df$U2PIFC_C< -1)) & abs(fdr_df$U2PIFC_H) < 0.75
 summary(ishumspec)
 summary(ishumloss)
 
@@ -59,6 +59,13 @@ write.table(fdr_df[ishumspec & istss,], "Human.IndChange.bed", row.names=FALSE, 
 write.table(fdr_df[((ishumspec & fdr_df$U2PIFC_H < 0) | (ishumloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_M")]) < 0)) & istss,], "Human.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 write.table(fdr_df[((ishumspec & fdr_df$U2PIFC_H > 0) | (ishumloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_M")]) > 0)) & istss,], "Human.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
+#write.table(fdr_df[(ishumspec & fdr_df$U2PIFC_H < 0) & istss,], "Human.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+#write.table(fdr_df[(ishumspec & fdr_df$U2PIFC_H > 0) & istss,], "Human.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+
+
+## Write out all TSS that increase in human following PI...
+
+write.table(fdr_df[(fdr_df$U2PIFDR_H < 0.05 & fdr_df$U2PIFC_H < 0 & (fdr_df$annot_type=="dREG_ENH" | fdr_df$annot_type=="dREG_INGENE" | fdr_df$annot_type=="dREG_TSS")),], "Human.Any.Change.tss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 #################
 ## EXPERIMENTAL
