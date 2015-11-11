@@ -27,13 +27,14 @@ pdf("foldchange.correlations.pdf")
 
 dev.off()
 
+istss <- fdr_df$annot_type=="dREG_ENH" | fdr_df$annot_type=="dREG_INGENE" | fdr_df$annot_type=="dREG_TSS"
 
 ## Take anything that's changed in human, not in rhesus or chimp.
 MAXNEG <- 0.25
 ishumspec <- fdr_df$U2PIFDR_H < PVAL & (fdr_df$U2PIFDR_C > MAXNEG & fdr_df$U2PIFDR_M > MAXNEG) & abs(fdr_df$U2PIFC_H) > 1 & abs(fdr_df$U2PIFC_C) < 0.75 & abs(fdr_df$U2PIFC_M) < 0.75
 ishumloss <- fdr_df$U2PIFDR_H > MAXNEG & (fdr_df$U2PIFDR_C < PVAL & fdr_df$U2PIFDR_M < PVAL) & ((fdr_df$U2PIFC_M>1 & fdr_df$U2PIFC_C>1)|(fdr_df$U2PIFC_M< -1 & fdr_df$U2PIFC_C< -1)) & abs(fdr_df$U2PIFC_H) < 0.75
-summary(ishumspec)
-summary(ishumloss)
+summary(ishumspec & istss)
+summary(ishumloss & istss)
 
 pdf("Human.Differences_In_Induction.pdf")
  ## Sanity checks...
@@ -53,11 +54,17 @@ pdf("Human.Differences_In_Induction.pdf")
  ## Add labels.
 dev.off()
 
+fdr_df$score <- fdr_df$U2PIFC_H - rowMeans(fdr_df[,c("U2PIFC_M", "U2PIFC_C")])
+
 ## Write out REs for Zhong.
 istss <- fdr_df$annot_type=="dREG_ENH" | fdr_df$annot_type=="dREG_INGENE" | fdr_df$annot_type=="dREG_TSS"
-write.table(fdr_df[ishumspec & istss,], "Human.IndChange.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
-write.table(fdr_df[((ishumspec & fdr_df$U2PIFC_H < 0) | (ishumloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_M")]) < 0)) & istss,], "Human.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
-write.table(fdr_df[((ishumspec & fdr_df$U2PIFC_H > 0) | (ishumloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_M")]) > 0)) & istss,], "Human.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+#write.table(fdr_df[ishumspec & istss,], "Human.IndChange.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(fdr_df[((ishumspec & fdr_df$U2PIFC_H < 0)) & istss,c(1:6)], "Human.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(fdr_df[((ishumloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_M")]) < 0)) & istss,c(1:6)], "Human.looseActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+
+write.table(fdr_df[((ishumspec & fdr_df$U2PIFC_H > 0)) & istss,c(1:6)], "Human.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(fdr_df[((ishumloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_M")]) > 0)) & istss,c(1:6)], "Human.looseSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+
 
 #write.table(fdr_df[(ishumspec & fdr_df$U2PIFC_H < 0) & istss,], "Human.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 #write.table(fdr_df[(ishumspec & fdr_df$U2PIFC_H > 0) & istss,], "Human.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")

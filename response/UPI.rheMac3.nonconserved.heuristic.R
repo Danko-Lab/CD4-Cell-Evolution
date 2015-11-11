@@ -40,11 +40,17 @@ pdf("RMacaque.Differences_In_Induction.pdf")
  ## Add labels.
 dev.off()
 
+fdr_df$score <- fdr_df$U2PIFC_M - rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")])
+
 ## Write out REs for Zhong.
 istss <- (fdr_df$annot_type=="dREG_ENH" | fdr_df$annot_type=="dREG_INGENE" | fdr_df$annot_type=="dREG_TSS")
-write.table(fdr_df[isrhespec & istss,], "RMacaque.IndChange.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
-write.table(fdr_df[((isrhespec & fdr_df$U2PIFC_M < 0) | (isrheloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")]) < 0)) & istss,], "RMacaque.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
-write.table(fdr_df[((isrhespec & fdr_df$U2PIFC_M > 0) | (isrheloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")]) > 0)) & istss,], "RMacaque.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+#write.table(fdr_df[isrhespec & istss,], "RMacaque.IndChange.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+
+write.table(fdr_df[((isrhespec & fdr_df$U2PIFC_M < 0)) & istss,c(1:6)], "RMacaque.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(fdr_df[((isrheloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")]) < 0)) & istss,c(1:6)], "RMacaque.looseActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+
+write.table(fdr_df[((isrhespec & fdr_df$U2PIFC_M > 0)) & istss,c(1:6)], "RMacaque.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(fdr_df[((isrheloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_H")]) > 0)) & istss,c(1:6)], "RMacaque.looseSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 #write.table(fdr_df[((isrhespec & fdr_df$U2PIFC_M < 0)) & istss,], "RMacaque.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 #write.table(fdr_df[((isrhespec & fdr_df$U2PIFC_M > 0)) & istss,], "RMacaque.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
