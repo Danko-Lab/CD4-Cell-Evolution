@@ -79,6 +79,7 @@ done
 zcat $MERGE/H-*.TSS.bed.gz $MERGE/C-*.TSS_hg19.bed.gz $MERGE/M-*.TSS_hg19.bed.gz | sort-bed - | bedops --merge - |
 	 perl ~/perl/bed_merge.pl $CLUST_SIZE | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,($1"_"$2"_"$3),0,"."}' > tmp.bed
 
+
 ## Get the max score for H, C, and M.
 zcat H-U.TSS.bedGraph.gz      | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > Hu.tmp
 zcat C-U.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.bed - > Cu.tmp
@@ -90,4 +91,25 @@ zcat M-PI.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' |
 ## Paste sites together. 
 paste tmp.bed Hu.tmp Cu.tmp Mu.tmp Hp.tmp Cp.tmp Mp.tmp | sed "s/NAN/NA/g" | sed "s/\s+\s/\t.\t/g" > HCM-U-PI.dREG-tss-clusters.tsv
 rm *.tmp tmp.bed
+
+
+####
+## Now add files that include MOUSE and RAT.
+
+zcat $MERGE/H-*.TSS.bed.gz $MERGE/C-*.TSS_hg19.bed.gz $MERGE/M-*.TSS_hg19.bed.gz $MERGE/Mouse-*.TSS_hg19.bed.gz $MERGE/Rat-*.TSS_hg19.bed.gz | sort-bed - | bedops --merge - |
+         perl ~/perl/bed_merge.pl $CLUST_SIZE | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,($1"_"$2"_"$3),0,"."}' > tmp.mr.bed
+
+## Get the max score for Human, Chimp, R. Macaque, Mouse, and Rat.
+zcat H-U.TSS.bedGraph.gz      | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Hu.tmp
+zcat C-U.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Cu.tmp
+zcat M-U.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Mu.tmp
+zcat Mouse-U.TSS.hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Mouseu.tmp
+zcat Rat-U.TSS.hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Ratu.tmp
+zcat H-PI.TSS.bedGraph.gz      | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Hp.tmp
+zcat C-PI.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Cp.tmp
+zcat M-PI.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Mp.tmp
+
+## Paste sites together. 
+paste tmp.mr.bed Hu.tmp Cu.tmp Mu.tmp Mouseu.tmp Ratu.tmp Hp.tmp Cp.tmp Mp.tmp | sed "s/NAN/NA/g" | sed "s/\s+\s/\t.\t/g" > HCMmr-U-PI.dREG-tss-clusters.tsv
+rm *.tmp tmp.mr.bed
 

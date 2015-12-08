@@ -9,7 +9,8 @@ source("../../lib/getOverlap.R")
 bed <- read.table("tfbs.merge.bed") # dREG_HD.merge.bed")#/local/storage/projects/NHP/dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed")
 
 ## Read in MAFs
-con <- load.bigWig("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw")
+con <- load.bigWig("/local/storage/data/hg19/all/phylopprimate/chr1.phyloP46way.bw")
+#con <- load.bigWig("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw")
 
 ## Get mean conservation for each h_bed.
 mean_con <- bed.region.bpQuery.bigWig(con, bed[,1:3], op="max")# op="avg")
@@ -45,19 +46,59 @@ pdf("ChangeOverDistance.pdf")
 dev.off()
 
 ########################
+## Superenhancer.
+vioplot(mean_con[bed[,7]>0], mean_con[bed$V7==0])
+
+summary(mean_con[bed[,7]>0])
+summary(mean_con[bed$V7==0])
+
+pdf("DNASequence.phyloP.Conservation.pdf")
+ ld<- 3; xlim_s=c(-1, 0.8) #c(-1,6)
+
+ plot(ecdf(mean_con[bed[,7]>0]), col="#00A63E", xlim=xlim_s, lwd=ld)
+ plot(ecdf(mean_con[bed[,7]==0]), col="black", add=TRUE, lwd=ld)
+ plot(ecdf(mean_con[rowSums(bed[,c(5:6)])>0]), col="#b70000", add=TRUE, lwd=ld)
+
+ ## 1-10k
+ indx <- bed$V4 < 10000
+ plot(ecdf(mean_con[bed[,7]>0 & indx]), col="#00A63E", xlim=xlim_s, lwd=ld)
+ plot(ecdf(mean_con[bed[,7]==0 & indx]), col="black", add=TRUE, lwd=ld)
+ plot(ecdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx]), col="#b70000", add=TRUE, lwd=ld)
+
+ ## 10-100k
+ indx <- bed$V4 < 100000 & bed$V4 > 10000
+ plot(ecdf(mean_con[bed[,7]>0 & indx]), col="#00A63E", xlim=xlim_s, lwd=ld)
+ plot(ecdf(mean_con[bed[,7]==0 & indx]), col="black", add=TRUE, lwd=ld)
+ plot(ecdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx]), col="#b70000", add=TRUE, lwd=ld)
+
+ ## 100-1,000k
+ indx <- bed$V4 < 1000000 & bed$V4 > 100000
+ plot(ecdf(mean_con[bed[,7]==0 & indx]), col="black", xlim=xlim_s, lwd=ld)
+ plot(ecdf(mean_con[bed[,7]>0 & indx]), col="#00A63E", add=TRUE, lwd=ld)
+ plot(ecdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx]), col="#b70000", add=TRUE, lwd=ld)
+
+dev.off()
+
+########################
 ## Add loop information.
 vioplot(mean_con[rowSums(bed[,c(5:6)])>0], mean_con[rowSums(bed[,c(5:6)])==0])
 
 summary(mean_con[rowSums(bed[,c(5:6)])>0])
 summary(mean_con[rowSums(bed[,c(5:6)])==0])
 
-plot(ecdf(mean_con[rowSums(bed[,c(5:6)])>0]), col="red", xlim=c(-1,6))
+plot(ecdf(mean_con[rowSums(bed[,c(5:6)])>0]), col="red", xlim=xlim_s)
 plot(ecdf(mean_con[rowSums(bed[,c(5:6)])==0]), col="black", add=TRUE)
 
 wt<- wilcox.test(mean_con[rowSums(bed[,c(5:6)])>0], mean_con[rowSums(bed[,c(5:6)])==0])
 wt; wt$p.value
 
 ks<- ks.test(mean_con[rowSums(bed[,c(5:6)])>0], mean_con[rowSums(bed[,c(5:6)])==0])
+ks; ks$p.value
+
+wt<- wilcox.test(mean_con[bed[,7]>0], mean_con[bed[,7]==0])
+wt; wt$p.value
+
+ks<- ks.test(mean_con[bed[,7]>0], mean_con[bed[,7]==0])
 ks; ks$p.value
 
 ######################################################

@@ -8,7 +8,9 @@ load("../annotations/fdr.RData")
 
 ## Index extent of changes.
 isresp <- fdr_df$U2PIFDR_H < PVAL & fdr_df$U2PIFDR_C < PVAL & fdr_df$U2PIFDR_M < PVAL ## Clearly responding in any of the three.
+noresp <- fdr_df$U2PIFDR_H > 0.5 & fdr_df$U2PIFDR_C > 0.5 & fdr_df$U2PIFDR_M > 0.5 & abs(fdr_df$U2PIFC_H) < 0.25 & abs(fdr_df$U2PIFC_C) < 0.25 & abs(fdr_df$U2PIFC_M) < 0.25
 summary(isresp)
+summary(noresp)
 
 pdf("foldchange.correlations.pdf")
 
@@ -65,6 +67,11 @@ write.table(fdr_df[((ishumloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_M")]) < 
 write.table(fdr_df[((ishumspec & fdr_df$U2PIFC_H > 0)) & istss,c(1:6)], "Human.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 write.table(fdr_df[((ishumloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_M")]) > 0)) & istss,c(1:6)], "Human.looseSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
+## Write out background sets.
+fdr_df$score <- fdr_df$U2PIFC
+
+write.table(fdr_df[isresp & istss, c(1:6)], "all.conservedActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(fdr_df[noresp & istss, c(1:6)], "all.noActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 #write.table(fdr_df[(ishumspec & fdr_df$U2PIFC_H < 0) & istss,], "Human.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 #write.table(fdr_df[(ishumspec & fdr_df$U2PIFC_H > 0) & istss,], "Human.gainSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")

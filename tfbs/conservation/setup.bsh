@@ -5,9 +5,8 @@ cat /local/storage/projects/NHP/dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed | sort-be
 featureBits -bed=refGene.exons.bed hg19 refGene:exon
 
 ## Reduce to high-confidence TFBS.
-unstarch ../tf.u.hg19.bed.starch | awk '($5 > 8 && $1 == "chr1") {print $0}' | bedops --intersect - dREG_HD.merge.bed | bedops -n 1 - refGene.exons.bed > tfbs.merge.bed
-
 CMPBED=tfbs.merge.bed ## dREG_HD.merge.bed
+unstarch ../tf.u.hg19.bed.starch | awk '($5 > 8 && $1 == "chr1") {print $0}' | bedops --intersect - dREG_HD.merge.bed | bedops -n 1 - refGene.exons.bed > $CMPBED
 
 ###################################
 ## Get enhancer-gene distances.
