@@ -1,8 +1,10 @@
 ## Classifies sites as either (1) Promoter == proximal, stable.
 ##            :OR:            (2) Enhancer == distal (>10kb), unstable.
 
+doClassification <- function(prefix) {
+
 ## Get the location of sites.
-tss <- read.table("HCM-U-PI.dREG-tss-clusters.dist.tsv")
+tss <- read.table(paste(prefix, "-U-PI.dREG-tss-clusters.dist.tsv", sep=""))
 tss <- tss[grep("chrUn|random", tss$V1, invert=TRUE),]
 
 ## Reposition to -110bp from the highest site.
@@ -38,5 +40,9 @@ mn_Scores <- unstableScore(mData)
 ## Then classify sites as proximal/ distal based on RefGene annotations (don't want enhancer TU in the annotations).
 stab_tss <- cbind(tss, tss_centers[,1:3], pl_Scores, mn_Scores)
 
-write.table(stab_tss, "HCM-U-PI.dREG-tss-clusters.dist.stability.tsv", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(stab_tss, paste(prefix, "-U-PI.dREG-tss-clusters.dist.stability.tsv", sep=""), row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+}
+
+doClassification("HCM")
+doClassification("HCMmr")
 
