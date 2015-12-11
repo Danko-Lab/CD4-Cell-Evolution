@@ -33,6 +33,11 @@ hgsql CGhg19 -N -e "
     panTro4Diff.chromStart = rheMac3Diff.chromStart AND
     panTro4Diff.panTro4 != rheMac3Diff.rheMac3 limit 10" | sort-bed - | starch - > all.diff.bed.starch
 
+## Create panTro4 !rheMac3.  
+bedmap --echo --indicator panTro4.diff.bed.starch rheMac3.diff.bed.starch | grep "|0" | sed "s/|0//g" | starch - > panTro4.ls.diff.bed.starch
+bedmap --echo --indicator rheMac3.diff.bed.starch panTro4.diff.bed.starch | grep "|0" | sed "s/|0//g" | starch - > rheMac3.ls.diff.bed.starch
+ln -s hg19.diff.bed.starch hg19.ls.diff.bed.starch
+
 ## Descriptoin:
 #cdanko@nextgen:/usr/projects/GROseq/NHP/dna_sequence$ hgsql CGhg19 -N -e "describe panTro4Diff" 
 #+------------+------------------+-----+-----+------+--+

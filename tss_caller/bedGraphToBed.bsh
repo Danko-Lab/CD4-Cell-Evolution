@@ -110,6 +110,6 @@ zcat C-PI.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' |
 zcat M-PI.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Mp.tmp
 
 ## Paste sites together. 
-paste tmp.mr.bed Hu.tmp Cu.tmp Mu.tmp Mouseu.tmp Ratu.tmp Hp.tmp Cp.tmp Mp.tmp | sed "s/NAN/NA/g" | sed "s/\s+\s/\t.\t/g" > HCMmr-U-PI.dREG-tss-clusters.tsv
+paste tmp.mr.bed Hu.tmp Cu.tmp Mu.tmp Mouseu.tmp Ratu.tmp Hp.tmp | sed "s/NAN/NA/g" | sed "s/\s+\s/\t.\t/g" > HCMmr-U-PI.dREG-tss-clusters.tsv
 rm *.tmp tmp.mr.bed
 

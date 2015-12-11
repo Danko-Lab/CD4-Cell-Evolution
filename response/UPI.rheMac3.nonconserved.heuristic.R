@@ -12,8 +12,8 @@ summary(isresp)
 
 ## Take anything that's changed in human, not in rhesus or chimp.
 MAXNEG <- 0.25
-isrhespec <- fdr_df$U2PIFDR_M < PVAL & (fdr_df$U2PIFDR_C > MAXNEG & fdr_df$U2PIFDR_H > MAXNEG) & abs(fdr_df$U2PIFC_M) > 1 & abs(fdr_df$U2PIFC_C) < 0.75 & abs(fdr_df$U2PIFC_H) < 0.75
-isrheloss <- fdr_df$U2PIFDR_M > MAXNEG & (fdr_df$U2PIFDR_C < PVAL & fdr_df$U2PIFDR_H < PVAL) & ((fdr_df$U2PIFC_H>1 & fdr_df$U2PIFC_C>1)|(fdr_df$U2PIFC_H< -1 & fdr_df$U2PIFC_C< -1)) & abs(fdr_df$U2PIFC_M) < 0.75
+isrhespec <- fdr_df$U2PIFDR_M < PVAL & (fdr_df$U2PIFDR_C > MAXNEG & fdr_df$U2PIFDR_H > MAXNEG) & abs(fdr_df$U2PIFC_M) > 1 & abs(fdr_df$U2PIFC_C) < 0.5 & abs(fdr_df$U2PIFC_H) < 0.5
+isrheloss <- fdr_df$U2PIFDR_M > MAXNEG & (fdr_df$U2PIFDR_C < PVAL & fdr_df$U2PIFDR_H < PVAL) & ((fdr_df$U2PIFC_H>1 & fdr_df$U2PIFC_C>1)|(fdr_df$U2PIFC_H< -1 & fdr_df$U2PIFC_C< -1)) & abs(fdr_df$U2PIFC_M) < 0.5
 summary(isrhespec)
 summary(isrheloss)
 
