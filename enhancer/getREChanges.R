@@ -30,22 +30,72 @@ indx_hg19_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V7 > 0.7 & tss$V8 <
 indx_hg19_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V7 < 0.1 & tss$V8 > 0.7 & tss$V9 > 0.7) | (tss$HumanFDR < 0.05 & tss$HumanFC < 0))
 
 write.table(tss[indx_hg19_gain | indx_hg19_loss,], "hg19.gain.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(tss[indx_hg19_gain,], "hg19.gain.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(tss[indx_hg19_loss,], "hg19.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
               ##     1:1 ortholog,  mappable,             complete gain/ loss,                            gain/ loss in magnitude.
 indx_rheMac3_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V9 > 0.7 & tss$V8 < 0.1 & tss$V7 < 0.1) | (tss$MacaqueFDR < 0.05 & tss$MacaqueFC > 0))
 indx_rheMac3_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V9 < 0.1 & tss$V8 > 0.7 & tss$V7 > 0.7) | (tss$MacaqueFDR < 0.05 & tss$MacaqueFC < 0))
 
 write.table(tss[indx_rheMac3_gain | indx_rheMac3_loss,], "rheMac3.gain.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(tss[indx_rheMac3_gain,], "rheMac3.gain.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(tss[indx_rheMac3_loss,], "rheMac3.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
               ##     1:1 ortholog,  mappable,             complete gain/ loss,                            gain/ loss in magnitude.
 indx_panTro4_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V8 > 0.7 & tss$V9 < 0.1 & tss$V7 < 0.1) | (tss$ChimpFDR < 0.05 & tss$ChimpFC > 0))
 indx_panTro4_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V8 < 0.1 & tss$V9 > 0.7 & tss$V7 > 0.7) | (tss$ChimpFDR < 0.05 & tss$ChimpFC < 0))
 
 write.table(tss[indx_panTro4_gain | indx_panTro4_loss,], "panTro4.gain.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(tss[indx_panTro4_gain,], "panTro4.gain.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(tss[indx_panTro4_loss,], "panTro4.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+
+## Conserved in all species.
+indx <- tss$V20 == 0 & !is.na(tss$mapSize) & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7) & (tss$HumanFDR > 0.25 & tss$ChimpFDR > 0.25 & tss$MacaqueFDR > 0.25) & (tss$HumanFC < 0.5 & tss$ChimpFC < 0.5 & tss$MacaqueFC < 0.5)
+sum(indx) 
+
+write.table(tss[indx,], "all.conserved.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 
+## Validation in humans.
+require(bigWig)
+makePlot <- function(bed, mark, bwpath= "/local/storage/data/hg19/cd4/epiRoadmap_histone/", halfWindow= 5000, step= 25) {
+  bw <- load.bigWig(paste(bwpath, mark, ".bw", sep=""))
+  mp <- metaprofile.bigWig(center.bed(bed[,1:3], halfWindow, halfWindow), bw, step=step)
+  plot(mp)
+}
 
-## Data playtime!
+makePlot(tss[indx,], "H3K27ac")
+makePlot(tss[indx_hg19_gain,], "H3K27ac")
+makePlot(tss[indx_hg19_loss,], "H3K27ac") ## These include sites that are decreases.
+makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K27ac") ## Complete loss of dREG signal.
+
+makePlot(tss[indx,], "H3K27me3")
+makePlot(tss[indx_hg19_gain,], "H3K27me3")
+makePlot(tss[indx_hg19_loss,], "H3K27me3")
+makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K27me3")
+
+makePlot(tss[indx,], "H3K4me3")
+makePlot(tss[indx_hg19_gain,], "H3K4me3")
+makePlot(tss[indx_hg19_loss,], "H3K4me3")
+makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K4me3")
+
+makePlot(tss[indx,], "H3K4me1")
+makePlot(tss[indx_hg19_gain,], "H3K4me1")
+makePlot(tss[indx_hg19_loss,], "H3K4me1")
+makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K4me1")
+
+makePlot(tss[indx,], "MeDIP-Seq")
+makePlot(tss[indx_hg19_gain,], "MeDIP-Seq")
+makePlot(tss[indx_hg19_loss,], "MeDIP-Seq")
+makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "MeDIP-Seq")
+
+makeHeatmap <- function(bed, path, halfWindow=5000, step=25) {
+bw <- load.bigWig(paste("/local/storage/data/hg19/cd4/epiRoadmap_histone/H3K27ac.bw", sep="")) 
+hm <- bed.step.bpQuery.bigWig(bw, center.bed(tss[indx,1:3], 5000, 5000), step=25)
+hm_mat <- t(matrix(unlist(hm), NROW(hm[[1]])))
+}
+
+#2# Data playtime!
 
 ## 
 indx_hg19_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V7 > 0.7 & tss$V8 < 0.1 & tss$V9 < 0.1))

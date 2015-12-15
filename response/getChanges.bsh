@@ -1,0 +1,63 @@
+#!/usr/bin/bash
+featureBits hg19 ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed
+featureBits hg19 ../dREG_HD/H-U_dREG_HD.bed
+
+cd /local/storage/projects/NHP/tfbs
+
+function testDataset {
+ echo $1
+ echo $2
+ 
+ bedops --element-of 1 ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed $1 > tmp.dreg-hd.bed #../dREG_HD/H-U_dREG_HD.bed
+ unstarch ../tfbs/tf.u.hg19.bed.starch | grep "$2" | awk '($5 > 6) {print $0}' | bedops --element-of 1 - tmp.dreg-hd.bed | bedops --merge - > tmp.tfbs.bed ## tmp.bed ==> merged TFBS
+
+ echo "" 
+ echo "Number of dREG-HD sites:"
+ grep "" -c tmp.dreg-hd.bed
+ 
+ echo "Number of dREG-HD sites with 1 motif:"
+ bedops --element-of 1 tmp.dreg-hd.bed tmp.tfbs.bed | grep "" -c 
+
+ echo "Number of dREG-HD sites with 1 motif that has a SNP:"
+ bedops --element-of 1 tmp.tfbs.bed ../dna_sequence/$3.ls.diff.bed.starch | bedops --element-of 1 tmp.dreg-hd.bed - | grep "" -c 
+
+ rm tmp.tfbs.bed tmp.dreg-hd.bed 
+}
+
+testDataset ../response/Human.gainActivation.bed 'FOS\|JUN\|REL\|NFAT' hg19
+testDataset ../response/Human.looseActivation.bed 'FOS\|JUN\|REL\|NFAT' hg19
+testDataset ../response/all.conservedActivation.bed 'FOS\|JUN\|REL\|NFAT' hg19
+testDataset ../response/all.noActivation.bed 'FOS\|JUN\|REL\|NFAT' hg19
+
+testDataset ../response/Chimp.gainActivation.bed  'FOS\|JUN\|REL\|NFAT' panTro4
+testDataset ../response/Chimp.looseActivation.bed  'FOS\|JUN\|REL\|NFAT' panTro4
+testDataset ../response/all.conservedActivation.bed  'FOS\|JUN\|REL\|NFAT'  panTro4
+testDataset ../response/all.noActivation.bed  'FOS\|JUN\|REL\|NFAT'  panTro4
+
+testDataset ../response/RMacaque.gainActivation.bed  'FOS\|JUN\|REL\|NFAT'  rheMac3
+testDataset ../response/RMacaque.looseActivation.bed  'FOS\|JUN\|REL\|NFAT'  rheMac3
+testDataset ../response/all.conservedActivation.bed  'FOS\|JUN\|REL\|NFAT'  rheMac3
+testDataset ../response/all.noActivation.bed  'FOS\|JUN\|REL\|NFAT'  rheMac3
+
+## Specific?!
+testDataset ../response/Human.gainActivation.bed chr hg19
+testDataset ../response/Human.looseActivation.bed chr hg19
+testDataset ../response/all.conservedActivation.bed chr hg19
+testDataset ../response/all.noActivation.bed chr hg19
+
+testDataset ../response/Chimp.gainActivation.bed  chr panTro4
+testDataset ../response/Chimp.looseActivation.bed  chr panTro4
+testDataset ../response/all.conservedActivation.bed  chr  panTro4
+testDataset ../response/all.noActivation.bed  chr  panTro4
+
+testDataset ../response/RMacaque.gainActivation.bed  chr  rheMac3
+testDataset ../response/RMacaque.looseActivation.bed  chr  rheMac3
+testDataset ../response/all.conservedActivation.bed  chr  rheMac3
+testDataset ../response/all.noActivation.bed  chr  rheMac3
+
+
+## Do changes in DNA sequence in human gainActivation typically increase the motif match score?
+bedops --element-of 1 ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed ../response/Human.gainActivation.bed > tmp.dreg-hd.bed
+unstarch ../tfbs/tf.u.hg19.bed.starch | grep "FOS\|JUN\|REL\|NFAT" | bedmap --echo --indicator - tmp.dreg-hd.bed | grep "|1" | sed "s/|1//g" | \
+	bedmap --echo --indicator - ../dna_sequence/hg19.diff.bed.starch | grep "|1" | less
+
