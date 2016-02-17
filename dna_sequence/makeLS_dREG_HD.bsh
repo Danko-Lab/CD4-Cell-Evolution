@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+cat ../enhancer/hg19.gain.bed ../enhancer/hg19.loss.bed | sort-bed - | bedmap --echo --indicator ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed - | grep "|1" | sed "s/|1//g" | gzip > H-U.gain-loss.dREG_HD.bed.gz
+
+cat ../enhancer/panTro4.gain.bed ../enhancer/panTro4.loss.bed | sort-bed - | bedmap --echo --indicator ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed - | grep "|1" | sed "s/|1//g" | gzip > C-U.gain-loss.dREG_HD.bed.gz
+
+cat ../enhancer/rheMac3.gain.bed ../enhancer/rheMac3.loss.bed | sort-bed - | bedmap --echo --indicator ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed - | grep "|1" | sed "s/|1//g" | gzip > M-U.gain-loss.dREG_HD.bed.gz
+
+cat ../enhancer/all.conserved.bed | sort-bed - | bedmap --echo --indicator ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed - | grep "|1" | sed "s/|1//g"  | gzip > conserved.dREG_HD.bed.gz

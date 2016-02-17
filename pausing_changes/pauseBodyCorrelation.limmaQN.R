@@ -58,6 +58,8 @@ makePBPlot(indxH, indxC, "Human", "Chimp", hv=3, lv=3)
 makePBPlot(indxH, indxM, "Human", "Macaque", hv=3, lv=3)
 makePBPlot(indxC, indxM, "Chimp", "Macaque", hv=3, lv=3)
 
+makePBPlot(indxH, c(indxC,indxM), "Human", "NHP", hv=3, lv=3)
+
 
 makePBPlot(indxH, indxHpi, "Human_U", "Human_PI", hv=3, lv=3)
 makePBPlot(indxC, indxCpi, "Chimp_U", "Chimp_PI", hv=3, lv=3)

@@ -19,7 +19,6 @@ function initCounts {
 
 initCounts $GENEBODIES $INCREMENTS $COUNTALL
 initCounts $PAUSESITES $PAUSEINCR  $COUNTPAUSE
-cat $PAUSESITES | awk 'BEGIN{OFS="\t"} {print $0,($3-$2)}' > $COUNTPAUSE
 initCounts $TSSSITES   $TSSINCR    $COUNTTSS
 
 function getCounts {

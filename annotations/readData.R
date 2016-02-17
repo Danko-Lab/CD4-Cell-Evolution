@@ -9,10 +9,10 @@ gap <- read.table("genes.inGap")[!is.na(ca[,11]),] ## Read gap data.
 ca <- ca[!is.na(ca[,11]),]
 
 ## Get pause counts.
-#ps <- read.table("countpause.tsv")
+ps <- read.table("countpause.tsv")
 #ps[,7] <- paste(ps[,7],"_PauseSite", sep="")
-#ps <- cbind(ps[,1:9], "ps", ps[,10:NCOL(ps)])
-#colnames(ps) <- colnames(ca)
+ps <- cbind(ps[,1:6], "PauseSite", paste(ps[,4],"_PauseSite",sep=""), ps[,7], "ps", ps[,8:NCOL(ps)])
+colnames(ps) <- colnames(ca)
 
 ## Get dREG counts.
 ts <- read.table("counttss.tsv")

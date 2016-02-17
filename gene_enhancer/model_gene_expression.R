@@ -126,7 +126,7 @@ test  <- rep(TRUE, NROW(sm_cng)); test[train] <- FALSE; test <- which(test)
 
 gl <- glm(pro~near+loop+uas, data=sm_cng[train,])
 cor.test(predict(gl, sm_cng[test,]), sm_cng$pro[test])
-
+plot(predict(gl, sm_cng[test,]), sm_cng$pro[test])
 
 
 

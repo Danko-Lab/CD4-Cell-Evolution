@@ -38,6 +38,20 @@ bedmap --echo --indicator panTro4.diff.bed.starch rheMac3.diff.bed.starch | grep
 bedmap --echo --indicator rheMac3.diff.bed.starch panTro4.diff.bed.starch | grep "|0" | sed "s/|0//g" | starch - > rheMac3.ls.diff.bed.starch
 ln -s hg19.diff.bed.starch hg19.ls.diff.bed.starch
 
+## Create bigWigs for visulization.
+unstarch hg19.diff.bed.starch | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,1}' > hs.tmp.bedgraph
+bedGraphToBigWig hs.tmp.bedgraph ../hg19.chromInfo hs.ls.diff.bigWig
+rm hs.tmp.bedgraph
+
+unstarch panTro4.ls.diff.bed.starch | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,1}' > pt4.tmp.bedgraph
+bedGraphToBigWig pt4.tmp.bedgraph ../hg19.chromInfo pt.ls.diff.bigWig
+rm pt4.tmp.bedgraph
+
+unstarch rheMac3.ls.diff.bed.starch | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,1}' > rm3.tmp.bedgraph
+bedGraphToBigWig rm3.tmp.bedgraph ../hg19.chromInfo rm.ls.diff.bigWig
+rm rm3.tmp.bedgraph
+
+
 ## Descriptoin:
 #cdanko@nextgen:/usr/projects/GROseq/NHP/dna_sequence$ hgsql CGhg19 -N -e "describe panTro4Diff" 
 #+------------+------------------+-----+-----+------+--+
