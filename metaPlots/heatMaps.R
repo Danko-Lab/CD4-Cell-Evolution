@@ -22,7 +22,8 @@ writeHeatmap<- function(hMarkFile, name, hm_order= NULL,
 	}
 	hmat <- hmat[hm_order,]
 
-	## 
+	## Average by rows of 10.
+	
 
 	## Write out a heatmap.
 	library(pheatmap)
@@ -41,5 +42,9 @@ writeHeatmap<- function(hMarkFile, name, hm_order= NULL,
 ord <- writeHeatmap("H3K27ac.bw", "H3K27ac", cols=c("white","#00A63E"))
 sup <- writeHeatmap("H3K4me1.bw", "H3K4me1", hm_order= ord, cols=c("white","#ff551c"))
 sup <- writeHeatmap("H3K4me3.bw", "H3K4me3", hm_order= ord, cols=c("white","#fe0000"))
+
+pth= "/local/storage/projects/NHP/AllData/All_Merge/"
+sup <- writeHeatmap("H-U_plus.bw", "PROseq.plus", hm_order= ord, cols=c("white","#fe0000"), path=pth)
+sup <- writeHeatmap("H-U_minus.bw", "PROseq.minus", hm_order= ord, cols=c("white","#0000fe"), path=pth)
 
 
