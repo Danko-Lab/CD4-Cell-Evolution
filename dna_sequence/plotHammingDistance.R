@@ -5,6 +5,8 @@ doplot <- function(bw_file, bed_file, bed_file_conserved, stp=100, halfWindow=10
  bed <- read.table(bed_file)
  bed_conserved <- read.table(bed_file_conserved)
 
+# bed <- bed[bed[,1]=="chr1",]; bed_conserved <- bed_conserved[bed_conserved[,1]=="chr1",]
+
  meta_change <- metaprofile.bigWig(center.bed(bed, halfWindow, halfWindow), bw, step=stp)
  meta_conserved <- metaprofile.bigWig(center.bed(bed_conserved, halfWindow, halfWindow), bw, step=stp)
 
@@ -24,7 +26,21 @@ doplot <- function(bw_file, bed_file, bed_file_conserved, stp=100, halfWindow=10
 
 }
 
+pdf("PhyloP_100way.pdf")
+
 doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "H-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at Human LS dREG sites")
+doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "C-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz")
+doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "M-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz")
+
+dev.off()
+
+pdf("PrimatePhyloP.chr1.pdf")
+
+doplot("/local/storage/data/hg19/all/phylopprimate/chr1.phyloP46way.bw", "H-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at Human LS dREG sites")
+doplot("/local/storage/data/hg19/all/phylopprimate/chr1.phyloP46way.bw", "C-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at Chimp LS dREG sites")
+doplot("/local/storage/data/hg19/all/phylopprimate/chr1.phyloP46way.bw", "M-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at R.Macaque LS dREG sites")
+
+dev.off()
 
 pdf("DNASequence.pdf")
 

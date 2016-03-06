@@ -23,9 +23,12 @@ snU <- c(rep("H-U",3), rep("C-U", 3), rep("M-U",3), rep("H-PI", 3), rep("C-PI", 
 ## Specific examples...
 q("no")
 
+pdf("CCR7.circplot.pdf")
 
 cd.circplot(rpkm_df[ca$name == "chr17_38672950_38722300", ], snU) ## CCR7
+cd.circplot(rpkm_df[ca$name == "chr17_38672950_38722300", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-2, -7)) ## CCR7
 
+dev.off()
 
 ## Good ...
 cd.circplot(rpkm_df[ca$name == "chr12_15771150_15943000", ], snU)

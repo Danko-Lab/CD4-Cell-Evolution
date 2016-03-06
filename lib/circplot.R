@@ -13,8 +13,8 @@ cd.circle <- function(x, y, r) {
 } ## TEST!
 
 
-cd.circplot<- function(data, names, fill="black") {
-	lab <- pretty(c(min(data),max(data)), n=5)
+cd.circplot<- function(data, names, lims=c(min(data), max(data)), fill="black") {
+	lab <- pretty(lims, n=5)
         data <- (data - min(lab)) / (max(lab) - min(lab))
 	labels <- unique(names)
 
