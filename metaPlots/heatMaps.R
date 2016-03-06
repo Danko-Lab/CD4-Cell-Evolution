@@ -15,7 +15,7 @@ writeHeatmap<- function(hMarkFile, name, hm_order= NULL,
 	hMark <- load.bigWig(paste(path, hMarkFile, sep=""))  #"/local/storage/data/hg19/cd4/epiRoadmap_histone/H3K27ac.bw")
 
 	## Get a matrix of counts.
-	hCountMatrix <- bed.step.bpQuery.bigWig(hMark, center.bed(hd, dist, dist), step=step)
+	hCountMatrix <- bed.step.bpQuery.bigWig(hMark, center.bed(hd, dist, dist), step=step, abs.value=TRUE)
 	hmat <- log(matrix(unlist(hCountMatrix), nrow= NROW(hd), byrow=TRUE)+1)
 	if(is.null(hm_order)) {
 	  hm_order <- order(rowSums(hmat[,(NCOL(hmat)/2 -10):(NCOL(hmat)/2 +10)]), decreasing=TRUE)
@@ -23,17 +23,17 @@ writeHeatmap<- function(hMarkFile, name, hm_order= NULL,
 	hmat <- hmat[hm_order,]
 
 	## Average by rows of 10.
-	
+	navg <- 10 ## Average every navg rows
+	avgMat <- t(sapply(1:floor(NROW(hmat)/navg), function(x) {colMeans(hmat[((x-1)*navg+1):min(NROW(hmat),(x*navg)),])}))
+	hmat <- avgMat
 
 	## Write out a heatmap.
 	library(pheatmap)
 	bk <- seq(min(hmat), max(hmat), 0.01)
 	hmcols <- colorRampPalette(cols)(length(bk)-1) # red
 
-	png(paste(name,".png",sep=""), width=300, height = 800)     # width and height are in pixels
-
-	pheatmap( hmat, cluster_rows = FALSE, cluster_cols = FALSE, col= hmcols, breaks = bk, legend=FALSE, show_rownames=FALSE, show_colnames=FALSE )
-
+	png(paste(name,".png",sep=""), width=300, height = 600)     # width and height are in pixels
+		pheatmap( hmat, cluster_rows = FALSE, cluster_cols = FALSE, col= hmcols, breaks = bk, legend=FALSE, show_rownames=FALSE, show_colnames=FALSE )
 	dev.off()
 	
 	return(hm_order)
