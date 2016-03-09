@@ -149,8 +149,8 @@ cmpFracConserved <- function(tss1, tss2, i=2, i2=i) { ## defaults to enhancer (i
  total1 <- summary(as.factor(tss1$V5))
  one2m1 <- summary(as.factor(tss1$V5[tss1$V20 > 0])) ## Possible 1:many orthology
  unmap1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & is.na(tss1$mapSize)])) ## INDEL
- lccng1 <- summary(as.factor(tss1$V5[(tss1$V7 < 0.1 | tss1$V8 < 0.1 | tss1$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss1$V20 == 0 & !is.na(tss1$mapSize)])) # 'Low-confidence'
- chang1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < 0.05 & (tss1$V7 > 0.7 | tss1$V8 > 0.7 | tss1$V9 > 0.7) & (tss$V7 > 0.1 & tss$V8 > 0.1 & tss$V9 > 0.1)])) # 'High-confidence'
+ lccng1 <- summary(as.factor(tss1$V5[(tss1$V7 < 0.1 | tss1$V8 < 0.1 | tss1$V9 < 0.1) & (tss1$V7 > 0.7 | tss1$V8 > 0.7 | tss1$V9 > 0.7) & tss1$V20 == 0 & !is.na(tss1$mapSize)])) # 'Low-confidence'
+ chang1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < 0.05 & (tss1$V7 > 0.7 | tss1$V8 > 0.7 | tss1$V9 > 0.7) & (tss1$V7 > 0.1 & tss1$V8 > 0.1 & tss1$V9 > 0.1)])) # 'High-confidence'
  allcng1<- summary(as.factor(tss1$V5[(tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < 0.05)]))
 
  tot1 <- total1[i]-one2m1[i]
@@ -160,8 +160,8 @@ cmpFracConserved <- function(tss1, tss2, i=2, i2=i) { ## defaults to enhancer (i
  total2 <- summary(as.factor(tss2$V5))
  one2m2 <- summary(as.factor(tss2$V5[tss2$V20 > 0])) ## Possible 1:many orthology
  unmap2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & is.na(tss2$mapSize)])) ## INDEL
- lccng2 <- summary(as.factor(tss2$V5[(tss2$V7 < 0.1 | tss2$V8 < 0.1 | tss2$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss2$V20 == 0 & !is.na(tss2$mapSize)])) # 'Low-confidence'
- chang2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < 0.05 & (tss2$V7 > 0.7 | tss2$V8 > 0.7 | tss2$V9 > 0.7) & (tss$V7 > 0.1 & tss$V8 > 0.1 & tss$V9 > 0.1)])) # 'High-confidence'
+ lccng2 <- summary(as.factor(tss2$V5[(tss2$V7 < 0.1 | tss2$V8 < 0.1 | tss2$V9 < 0.1) & (tss2$V7 > 0.7 | tss2$V8 > 0.7 | tss2$V9 > 0.7) & tss2$V20 == 0 & !is.na(tss2$mapSize)])) # 'Low-confidence'
+ chang2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < 0.05 & (tss2$V7 > 0.7 | tss2$V8 > 0.7 | tss2$V9 > 0.7) & (tss2$V7 > 0.1 & tss2$V8 > 0.1 & tss2$V9 > 0.1)])) # 'High-confidence'
  allcng2<- summary(as.factor(tss2$V5[(tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < 0.05)]))
 
  tot2 <- total2[i2]-one2m2[i2]
