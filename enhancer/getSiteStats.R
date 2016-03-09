@@ -86,7 +86,7 @@ SEtotal <- summary(as.factor(tss$V5[tss$V19 == 1]))
 SEone2m <- summary(as.factor(tss$V5[tss$V20 > 0 & tss$V19 == 1])) ## Possible 1:many orthology
 SEunmap <- summary(as.factor(tss$V5[tss$V20 == 0 & is.na(tss$mapSize) & tss$V19 == 1])) ## INDEL
 SElccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss$V20 == 0 & !is.na(tss$mapSize) & tss$V19 == 1])) # 'Low-confidence'
-SEchang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7) & tss$V19 == 1])) # 'High-confidence'
+SEchang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & (tss$V7 > 0.1 & tss$V8 > 0.1 & tss$V9 > 0.1) & tss$V19 == 1])) # 'High-confidence'
 
 SEone2m/SEtotal ## Seems strange that there's such an enrichment in genes here ...
 SEunmap/(SEtotal - SEone2m)
@@ -145,12 +145,12 @@ source("../lib/densScatterplot.R")
 
 ##########################################################
 ## Do SE change less frequently?
-cmpFracConserved <- function(tss1, tss2, i=2) { ## defaults to enhancer (i=2) ... promoters (i=3)
+cmpFracConserved <- function(tss1, tss2, i=2, i2=i) { ## defaults to enhancer (i=2) ... promoters (i=3)
  total1 <- summary(as.factor(tss1$V5))
  one2m1 <- summary(as.factor(tss1$V5[tss1$V20 > 0])) ## Possible 1:many orthology
  unmap1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & is.na(tss1$mapSize)])) ## INDEL
  lccng1 <- summary(as.factor(tss1$V5[(tss1$V7 < 0.1 | tss1$V8 < 0.1 | tss1$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss1$V20 == 0 & !is.na(tss1$mapSize)])) # 'Low-confidence'
- chang1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < 0.05 & (tss1$V7 > 0.7 & tss1$V8 > 0.7 & tss1$V9 > 0.7)])) # 'High-confidence'
+ chang1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < 0.05 & (tss1$V7 > 0.7 | tss1$V8 > 0.7 | tss1$V9 > 0.7) & (tss$V7 > 0.1 & tss$V8 > 0.1 & tss$V9 > 0.1)])) # 'High-confidence'
  allcng1<- summary(as.factor(tss1$V5[(tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < 0.05)]))
 
  tot1 <- total1[i]-one2m1[i]
@@ -161,11 +161,11 @@ cmpFracConserved <- function(tss1, tss2, i=2) { ## defaults to enhancer (i=2) ..
  one2m2 <- summary(as.factor(tss2$V5[tss2$V20 > 0])) ## Possible 1:many orthology
  unmap2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & is.na(tss2$mapSize)])) ## INDEL
  lccng2 <- summary(as.factor(tss2$V5[(tss2$V7 < 0.1 | tss2$V8 < 0.1 | tss2$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss2$V20 == 0 & !is.na(tss2$mapSize)])) # 'Low-confidence'
- chang2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < 0.05 & (tss2$V7 > 0.7 & tss2$V8 > 0.7 & tss2$V9 > 0.7)])) # 'High-confidence'
+ chang2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < 0.05 & (tss2$V7 > 0.7 | tss2$V8 > 0.7 | tss2$V9 > 0.7) & (tss$V7 > 0.1 & tss$V8 > 0.1 & tss$V9 > 0.1)])) # 'High-confidence'
  allcng2<- summary(as.factor(tss2$V5[(tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < 0.05)]))
 
- tot2 <- total2[i]-one2m2[i]
- con2 <- total2[i]-one2m2[i]-unmap2[i]-chang2[i]-lccng2[i]
+ tot2 <- total2[i2]-one2m2[i2]
+ con2 <- total2[i2]-one2m2[i2]-unmap2[i2]-chang2[i2]-lccng2[i2]
  print(paste("2: ", con2/tot2))
 
  ft <- fisher.test(data.frame(c(tot1, con1), c(tot2, con2)))
@@ -178,7 +178,7 @@ fracConserved <- function(tss, ret="C") { ## defaults to ...
  one2m <- sum(tss$V20 > 0) ## Possible 1:many orthology
  unmap <- sum(tss$V20 == 0 & is.na(tss$mapSize)) ## INDEL
  lccng <- sum((tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss$V20 == 0 & !is.na(tss$mapSize)) # 'Low-confidence'
- chang <- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7)) # 'High-confidence'
+ chang <- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & (tss$V7 > 0.1 & tss$V8 > 0.1 & tss$V9 > 0.1)) # 'High-confidence'
  allcng<- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05)
 
  if(ret=="C") {
@@ -199,6 +199,13 @@ fracConserved <- function(tss, ret="C") { ## defaults to ...
 
   return(cng/tot)
  }
+ if(ret=="UNM") {
+  tot <- total-one2m
+  unm <- unmap #allcng ## A santiy check to make sure this shows the same trend as lccng.
+
+  return(unm/tot)
+ }
+
 }
 
 cmpFracConserved(tss, tss[tss$V19==1,], i=2) ## Enhancers
@@ -242,6 +249,7 @@ vect <- as.numeric(cut2(log(tss$V13, 10), cuts=xaxis)); vect[is.na(vect)] <- 1; 
 dist <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,])})
 glc  <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,], "GL")})
 cng  <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,], "CNG")})
+unm  <- sapply(1:max(vect), function(x) {fracConserved(tss[vect == x,], "UNM")})
 
 getCex <- function(n) { y=0.0138888*n+0.1; y[y>3] <- 3; y[y<0.1] <- 0.1; y }
 n <- sapply(1:max(vect), function(x) {NROW(tss[vect == x,])})
@@ -253,6 +261,7 @@ pdf("ChangeOverDistance.pdf")
  plot(10^xaxis[idx], dist[idx], type="p", xlab="Distance from TSS [bp]", ylab="Fraction conserved", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n[idx]))
  plot(10^xaxis[idx], glc[idx], type="p", xlab="Distance from TSS [bp]", ylab="Fraction gain/ loss", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n[idx]))
  plot(10^xaxis[idx], cng[idx], type="p", xlab="Distance from TSS [bp]", ylab="Fraction change", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n[idx]))
+ plot(10^xaxis[idx], unm[idx], type="p", xlab="Distance from TSS [bp]", ylab="Fraction unmappable", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n[idx]))
 dev.off()
 
 ##################################################################
@@ -268,6 +277,7 @@ exp_vect[is.na(exp_vect)] <- 0
 conserved <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x & type_max == "dREG_ENH",])})
 gainloss <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x & type_max == "dREG_ENH",], "GL")})
 change   <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x & type_max == "dREG_ENH",], "CNG")})
+gaps     <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x & type_max == "dREG_ENH",], "UNM")})
 
 cor.test(conserved, c(1:NROW(conserved))) ## p= (for manuscript)
 
@@ -275,6 +285,7 @@ pdf("ChangeOverActivity.pdf")
  plot(conserved, type="b")
  plot(gainloss,  type="b")
  plot(change,    type="b")
+ plot(gaps,      type="b")
 dev.off()
 
 ###############################################################
@@ -284,8 +295,28 @@ loop <- read.table("tss.tsv.loop")
 fracConserved(tss[rowSums(loop[,5:6]) >  0 & tss$V5 == "Dist_UnSt",])  ## Conservation of looped REs.
 fracConserved(tss[rowSums(loop[,5:6]) == 0 & tss$V5 == "Dist_UnSt",])  ## Conservation of unlooped. 
 
+fracConserved(tss[rowSums(loop[,5:6]) >  0 & tss$V5 == "Prox_Stab",])  ## Conservation of looped REs.
+fracConserved(tss[rowSums(loop[,5:6]) == 0 & tss$V5 == "Prox_Stab",])  ## Conservation of unlooped. 
+
 cmpFracConserved(tss[rowSums(loop[,5:6]) >  0,], tss[rowSums(loop[,5:6]) == 0,], i=2) ## Enhancers
 cmpFracConserved(tss[rowSums(loop[,5:6]) >  0,], tss[rowSums(loop[,5:6]) == 0,], i=3) ## Promoters
+
+## Compare looped enhancers to promoters.
+cmpFracConserved(tss[rowSums(loop[,5:6]) >  0,], tss, i=2, i2=3)
+b_du <- boot(data= tss[tss$V5=="Dist_UnSt",], R=1000, statistic= function(a, i) {fracConserved(a[i,])})
+b_du_loop <- boot(data= tss[tss$V5=="Dist_UnSt" & rowSums(loop[,5:6]) >  0,], R=1000, statistic= function(a, i) {fracConserved(a[i,])})
+b_ps <- boot(data= tss[tss$V5=="Prox_Stab",], R=1000, statistic= function(a, i) {fracConserved(a[i,])})
+b_ps_loop <- boot(data= tss[tss$V5=="Prox_Stab" & rowSums(loop[,5:6]) >  0,], R=1000, statistic= function(a, i) {fracConserved(a[i,])})
+
+pdf("LoopEnhPromoter.pdf")
+ source("../lib/barplot.R")
+ bars <- c(b_du$t0, b_du_loop$t0, b_ps$t0, b_ps_loop$t0)
+ errs <- c(sqrt(var(b_du$t)), sqrt(var(b_du_loop$t)), sqrt(var(b_ps$t)), sqrt(var(b_ps_loop$t)))
+ names<- c("All Enhancer", "Looped Enhancer", "All Promoter", "Looped Promoter")
+ cd.barplot(bars, errs, names, fill=TRUE)
+# drawBars(bars, errs, names) ## From the eRNA regression code in the dREG paper.  Does not work as well out of the box.
+dev.off()
+
 
 ## Is this more so than expected based on distance bias alone?
 sum(rowSums(loop[,5:6]) >  0 & tss$V5=="Dist_UnSt") ## Get the number of elements to use for selecting a reasonable number for re-sampling.
@@ -327,6 +358,10 @@ cor.test(c(0:12), loop_cons)
 indx <- !is.na(loop_cons)
 corr(loop_cons_df[indx,1:2], w = n[indx]/sum(n[indx]))
 
+## Weighted regression
+fit_line <- lm(conservation~nloops, data= loop_cons_df[indx,1:2], w = n[indx]/sum(n[indx]))
+fit_line
+
 ## Evaluate significance of this weighted correlation using a label swap.
 ## Note that this is not quire right, because boot is going to sample with replacement.  
 ## Real label-swap samples without replacemenet.
@@ -351,6 +386,7 @@ for(x in nloops) {
 use <- !is.na(loop_cons_df$t0)
 pdf("NumberOfLoops.Promoter.pdf")
   plot(0:12, loop_cons, pch=19, cex=3*getCex(n), xlab= "Number of loops to promoter", ylab= "Fraction conserved")
+  abline(fit_line)
   cd.barplot(loop_cons_df$t0[use], loop_cons_df$sd[use], as.character(nloops)[use], fill=TRUE, order=FALSE)
   plot(loop_swap)
 dev.off()
@@ -360,7 +396,7 @@ cmpFracConserved(tss[rowSums(loop[,5:6]) > 0 & rowSums(loop[,5:6]) <= 2,], tss[r
 
 ## Do differences in expression explain loop correlation?
 expr <- rowSums(rpkm_df[,2:9])
-loop_expr <- sapply(nloops, function(i) {mean(expr[rowSums(loop[,5:6]) == i & tss$V5=="Prox_Stab"])})  ## Conservation of unlooped. 
+loop_expr <- sapply(nloops, function(i) {median(expr[rowSums(loop[,5:6]) == i & tss$V5=="Prox_Stab"])})  ## Conservation of unlooped. 
 plot(loop_expr)
 
 ####################################################
