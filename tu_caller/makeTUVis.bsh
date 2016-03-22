@@ -5,3 +5,6 @@
 #gzip annot/TU.vis.bed
 
 zcat annot/TU.final.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,$5,$6}' > annot/TU.vis.bed 
+bgzip annot/TU.vis.bed
+tabix -p bed annot/TU.vis.bed.gz
+

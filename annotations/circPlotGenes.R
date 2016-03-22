@@ -30,6 +30,40 @@ cd.circplot(rpkm_df[ca$name == "chr17_38672950_38722300", c(1:9,18:19)], snU[c(1
 
 dev.off()
 
+pdf("MasterRegulators.circplot.pdf")
+
+par(mfrow=c(2,5))
+cd.circplot(rpkm_df[ca$name == "chr17_45810350_45842800", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-6, -14)) ## TBX21
+cd.circplot(rpkm_df[ca$name == "chr10_8095400_8179250", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-6, -12)) ## GATA3
+cd.circplot(rpkm_df[ca$name == "chrX_49093550_49130150", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-2, -10)) ## FOXP3, note problem with TSS
+cd.circplot(rpkm_df[ca$name == "chr1_198588550_198748950", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-2, -10))  # PTPRC
+cd.circplot(rpkm_df[ca$name == "chr3_187431250_187468300", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-2, -10)) # BCL6
+cd.circplot(rpkm_df[ca$name == "chr2_191783100_192016300", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-6, -12)) # STAT4
+cd.circplot(rpkm_df[ca$name == "chr12_57413700_57506300", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-2, -10)) # STAT6, problems with TTS.
+cd.circplot(rpkm_df[ca$name == "chr17_40453350_40541300", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-2, -10)) # STAT3
+cd.circplot(rpkm_df[ca$name == "chr1_151769750_151788550", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-8, -16)) # RORC, very poor match to the annotation.
+cd.circplot(rpkm_df[ca$name == "chr11_47363250_47416450", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-2, -12)) #  PU1/ SPI1, Wrong TSS
+
+dev.off()
+
+cd.circplot(rpkm_df[ca$name == "", c(1:9,18:19)], snU[c(1:9,18:19)]) # 
+cd.circplot(rpkm_df[ca$name == "", c(1:9,18:19)], snU[c(1:9,18:19)]) # 
+cd.circplot(rpkm_df[ca$name == "", c(1:9,18:19)], snU[c(1:9,18:19)]) # 
+cd.circplot(rpkm_df[ca$name == "", c(1:9,18:19)], snU[c(1:9,18:19)]) # 
+cd.circplot(rpkm_df[ca$name == "", c(1:9,18:19)], snU[c(1:9,18:19)]) # 
+
+
+## Neat.
+cd.circplot(rpkm_df[ca$name == "chr4_123527900_123542600", ], snU) ## IL21
+cd.circplot(rpkm_df[ca$name == "chr4_123499950_123506250", ], snU) ## IL21 enhancer +.
+cd.circplot(rpkm_df[ca$name == "chr4_123498550_123499600", ], snU) ## IL21 enhancer -.
+
+
+## Note chimp is lower in FOXP3 (Treg) and higher in SPI1 (TH9) than other species.
+## Possibly swap of similar cells? http://www.nature.com/icb/journal/v88/n6/fig_tab/icb201073f1.html
+##
+## Note, however, that there's virtually no IL9 production.
+
 ## Good ...
 cd.circplot(rpkm_df[ca$name == "chr12_15771150_15943000", ], snU)
 cd.circplot(rpkm_df[ca$name == "chr13_77989450_77990050", ], snU)
