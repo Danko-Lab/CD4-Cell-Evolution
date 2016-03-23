@@ -82,3 +82,51 @@ PX <- cbind(bodies, res)
 PX <- PX[order(PX$padj),]
 write.table(PX, "results/human-changed.genes.tsv", sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 
+
+######################
+## Now get REs.
+
+hdU <- read.table("../dREG_HD/H-U_dREG_HD.bed")
+hdPI<- read.table("../dREG_HD/H-PI_dREG_HD.bed")
+
+hd <- rbind(hdU, hdPI)
+hd$V2 <- hd$V2-250; hd$V2[hd$V2 < 0] = 0
+hd$V3 <- hd$V3+250
+
+getCountsE <- function(plus, minus, path, intervals= hd) {
+  pl <- load.bigWig(paste(path, plus, sep=""))
+  mn <- load.bigWig(paste(path, minus, sep=""))
+  counts <- bed.region.bpQuery.bigWig(pl, intervals, abs.value = TRUE)+bed.region.bpQuery.bigWig(mn, intervals, abs.value = TRUE) ## Get counts
+  counts #* (1000/(bodies$V3-bodies$V2)) * (1e6/ (pl$mean*pl$basesCovered+mn$mean*mn$basesCovered)) ## Normalize to RPKM
+}
+
+raw_counts <- cbind(
+human_1_U= getCountsE("H1-U_plus.bw", "H1-U_minus.bw", "../AllData/"),
+human_2_U= getCountsE("H2-U.bed.gz_plus.bw", "H2-U.bed.gz_minus.bw", "../AllData/"),
+human_3_U= getCountsE("H3-U.bed.gz_plus.bw", "H3-U.bed.gz_minus.bw", "../AllData/"),
+human_1_PI= getCountsE("H1-PI_plus.bw", "H1-PI_minus.bw", "../AllData/"),
+human_2_PI= getCountsE("H2-PI_plus.bw", "H2-PI_minus.bw", "../AllData/"),
+human_3_PI= getCountsE("H3-PI.bed.gz_plus.bw", "H3-PI.bed.gz_minus.bw", "../AllData/")
+)
+
+print(cor(raw_counts, method="spearman"))
+
+library("DESeq2")
+colData <- data.frame(Condition= c(rep("U",3), rep("PI",3)), row.names=colnames(raw_counts))
+
+## Create DESeq2 object.
+dds <- DESeqDataSetFromMatrix(countData= raw_counts, colData= colData, design= ~ Condition)
+dds$Condition <- relevel(dds$Condition, ref="U") ## Set the reference condition as the primary tumor.
+
+dds <- DESeq(dds)
+res <- results(dds)
+
+print(paste("Number of changes: ", sum(res$padj < 0.01, na.rm=TRUE))) ## Number of transcripts.
+print(paste("Number of unique genes: ", NROW(unique(refGene$V7[res$padj < 0.01])))) ## Number of genes.
+
+## Write out genes.
+PE <- cbind(bodies, res)
+PE <- PE[order(PE$padj),]
+write.table(PE, "results/human-changed.TREs.tsv", sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
+
+
