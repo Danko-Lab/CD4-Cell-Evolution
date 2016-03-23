@@ -122,10 +122,10 @@ dds <- DESeq(dds)
 res <- results(dds)
 
 print(paste("Number of changes: ", sum(res$padj < 0.01, na.rm=TRUE))) ## Number of transcripts.
-print(paste("Number of unique genes: ", NROW(unique(refGene$V7[res$padj < 0.01])))) ## Number of genes.
+#print(paste("Number of unique genes: ", NROW(unique(refGene$V7[res$padj < 0.01])))) ## Number of genes.
 
 ## Write out genes.
-PE <- cbind(bodies, res)
+PE <- cbind(rbind(hdU, hdPI), res)
 PE <- PE[order(PE$padj),]
 write.table(PE, "results/human-changed.TREs.tsv", sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 
