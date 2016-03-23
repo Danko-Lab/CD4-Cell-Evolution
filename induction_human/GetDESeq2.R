@@ -27,7 +27,7 @@ human_1_PI= getCounts("H1-PI_plus.bw", "H1-PI_minus.bw", "../AllData/"),
 human_2_PI= getCounts("H2-PI_plus.bw", "H2-PI_minus.bw", "../AllData/"),
 human_3_PI= getCounts("H3-PI.bed.gz_plus.bw", "H3-PI.bed.gz_minus.bw", "../AllData/")
 )
-cor(raw_counts, method="spearman")
+print(cor(raw_counts, method="spearman"))
 
 library("DESeq2")
 colData <- data.frame(Condition= c(rep("U",3), rep("PI",3)), row.names=colnames(raw_counts))
@@ -39,8 +39,8 @@ dds$Condition <- relevel(dds$Condition, ref="U") ## Set the reference condition 
 dds <- DESeq(dds)
 res <- results(dds)
 
-sum(res$padj < 0.01, na.rm=TRUE) ## Number of transcripts.
-NROW(unique(refGene$V7[res$padj < 0.01])) ## Number of genes.
+print(paste("Number of changes: ", sum(res$padj < 0.01, na.rm=TRUE))) ## Number of transcripts.
+print(paste("Number of unique genes: ", NROW(unique(refGene$V7[res$padj < 0.01])))) ## Number of genes.
 
 ## Add specific genes to the plot.
 addlab <- function(gene_ID, deRes, genes, ...) {
@@ -68,12 +68,12 @@ pdf("results/human.MAplot.pdf")
 plotMA(res, ylim=c(-11,11), xlim=c(1e-1, 2e5), alpha= 0.01, cex=0.75, ylab= "Log Fold-Change, U/ PI")
 
 plotMA(res, ylim=c(-11,11), xlim=c(1e-1, 2e5), alpha= 0.01, cex=0.75, ylab= "Log Fold-Change, U/ PI")
-addlab(c("CDK5", "GIMAP4", "EPHA1", "VMAC", "ZKSCAN4", "MRS2"), res, bodies) ## Downreg.
-addlab(c("IL2", "IL21", "IL2RA", "TNF", "IFNG", "NFKB1", "EGR1", "EGR3", "NR4A1", "C5orf52"), res, bodies) ## Upreg.
+addlab(c("CDK5", "GIMAP4", "VMAC", "ZKSCAN4", "MRS2"), res, bodies) ## Downreg.
+addlab(c("IL2", "IL21", "IL2RA", "TNF", "IFNG", "NFKB1", "EGR3", "NR4A1", "C5orf52"), res, bodies) ## Upreg.
 
 plot(0, 0, ylim=c(-11,11), xlim=c(1e-1, 2e5), log="x")
-addlab(c("CDK5", "GIMAP4", "EPHA1", "VMAC", "ZKSCAN4", "MRS2"), res, bodies) ## Downreg.
-addlab(c("IL2", "IL21", "IL2RA", "TNF", "IFNG", "NFKB1", "EGR1", "EGR3", "NR4A1", "C5orf52"), res, bodies) ## Upreg.
+addlab(c("CDK5", "GIMAP4", "VMAC", "ZKSCAN4", "MRS2"), res, bodies) ## Downreg.
+addlab(c("IL2", "IL21", "IL2RA", "TNF", "IFNG", "NFKB1", "EGR3", "NR4A1", "C5orf52"), res, bodies) ## Upreg.
 
 dev.off()
 
