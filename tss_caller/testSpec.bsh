@@ -22,12 +22,13 @@ bedops --element-of 1 $h3k27ac $dnase | bedops --element-of 1 - $chromhmm | awk 
 ################################################################
 ## Test sensitivity ...
 
-for th in 0.6 0.7 # 0.95 0.97 0.98 0.99 
+for th in 0.7 # 0.95 0.97 0.98 0.99 
 do
  echo $th
 
  ## Use threshold 0.81 @ 10% FDR.
  zcat $infPos | awk 'BEGIN{OFS="\t"} ($4 > '"$th"') {print $1,$2-50,$3+51,$4}' | sort-bed - |  bedops --merge - | perl ~/perl/bed_merge.pl $dist > tmp.mergepred.bed
+ #cat tmp.mergepred.bed | gzip > Human-U.dREG.bed.gz
 
  ## Number of sites.
  echo "Number of sites"
