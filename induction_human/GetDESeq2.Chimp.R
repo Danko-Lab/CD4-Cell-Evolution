@@ -20,12 +20,12 @@ getCounts <- function(plus, minus, path, intervals= bodies) {
 }
 
 raw_counts <- cbind(
-human_1_U= getCounts("H1-U_plus.bw", "H1-U_minus.bw", "../AllData/"),
-human_2_U= getCounts("H2-U.bed.gz_plus.bw", "H2-U.bed.gz_minus.bw", "../AllData/"),
-human_3_U= getCounts("H3-U.bed.gz_plus.bw", "H3-U.bed.gz_minus.bw", "../AllData/"),
-human_1_PI= getCounts("H1-PI_plus.bw", "H1-PI_minus.bw", "../AllData/"),
-human_2_PI= getCounts("H2-PI_plus.bw", "H2-PI_minus.bw", "../AllData/"),
-human_3_PI= getCounts("H3-PI.bed.gz_plus.bw", "H3-PI.bed.gz_minus.bw", "../AllData/")
+chimp_1_U= getCounts("C3-U.bed.gz_plus.hg19.bw", "C3-U.bed.gz_minus.hg19.bw", "../AllData/"),
+chimp_2_U= getCounts("C4-U.bed.gz_plus.hg19.bw", "C4-U.bed.gz_minus.hg19.bw", "../AllData/"),
+chimp_3_U= getCounts("C5-U_plus.hg19.bw", "C5-U_minus.hg19.bw", "../AllData/"),
+chimp_1_PI= getCounts("C3-PI.bed.gz_plus.hg19.bw", "C3-PI.bed.gz_minus.hg19.bw", "../AllData/"),
+chimp_2_PI= getCounts("C4-PI.bed.gz_plus.hg19.bw", "C4-PI.bed.gz_minus.hg19.bw", "../AllData/"),
+chimp_3_PI= getCounts("C5-PI_plus.hg19.bw", "C5-PI_minus.hg19.bw", "../AllData/")
 )
 print(cor(raw_counts, method="spearman"))
 
@@ -58,12 +58,8 @@ addlab <- function(gene_ID, deRes, genes, ...) {
  return(data.frame(Gene= genes[idx,7], AveExpr= deRes$baseMean[idx], logFC= deRes$log2FoldChange[idx], adj.P.Val= deRes$padj[idx]))
 }
 
-## Exploratory...
-cbind(bodies, res)[res$log2FoldChange > 9 & !is.na(res$log2FoldChange),]
-cbind(bodies, res)[res$log2FoldChange < -5 & !is.na(res$log2FoldChange) & res$baseMean > 1e2,]
-
 ## MA plot.
-pdf("results/human.MAplot.pdf")
+pdf("results/chimp.MAplot.pdf")
 
 plotMA(res, ylim=c(-11,11), xlim=c(1e-1, 2e5), alpha= 0.01, cex=0.75, ylab= "Log Fold-Change, U/ PI")
 
@@ -80,19 +76,20 @@ dev.off()
 ## Write out genes.
 PX <- cbind(bodies, res)
 PX <- PX[order(PX$padj),]
-write.table(PX, "results/human-changed.genes.tsv", sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
+write.table(PX, "results/chimp-changed.genes.tsv", sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 
+q("no")
 
 ######################
 ## Now get REs.
-dREG<- read.table("../tss_caller/Human-U.dREG.bed.gz")
-
-hdU <- read.table("../dREG_HD/H-U_dREG_HD.bed")
-hdPI<- read.table("../dREG_HD/H-PI_dREG_HD.bed")
+hdU <- read.table("../dREG_HD/C-U_dREG_HD.bed")
+hdPI<- read.table("../dREG_HD/C-PI_dREG_HD.bed")
 
 hd <- rbind(hdU, hdPI)
 hd$V2 <- hd$V2-250; hd$V2[hd$V2 < 0] = 0
 hd$V3 <- hd$V3+250
+
+hd <- hd[grep("random|Un", hd$V1, invert=TRUE),]
 
 getCountsE <- function(plus, minus, path, intervals= hd) {
   pl <- load.bigWig(paste(path, plus, sep=""))
@@ -101,46 +98,24 @@ getCountsE <- function(plus, minus, path, intervals= hd) {
   counts #* (1000/(bodies$V3-bodies$V2)) * (1e6/ (pl$mean*pl$basesCovered+mn$mean*mn$basesCovered)) ## Normalize to RPKM
 }
 
-################################################################################
-## First focus on dREG ... just to get number of changed sites for the paper.
-counts_dreg <- cbind(
-human_1_U= getCountsE("H1-U_plus.bw", "H1-U_minus.bw", "../AllData/", intervals= dREG),
-human_2_U= getCountsE("H2-U.bed.gz_plus.bw", "H2-U.bed.gz_minus.bw", "../AllData/", intervals= dREG),
-human_3_U= getCountsE("H3-U.bed.gz_plus.bw", "H3-U.bed.gz_minus.bw", "../AllData/", intervals= dREG),
-human_1_PI= getCountsE("H1-PI_plus.bw", "H1-PI_minus.bw", "../AllData/", intervals= dREG),
-human_2_PI= getCountsE("H2-PI_plus.bw", "H2-PI_minus.bw", "../AllData/", intervals= dREG),
-human_3_PI= getCountsE("H3-PI.bed.gz_plus.bw", "H3-PI.bed.gz_minus.bw", "../AllData/", intervals= dREG)
-)
-
-
-print(cor(counts_dreg, method="spearman"))
-
-library("DESeq2")
-colData <- data.frame(Condition= c(rep("U",3), rep("PI",3)), row.names=colnames(counts_dreg))
-
-## Number of dREG sites that change.
-dds <- DESeqDataSetFromMatrix(countData= counts_dreg, colData= colData, design= ~ Condition)
-dds$Condition <- relevel(dds$Condition, ref="U") ## Set the reference condition as the primary tumor.
-
-dds <- DESeq(dds)
-res <- results(dds)
-
-print(paste("Number of changes: ", sum(res$padj < 0.01, na.rm=TRUE))) ## Number of transcripts.
-
 ###################################################################################
 ### NOW FOCUS ON dREG-HD
 raw_counts <- cbind(
-human_1_U= getCountsE("H1-U_plus.bw", "H1-U_minus.bw", "../AllData/"),
-human_2_U= getCountsE("H2-U.bed.gz_plus.bw", "H2-U.bed.gz_minus.bw", "../AllData/"),
-human_3_U= getCountsE("H3-U.bed.gz_plus.bw", "H3-U.bed.gz_minus.bw", "../AllData/"),
-human_1_PI= getCountsE("H1-PI_plus.bw", "H1-PI_minus.bw", "../AllData/"),
-human_2_PI= getCountsE("H2-PI_plus.bw", "H2-PI_minus.bw", "../AllData/"),
-human_3_PI= getCountsE("H3-PI.bed.gz_plus.bw", "H3-PI.bed.gz_minus.bw", "../AllData/")
+chimp_1_U= getCountsE("C3-U_plus.bw", "C3-U_minus.bw", "../Alignments_2ndPrep/"),
+chimp_2_U= getCountsE("C4-U_plus.bw", "C4-U_minus.bw", "../Alignments_3rdPrep/"),
+chimp_3_U= getCountsE("C5-U_plus.bw", "C5-U_minus.bw", "../Alignments_4thPrep/"),
+chimp_1_PI= getCountsE("C3-PI_plus.bw", "C3-PI_minus.bw", "../Alignments_2ndPrep/"),
+chimp_2_PI= getCountsE("C4-PI_plus.bw", "C4-PI_minus.bw", "../Alignments_3rdPrep/"),
+chimp_3_PI= getCountsE("C5-PI_plus.bw", "C5-PI_minus.bw", "../Alignments_4thPrep/")
 )
 
 print(cor(raw_counts, method="spearman"))
 
+colData <- data.frame(Condition= c(rep("U",3), rep("PI",3)), row.names=colnames(raw_counts))
+
 ## Create DESeq2 object.
+library("DESeq2")
+
 dds <- DESeqDataSetFromMatrix(countData= raw_counts, colData= colData, design= ~ Condition)
 dds$Condition <- relevel(dds$Condition, ref="U") ## Set the reference condition as the primary tumor.
 
@@ -151,8 +126,10 @@ print(paste("Number of changes: ", sum(res$padj < 0.01, na.rm=TRUE))) ## Number 
 #print(paste("Number of unique genes: ", NROW(unique(refGene$V7[res$padj < 0.01])))) ## Number of genes.
 
 ## Write out dREG-HD TREs for motif analysis.
-PE <- cbind(rbind(hdU, hdPI), res)
+hd <- rbind(hdU, hdPI); hd <- hd[grep("random|Un", hd$V1, invert=TRUE),]
+
+PE <- cbind(hd, res)
 PE <- PE[order(PE$padj),]
-write.table(PE, "results/human-changed.TREs.tsv", sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
+write.table(PE, "results/chimp-changed.TREs.tsv", sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 
 

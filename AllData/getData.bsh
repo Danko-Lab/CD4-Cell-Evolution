@@ -35,8 +35,8 @@ cp $CD4JUR/H1-U_*.bw .
 cp $CD4JUR/H1-PI_*.bw .
 
 ## H2 -- Take H2.2-U (H2-U not complex enough).
-cp $ALIGN3/H2.2-U.bed.gz_plus.bw H2-U.bed.gz_plus.bw
-cp $ALIGN3/H2.2-U.bed.gz_minus.bw H2-U.bed.gz_minus.bw
+cp $ALIGN3/H2.2-U_plus.bw H2-U_plus.bw
+cp $ALIGN3/H2.2-U_minus.bw H2-U_minus.bw
 
 # combine H2 and H2.2 (PI).
 zcat $ALIGN2/H2-PI.bed.gz $ALIGN3/H2.2-PI.bed.gz | sort-bed - | gzip > H2-PI.bed.gz

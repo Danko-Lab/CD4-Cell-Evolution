@@ -32,7 +32,6 @@ dev.off()
 
 pdf("MasterRegulators.circplot.pdf")
 
-par(mfrow=c(2,5))
 cd.circplot(rpkm_df[ca$name == "chr17_45810350_45842800", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-6, -14)) ## TBX21
 cd.circplot(rpkm_df[ca$name == "chr10_8095400_8179250", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-6, -12)) ## GATA3
 cd.circplot(rpkm_df[ca$name == "chrX_49093550_49130150", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-2, -10)) ## FOXP3, note problem with TSS
@@ -44,6 +43,12 @@ cd.circplot(rpkm_df[ca$name == "chr17_40453350_40541300", c(1:9,18:19)], snU[c(1
 cd.circplot(rpkm_df[ca$name == "chr1_151769750_151788550", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-8, -16)) # RORC, very poor match to the annotation.
 cd.circplot(rpkm_df[ca$name == "chr11_47363250_47416450", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-2, -12)) #  PU1/ SPI1, Wrong TSS
 
+dev.off()
+
+pdf("ETS1_ELF1_NRF1.circplot.pdf")
+cd.circplot(rpkm_df[ca$name == "chr11_128221800_128395950",], snU) # ETS1
+#cd.circplot(rpkm_df[ca$name == "chr13_41366700_41593550",], snU) # ELF1
+cd.circplot(rpkm_df[ca$name == "chr7_129251550_129420450",], snU) # NRF1
 dev.off()
 
 cd.circplot(rpkm_df[ca$name == "", c(1:9,18:19)], snU[c(1:9,18:19)]) # 
