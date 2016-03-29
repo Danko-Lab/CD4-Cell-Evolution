@@ -11,7 +11,6 @@
 #tfs <- tfbs.selectByGeneExp(tfs)
 #
 #save.image(file="APCluster.rdata")
-#load.image("APCluster.rdata")
 
 library(rtfbsdb)
 load("APCluster.rdata")
@@ -19,6 +18,7 @@ load("APCluster.rdata")
 ## Now get enriched motifs...
 PVAL <- 0.01
 FOLD <- 3
+mTH  <- 7.5
 
 ## Do human
 file.twoBit_path        <- "/local/storage/data/hg19/hg19.2bit";
@@ -27,7 +27,7 @@ h.PROseq.plus           <- "/local/storage/projects/NHP/AllData/All_Merge/H-U_pl
 h.PROseq.minus          <- "/local/storage/projects/NHP/AllData/All_Merge/H-U_minus.bw"
 
 
-enh <- read.table("results/human-changed.TREs.tsv")
+enh <- read.table("results/human-changed.TREs.tsv"); enh$V4 <- 1:NROW(enh$V4)
 enh <- enh[(enh$V3 - enh$V2)>0,] ## CURRENTLY BUGGED.
 enh.up <- enh[enh$V9 < PVAL & enh$V5 > FOLD & !is.na(enh$V9),]
 enh.dn <- enh[enh$V9 < PVAL & enh$V5 < (-1*FOLD) & !is.na(enh$V9),]
@@ -41,7 +41,7 @@ tf_up <- tfbs.enrichmentTest(
         negative.bed= enh.unc,
         gc.correction=TRUE,
         use.cluster=TRUE,
-        threshold = 7,
+        threshold = mTH,
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_up, file.pdf="Human.TF-up.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
 
@@ -52,7 +52,7 @@ tf_dn <- tfbs.enrichmentTest(
         negative.bed= enh.unc,
         gc.correction=TRUE,
         use.cluster=TRUE,
-        threshold = 7,
+        threshold = mTH,
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_dn, file.pdf="Human.TF-dn.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
 
@@ -61,7 +61,7 @@ tfbs.reportEnrichment(tfs, tf_dn, file.pdf="Human.TF-dn.full.pdf", sig.only=TRUE
 
 ## Do Chimp in Chimp genome coordinates.
 chimp.twoBit_path        <- "/local/storage/data/2bit/panTro4.2bit";
-enh <- read.table("results/chimp-changed.TREs.tsv")
+enh <- read.table("results/chimp-changed.TREs.tsv"); enh$V4 <- 1:NROW(enh$V4)
 enh <- enh[(enh$V3 - enh$V2)>0,] ## CURRENTLY BUGGED.
 enh.up <- enh[enh$V9 < PVAL & enh$V5 > FOLD & !is.na(enh$V9),]
 enh.dn <- enh[enh$V9 < PVAL & enh$V5 < (-1*FOLD) & !is.na(enh$V9),]
@@ -74,7 +74,7 @@ tf_up <- tfbs.enrichmentTest(
         negative.bed= enh.unc,
         gc.correction=TRUE,
         use.cluster=TRUE,
-        threshold = 7,
+        threshold = mTH,
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_up, file.pdf="Chimp.TF-up.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
 
@@ -85,13 +85,13 @@ tf_dn <- tfbs.enrichmentTest(
         negative.bed= enh.unc,
         gc.correction=TRUE,
         use.cluster=TRUE,
-        threshold = 7,
+        threshold = mTH,
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_dn, file.pdf="Chimp.TF-dn.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
 
 ## Do Rhesus in Rhesus genome coordinates.
 rhesus.twoBit_path        <- "/local/storage/data/2bit/rheMac3.2bit";
-enh <- read.table("results/rhesus-changed.TREs.tsv")
+enh <- read.table("results/rhesus-changed.TREs.tsv"); enh$V4 <- 1:NROW(enh$V4)
 enh <- enh[(enh$V3 - enh$V2)>0,] ## CURRENTLY BUGGED.
 enh.up <- enh[enh$V9 < PVAL & enh$V5 > FOLD & !is.na(enh$V9),]
 enh.dn <- enh[enh$V9 < PVAL & enh$V5 < (-1*FOLD) & !is.na(enh$V9),]
@@ -104,7 +104,7 @@ tf_up <- tfbs.enrichmentTest(
         negative.bed= enh.unc,
         gc.correction=TRUE,
         use.cluster=TRUE,
-        threshold = 7,
+        threshold = mTH,
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_up, file.pdf="Rhesus.TF-up.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
 
@@ -115,7 +115,7 @@ tf_dn <- tfbs.enrichmentTest(
         negative.bed= enh.unc,
         gc.correction=TRUE,
         use.cluster=TRUE,
-        threshold = 7,
+        threshold = mTH,
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_dn, file.pdf="Rhesus.TF-dn.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
 
