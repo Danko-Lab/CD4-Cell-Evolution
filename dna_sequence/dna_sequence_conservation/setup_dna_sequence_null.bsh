@@ -1,12 +1,12 @@
 #!/usr/bin/bash
 ## Differs from conservation analysis located here: /local/storage/projects/NHP/tfbs/conservation
 ## Intended to be a much simpler foray into this, using the dREG-HD site rather than the TF binding site.
-CMPBED=dREG-HD.2compare.bed ## dREG_HD.merge.bed
+CMPBED=dREG-HD.NULL-MODEL.bed ## dREG_HD.merge.bed
 
 ## Exclude exons.
-featureBits -bed=refGene.exons.bed hg19 refGene:exon
+#featureBits -bed=refGene.exons.bed hg19 refGene:exon
 
-cat /local/storage/projects/NHP/dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed | sort-bed - | bedops -n 1 - refGene.exons.bed > $CMPBED
+bedtools random -n 100000 -l 500 -g /local/storage/data/hg19/hg19.chromInfo | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' | sort-bed - | bedops -n 1 - refGene.exons.bed > $CMPBED
 
 ## Use only TFBS?! (if desired).
 unstarch ../../tfbs/tf.u.hg19.bed.starch | awk '($5 > 10) {print $0}' | bedops --intersect - $CMPBED > tfbs.tmp.bed
@@ -40,5 +40,7 @@ rm loopint.first.tsv loopint.second.tsv first first.tss second second.tss
 cat /local/storage/data/hg19/cd4/superenhancers/BI_CD4p_CD25-_CD45RAp_Naive.csv | sed "s/,/\t/g" | awk '($7 == 1) {print $2,$3,$4}' | sort-bed - | bedmap --echo --indicator $CMPBED - | sed "s/|/\t/g" > $CMPBED\.tmp
 mv $CMPBED\.tmp  $CMPBED
 
-
+##########################################
+## Take subset that are aligend in human.
+bedmap --echo --indicator $CMPBED ../../annotations/gapMerge | grep "0$" | sed "s/|0//g" > ${CMPBED}.nogap
 
