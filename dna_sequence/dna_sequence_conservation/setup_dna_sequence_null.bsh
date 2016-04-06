@@ -6,14 +6,14 @@ CMPBED=dREG-HD.NULL-MODEL.bed ## dREG_HD.merge.bed
 ## Exclude exons.
 #featureBits -bed=refGene.exons.bed hg19 refGene:exon
 
-bedtools random -n 100000 -l 500 -g /local/storage/data/hg19/hg19.chromInfo | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' | sort-bed - | bedops -n 1 - refGene.exons.bed > $CMPBED
+bedtools random -n 100000 -l 10 -g /local/storage/data/hg19/hg19.chromInfo | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' | sort-bed - | bedops -n 1 - refGene.exons.bed > $CMPBED
 
 ## Use only TFBS?! (if desired).
-unstarch ../../tfbs/tf.u.hg19.bed.starch | awk '($5 > 10) {print $0}' | bedops --intersect - $CMPBED > tfbs.tmp.bed
-mv tfbs.tmp.bed $CMPBED
+#unstarch ../../tfbs/tf.u.hg19.bed.starch | awk '($5 > 10) {print $0}' | bedops --intersect - $CMPBED > tfbs.tmp.bed
+#mv tfbs.tmp.bed $CMPBED
 
 ## Add gene-enhancer distances.
-zcat ../../tss_caller/refGene.hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$6=="+"?$2:$3-1,$6=="+"?$2+1:$3,$4,$5,$6}' | sort-bed - | bedtools closest -d -t "first" -b stdin -a $CMPBED | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$10}' > dREG_HD.tmp.bed
+zcat ../../tss_caller/refGene.hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$6=="+"?$2:$3-1,$6=="+"?$2+1:$3,$4,$5,$6}' | sort-bed - | bedtools closest -D b -t "first" -b stdin -a $CMPBED | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$10}' > dREG_HD.tmp.bed
 mv dREG_HD.tmp.bed $CMPBED
 
 ## Add enhancers that loop.

@@ -2,27 +2,30 @@
 require(bigWig)
 require(vioplot)
 require(Hmisc)
+require(stats)
 
 source("../../lib/getOverlap.R")
 source("../../lib/densScatterplot.R")
 
 ## Read in dREG-HD peaks.
-peaksize <- 50 ## control peak size.
+peaksize <- 5 ## control peak size.
 
-bed <- read.table("dREG-HD.2compare.bed"); bed <- bed[bed[,1]=="chr1",]
+bed <- read.table("dREG-HD.2compare.bed"); #bed <- bed[bed[,1]=="chr1",]
+bed_data <- bed
 bed_data <- center.bed(bed, peaksize, peaksize)
 
-bed_null1 <-  read.table("dREG-HD.NULL-MODEL.bed"); bed_null1 <- bed_null1[bed_null1[,1] == "chr1",]
-bed_null1 <- bed_null1[grep("Un|Random", bed_null1$V1, invert=TRUE),]; 
+bed_null1 <-  read.table("dREG-HD.NULL-MODEL.bed"); #bed_null1 <- bed_null1[bed_null1[,1] == "chr1",]
+bed_null1 <- bed_null1[grep("Un|random|hap", bed_null1$V1, invert=TRUE),]; 
 bed_null1 <- center.bed(bed_null1, peaksize, peaksize)
 
-bed_null2 <- read.table("dREG-HD.NULL-MODEL.bed.nogap"); bed_null2 <- bed_null2[bed_null2[,1] == "chr1",]
-bed_null2 <- bed_null2[grep("Un|Random", bed_null2$V1, invert=TRUE),]
+bed_null2 <- read.table("dREG-HD.NULL-MODEL.bed.nogap"); #bed_null2 <- bed_null2[bed_null2[,1] == "chr1",]
+bed_null2 <- bed_null2[grep("Un|random|hap", bed_null2$V1, invert=TRUE),]
 bed_null2 <- center.bed(bed_null2, peaksize, peaksize)
 
 ## Read in MAFs
-#con <- load.bigWig("/local/storage/data/hg19/all/phylopprimate/chr1.phyloP46way.bw")
+#con <- load.bigWig("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw")
 con <- load.bigWig("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw")
+word <- "100way"#"Primate"
 
 ## Get mean conservation for each h_bed.
 mean_con <- bed.region.bpQuery.bigWig(con, bed_data[,1:3], op="avg")# op="max")
@@ -33,6 +36,47 @@ mean_con_null2 <- bed.region.bpQuery.bigWig(con, bed_null2[,1:3], op="avg")# op=
 ## Break it down based on distance, etc.
 cor.test(mean_con, bed$V4)
 idx <- rowSums(bed[,c(5:6)])>0; cor.test(mean_con[idx], bed$V4[idx])
+
+## LOESS smoothing.
+x_val <- seq(-1500000, 1500000, 1000)
+spn <- 0.1
+
+ls.data <-data.frame(dist= bed_data$V4, con= mean_con)
+ls.fit <- loess(con~dist, ls.data, span=spn)
+y_pred<- predict(ls.fit, newdata= x_val)
+
+ls.loop.fit <- loess(con~dist, ls.data[idx,], span=spn)
+y_loop<- predict(ls.loop.fit, newdata= x_val)
+
+null1.data <-data.frame(dist= bed_null1$V4, null1= mean_con_null1)
+null1.fit <- loess(null1~dist, null1.data, span=spn)
+y_null1<-predict(null1.fit, newdata=x_val)
+
+null2.data <-data.frame(dist= bed_null2$V4, null2= mean_con_null2)
+null2.fit <- loess(null2~dist, null2.data, span=spn)
+y_null2<-predict(null2.fit, newdata=x_val)
+
+## Plot NULLs
+pdf(paste(word,".PhyloPByDist.pdf", sep=""))
+
+plot(bed_data$V4, mean_con, xlim=c(-500000,500000), ylim=c(-2,0.75), main="Mean Primate PhyloP per TFBS", xlab="Distance from nearest TSS", ylab="Phylo P")
+points(x_val, y_pred, type="l", col="dark red", lwd=3)
+abline(h=0, lty="dotted", col="gray")
+
+plot(bed_data$V4[idx], mean_con[idx], xlim=c(-500000,500000), ylim=c(-2,0.75), main="Mean Primate PhyloP per LOOPED TFBS", xlab="Distance from nearest TSS", ylab="Phylo P")
+points(x_val, y_pred, type="l", col="dark gray", lwd=3)
+points(x_val, y_loop, type="l", col="dark red", lwd=3)
+abline(h=0, lty="dotted", col="gray")
+
+plot(bed_null2$V4, mean_con_null2, xlim=c(-500000,500000), ylim=c(-2,0.75), main="Mean Primate PhyloP, NULL2", xlab="Distance from nearest TSS", ylab="Phylo P")
+points(x_val, y_null2, type="l", col="dark red", lwd=3)
+abline(h=0, lty="dotted", col="gray")
+
+plot(bed_null1$V4, mean_con_null1, xlim=c(-500000,500000), ylim=c(-2,0.75), main="Mean Primate PhyloP, NULL1", xlab="Distance from nearest TSS", ylab="Phylo P")
+points(x_val, y_null1, type="l", col="dark red", lwd=3)
+abline(h=0, lty="dotted", col="gray")
+
+dev.off()
 
 par(mfrow=c(1,3))
 plot(bed_data$V4, mean_con, xlim=c(0,1500000), ylim=c(-2,8))
@@ -52,8 +96,9 @@ points((bed$V4+1)[idx], mean_con[idx], col="red")
 cor.test(log(bed$V4+1), mean_con)
 cor.test(log(bed$V4+1)[idx], mean_con[idx])
 
-#cor.test(bed[,3]-bed[,2], mean_con)
-#plot(bed[,3]-bed[,2], mean_con)
+## Look at signal V. length.
+cor.test(bed[,3]-bed[,2], mean_con)
+plot(bed[,3]-bed[,2], mean_con)
 
 median(mean_con[bed$V4 < 10])
 median(mean_con[bed$V4 > 10 & bed$V4 < 1000])
@@ -85,39 +130,48 @@ vioplot(mean_con[bed[,7]>0], mean_con[bed$V7==0])
 summary(mean_con[bed[,7]>0])
 summary(mean_con[bed$V7==0])
 
-pdf("DNASequence.phyloP.Conservation.pdf")
- ld<- 3; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
+pdf(paste("DNASequence.",word,".phyloP.Conservation.pdf", sep=""))
+ ld<- 3; xlim_s=c(-0.75, 0.5) #c(-0.4, 0.5) #PRIMATE
 
- plot(ecdf(mean_con[bed[,7]>0]), col="#00A63E", xlim=xlim_s, lwd=ld)
- plot(ecdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0]), col="black", add=TRUE, lwd=ld)
- plot(ecdf(mean_con[rowSums(bed[,c(5:6)])>0]), col="#b70000", add=TRUE, lwd=ld)
+ plot(ecdf(mean_con[bed_data[,7]>0]), col="#00A63E", xlim=xlim_s, lwd=ld)
+ plot(ecdf(mean_con[bed_data[,7]==0 & rowSums(bed_data[,c(5:6)])==0]), col="black", add=TRUE, lwd=ld)
+ plot(ecdf(mean_con[rowSums(bed_data[,c(5:6)])>0]), col="#b70000", add=TRUE, lwd=ld)
  plot(ecdf(mean_con_null1), col="gray", add=TRUE, lwd=ld)
  plot(ecdf(mean_con_null2), col="dark gray", add=TRUE, lwd=ld)
 
  ## 1-10k
- indx <- bed$V4 < 10000
+ indx <- abs(bed$V4) < 10000
  plot(ecdf(mean_con[bed[,7]>0 & indx]), col="#00A63E", xlim=xlim_s, lwd=ld)
  plot(ecdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx]), col="black", add=TRUE, lwd=ld)
  plot(ecdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx]), col="#b70000", add=TRUE, lwd=ld)
- plot(ecdf(mean_con_null1[bed_null1$V4 < 10000]), col="gray", add=TRUE, lwd=ld)
- plot(ecdf(mean_con_null2[bed_null2$V4 < 10000]), col="dark gray", add=TRUE, lwd=ld)
+ plot(ecdf(mean_con_null1[abs(bed_null1$V4) < 10000]), col="gray", add=TRUE, lwd=ld)
+ plot(ecdf(mean_con_null2[abs(bed_null2$V4) < 10000]), col="dark gray", add=TRUE, lwd=ld)
 
 
  ## 10-100k
- indx <- bed$V4 < 100000 & bed$V4 > 10000
+ indx <- abs(bed$V4) < 100000 & abs(bed$V4) > 10000
  plot(ecdf(mean_con[bed[,7]>0 & indx]), col="#00A63E", xlim=xlim_s, lwd=ld)
  plot(ecdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx]), col="black", add=TRUE, lwd=ld)
  plot(ecdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx]), col="#b70000", add=TRUE, lwd=ld)
- plot(ecdf(mean_con_null1[bed_null1$V4 > 10000 & bed_null1$V4 < 100000]), col="gray", add=TRUE, lwd=ld)
- plot(ecdf(mean_con_null2[bed_null2$V4 > 10000 & bed_null2$V4 < 100000]), col="dark gray", add=TRUE, lwd=ld)
+ plot(ecdf(mean_con_null1[abs(bed_null1$V4) > 10000 & abs(bed_null1$V4) < 100000]), col="gray", add=TRUE, lwd=ld)
+ plot(ecdf(mean_con_null2[abs(bed_null2$V4) > 10000 & abs(bed_null2$V4) < 100000]), col="dark gray", add=TRUE, lwd=ld)
 
  ## 100-1,000k
- indx <- bed$V4 < 1000000 & bed$V4 > 100000
+ indx <- abs(bed$V4) < 1000000 & abs(bed$V4) > 100000
  plot(ecdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0  & indx]), col="black", xlim=xlim_s, lwd=ld)
  plot(ecdf(mean_con[bed[,7]>0 & indx]), col="#00A63E", add=TRUE, lwd=ld)
  plot(ecdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx]), col="#b70000", add=TRUE, lwd=ld)
- plot(ecdf(mean_con_null1[bed_null1$V4 > 100000 & bed_null1$V4 < 1000000]), col="gray", add=TRUE, lwd=ld)
- plot(ecdf(mean_con_null2[bed_null2$V4 > 100000 & bed_null2$V4 < 1000000]), col="dark gray", add=TRUE, lwd=ld)
+ plot(ecdf(mean_con_null1[abs(bed_null1$V4) > 100000 & abs(bed_null1$V4) < 1000000]), col="gray", add=TRUE, lwd=ld)
+ plot(ecdf(mean_con_null2[abs(bed_null2$V4) > 100000 & abs(bed_null2$V4) < 1000000]), col="dark gray", add=TRUE, lwd=ld)
+
+ ## Difference based on distance...
+ ld<- 3; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
+ indx <- bed$V4 < 10000
+ plot(ecdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx]), col="black", xlim=xlim_s, lwd=ld)
+ indx <- bed$V4 < 100000 & bed$V4 > 10000
+ plot(ecdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx]), col="dark gray", add=TRUE, lwd=ld)
+ indx <- bed$V4 < 1000000 & bed$V4 > 100000
+ plot(ecdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0  & indx]), col="gray", lwd=ld, add=TRUE)
 
 dev.off()
 
