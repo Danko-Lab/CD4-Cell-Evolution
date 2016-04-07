@@ -8,7 +8,7 @@ source("../../lib/getOverlap.R")
 source("../../lib/densScatterplot.R")
 
 ## Read in dREG-HD peaks.
-peaksize <- 5 ## control peak size.
+peaksize <- 5 # 100 ## control peak size.
 
 bed <- read.table("dREG-HD.2compare.bed"); #bed <- bed[bed[,1]=="chr1",]
 bed_data <- bed
@@ -35,7 +35,7 @@ mean_con_null2 <- bed.region.bpQuery.bigWig(con, bed_null2[,1:3], op="avg")# op=
 ################################################
 ## Break it down based on distance, etc.
 cor.test(mean_con, bed$V4)
-idx <- rowSums(bed[,c(5:6)])>0; cor.test(mean_con[idx], bed$V4[idx])
+idx <- rowSums(bed_data[,c(5:6)])>0; cor.test(mean_con[idx], bed$V4[idx])
 
 ## LOESS smoothing.
 x_val <- seq(-1500000, 1500000, 1000)
@@ -58,21 +58,22 @@ y_null2<-predict(null2.fit, newdata=x_val)
 
 ## Plot NULLs
 pdf(paste(word,".PhyloPByDist.pdf", sep=""))
+ylims=c(-3,8) #c(-2, 0.75)
 
-plot(bed_data$V4, mean_con, xlim=c(-500000,500000), ylim=c(-2,0.75), main="Mean Primate PhyloP per TFBS", xlab="Distance from nearest TSS", ylab="Phylo P")
+plot(bed_data$V4, mean_con, xlim=c(-500000,500000), ylim=ylims, main="Mean Primate PhyloP per TFBS", xlab="Distance from nearest TSS", ylab="Phylo P")
 points(x_val, y_pred, type="l", col="dark red", lwd=3)
 abline(h=0, lty="dotted", col="gray")
 
-plot(bed_data$V4[idx], mean_con[idx], xlim=c(-500000,500000), ylim=c(-2,0.75), main="Mean Primate PhyloP per LOOPED TFBS", xlab="Distance from nearest TSS", ylab="Phylo P")
+plot(bed_data$V4[idx], mean_con[idx], xlim=c(-500000,500000), ylim=ylims, main="Mean Primate PhyloP per LOOPED TFBS", xlab="Distance from nearest TSS", ylab="Phylo P")
 points(x_val, y_pred, type="l", col="dark gray", lwd=3)
 points(x_val, y_loop, type="l", col="dark red", lwd=3)
 abline(h=0, lty="dotted", col="gray")
 
-plot(bed_null2$V4, mean_con_null2, xlim=c(-500000,500000), ylim=c(-2,0.75), main="Mean Primate PhyloP, NULL2", xlab="Distance from nearest TSS", ylab="Phylo P")
+plot(bed_null2$V4, mean_con_null2, xlim=c(-500000,500000), ylim=ylims, main="Mean Primate PhyloP, NULL2", xlab="Distance from nearest TSS", ylab="Phylo P")
 points(x_val, y_null2, type="l", col="dark red", lwd=3)
 abline(h=0, lty="dotted", col="gray")
 
-plot(bed_null1$V4, mean_con_null1, xlim=c(-500000,500000), ylim=c(-2,0.75), main="Mean Primate PhyloP, NULL1", xlab="Distance from nearest TSS", ylab="Phylo P")
+plot(bed_null1$V4, mean_con_null1, xlim=c(-500000,500000), ylim=ylims, main="Mean Primate PhyloP, NULL1", xlab="Distance from nearest TSS", ylab="Phylo P")
 points(x_val, y_null1, type="l", col="dark red", lwd=3)
 abline(h=0, lty="dotted", col="gray")
 
@@ -131,13 +132,36 @@ summary(mean_con[bed[,7]>0])
 summary(mean_con[bed$V7==0])
 
 pdf(paste("DNASequence.",word,".phyloP.Conservation.pdf", sep=""))
- ld<- 3; xlim_s=c(-0.75, 0.5) #c(-0.4, 0.5) #PRIMATE
+ ld<- 3; xlim_s=c(-0.75,3) #xlim_s=c(-0.75, 0.5) #c(-0.4, 0.5) #PRIMATE
 
  plot(ecdf(mean_con[bed_data[,7]>0]), col="#00A63E", xlim=xlim_s, lwd=ld)
  plot(ecdf(mean_con[bed_data[,7]==0 & rowSums(bed_data[,c(5:6)])==0]), col="black", add=TRUE, lwd=ld)
  plot(ecdf(mean_con[rowSums(bed_data[,c(5:6)])>0]), col="#b70000", add=TRUE, lwd=ld)
  plot(ecdf(mean_con_null1), col="gray", add=TRUE, lwd=ld)
  plot(ecdf(mean_con_null2), col="dark gray", add=TRUE, lwd=ld)
+
+## Cut at 0.75
+ th <- 0.75
+ abline(v=th)
+
+ sum(mean_con[bed_data[,7]==0 & rowSums(bed_data[,c(5:6)])==0] > th)/NROW(mean_con[bed_data[,7]==0 & rowSums(bed_data[,c(5:6)])==0])
+ sum(mean_con[bed_data[,7]>0] > th)/NROW(mean_con[bed_data[,7]>0])
+ sum(mean_con[rowSums(bed_data[,c(5:6)])>0] > th)/NROW(mean_con[rowSums(bed_data[,c(5:6)])>0])
+ sum(mean_con_null1 > th)/ NROW(mean_con_null1)
+ sum(mean_con_null2 > th)/ NROW(mean_con_null2)
+
+ ## Then add barplots...
+ require(boot)
+ b_dreg <- boot(data= tss[tss$V5=="Dist_UnSt",], R=1000, statistic= function(a, i) {fracConserved(a[i,])})
+
+ source("../lib/barplot.R")
+ bars <- c(b_du$t0, b_du_loop$t0, b_ps$t0, b_ps_loop$t0)
+ errs <- c(sqrt(var(b_du$t)), sqrt(var(b_du_loop$t)), sqrt(var(b_ps$t)), sqrt(var(b_ps_loop$t)))
+ names<- c("All Enhancer", "Looped Enhancer", "All Promoter", "Looped Promoter")
+ cd.barplot(bars, errs, names, fill=TRUE)
+ 
+
+## Now seperate by distance. 
 
  ## 1-10k
  indx <- abs(bed$V4) < 10000

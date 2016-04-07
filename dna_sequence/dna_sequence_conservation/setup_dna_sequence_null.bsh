@@ -5,8 +5,8 @@ CMPBED=dREG-HD.NULL-MODEL.bed ## dREG_HD.merge.bed
 
 ## Exclude exons.
 #featureBits -bed=refGene.exons.bed hg19 refGene:exon
-
-bedtools random -n 100000 -l 10 -g /local/storage/data/hg19/hg19.chromInfo | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' | sort-bed - | bedops -n 1 - refGene.exons.bed > $CMPBED
+SIZE=10 #500 #10
+bedtools random -n 100000 -l $SIZE -g /local/storage/data/hg19/hg19.chromInfo | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' | sort-bed - | bedops -n 1 - refGene.exons.bed > $CMPBED
 
 ## Use only TFBS?! (if desired).
 #unstarch ../../tfbs/tf.u.hg19.bed.starch | awk '($5 > 10) {print $0}' | bedops --intersect - $CMPBED > tfbs.tmp.bed
