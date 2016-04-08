@@ -1,31 +1,48 @@
 #!/usr/bin/bash
+
+## Human, separate gains/losses.
 cat ../enhancer/hg19.gain.bed ../enhancer/hg19.loss.bed | sort-bed - | bedmap --echo --indicator ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed - | grep "|1" | sed "s/|1//g" | gzip > H-U.gain-loss.dREG_HD.bed.gz
+cat ../enhancer/hg19.gain.bed | sort-bed - | bedmap --echo --indicator ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed - | grep "|1" | sed "s/|1//g" | gzip > H-U.gain.dREG_HD.bed.gz
+cat ../enhancer/hg19.loss.bed | sort-bed - | bedmap --echo --indicator ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed - | grep "|1" | sed "s/|1//g" | gzip > H-U.loss.dREG_HD.bed.gz
 
+## Non-human primate.
 cat ../enhancer/panTro4.gain.bed ../enhancer/panTro4.loss.bed | sort-bed - | bedmap --echo --indicator ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed - | grep "|1" | sed "s/|1//g" | gzip > C-U.gain-loss.dREG_HD.bed.gz
-
 cat ../enhancer/rheMac3.gain.bed ../enhancer/rheMac3.loss.bed | sort-bed - | bedmap --echo --indicator ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed - | grep "|1" | sed "s/|1//g" | gzip > M-U.gain-loss.dREG_HD.bed.gz
 
+## Conserved.
 cat ../enhancer/all.conserved.bed | sort-bed - | bedmap --echo --indicator ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed - | grep "|1" | sed "s/|1//g"  | gzip > conserved.dREG_HD.bed.gz
+zcat ../tss_caller/refGene.hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$6=="+"?$2:$3-1,$6=="+"?$2+1:$3,$4,$5,$6}' | sort-bed - | bedtools closest -d -t "first" -b stdin -a conserved.dREG_HD.bed.gz | awk 'BEGIN{OFS="\t"} ($10 > 10000) {print $1,$2,$3}' | gzip > conserved-distal.dREG_HD.bed.gz
 
 ## Get TFBS.
 zcat H-U.gain-loss.dREG_HD.bed.gz > H-U.gl.tmp.bed
 zcat conserved.dREG_HD.bed.gz > conserved.tmp.bed
-unstarch ../tfbs/tf.u.hg19.bed.starch | awk '($5 > 10) {print $0}' | bedops --element-of - H-U.gl.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > Hgain-loss.TFBS.bed.gz
-unstarch ../tfbs/tf.u.hg19.bed.starch | awk '($5 > 10) {print $0}' | bedops --element-of - conserved.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > conserved.TFBS.bed.gz
-rm H-U.gl.tmp.bed conserved.tmp.bed
+zcat H-U.gain.dREG_HD.bed.gz > H-U.gain.tmp.bed
+zcat H-U.loss.dREG_HD.bed.gz > H-U.loss.tmp.bed
+unstarch ../tfbs/tf.u.hg19.bed.starch | awk '($5 > 10) {print $0}' | gzip > tfs.tmp.gz
 
+zcat tfs.tmp.gz | bedops --element-of - H-U.gl.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > Hgain-loss.TFBS.bed.gz
+zcat tfs.tmp.gz | bedops --element-of - H-U.gain.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > Hgain.TFBS.bed.gz
+zcat tfs.tmp.gz | bedops --element-of - H-U.loss.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > Hloss.TFBS.bed.gz
+zcat tfs.tmp.gz | bedops --element-of - conserved.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > conserved.TFBS.bed.gz
+rm tfs.tmp.gz
 
 ## Try also these specific TFBS: 
+function getTF {
+unstarch ../tfbs/tf.u.hg19.bed.starch | grep $1 | awk '($5 > 9) {print $0}' > tf.tmp
+cat tf.tmp | bedops --element-of - H-U.gl.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > ${2}.Hgain-loss.TFBS.bed.gz
+cat tf.tmp | bedops --element-of - H-U.gain.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > ${2}.Hgain.TFBS.bed.gz
+cat tf.tmp | bedops --element-of - H-U.loss.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > ${2}.Hloss.TFBS.bed.gz
+cat tf.tmp | bedops --element-of - conserved.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > ${2}.conserved.TFBS.bed.gz
+rm tf.tmp
+}
 
-#M6203_1.02/ELF1
-unstarch ../tfbs/tf.u.hg19.bed.starch | awk '($5 > 10) {print $0}' | bedops --element-of - H-U.gain-loss.dREG_HD.bed.gz | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > Hgain-loss.TFBS.bed.gz
-unstarch ../tfbs/tf.u.hg19.bed.starch | awk '($5 > 10) {print $0}' | bedops --element-of - conserved.dREG_HD.bed.gz | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > conserved.TFBS.bed.gz
+getTF M6203_1.02 ELF1
+getTF M4505_1.02 GABPA
+getTF M6151_1.02 ARNT
+getTF M4490_1.02 YY1
+getTF M6352_1.02 MYCN
+getTF M6494_1.02 STAT2
+getTF M6180_1.02 CREB1
 
-
-#M4505_1.02/GABPA
-#M6151_1.02/ARNT
-#M4490_1.02/YY1
-#M6352_1.02/MYCN
-#M6494_1.02/STAT2
-#M6180_1.02/CREB1
+rm H-U.gl.tmp.bed conserved.tmp.bed H-U.gain.tmp.bed H-U.loss.tmp.bed
 
