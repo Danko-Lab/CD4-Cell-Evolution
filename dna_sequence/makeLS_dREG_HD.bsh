@@ -6,3 +6,26 @@ cat ../enhancer/panTro4.gain.bed ../enhancer/panTro4.loss.bed | sort-bed - | bed
 cat ../enhancer/rheMac3.gain.bed ../enhancer/rheMac3.loss.bed | sort-bed - | bedmap --echo --indicator ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed - | grep "|1" | sed "s/|1//g" | gzip > M-U.gain-loss.dREG_HD.bed.gz
 
 cat ../enhancer/all.conserved.bed | sort-bed - | bedmap --echo --indicator ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed - | grep "|1" | sed "s/|1//g"  | gzip > conserved.dREG_HD.bed.gz
+
+## Get TFBS.
+zcat H-U.gain-loss.dREG_HD.bed.gz > H-U.gl.tmp.bed
+zcat conserved.dREG_HD.bed.gz > conserved.tmp.bed
+unstarch ../tfbs/tf.u.hg19.bed.starch | awk '($5 > 10) {print $0}' | bedops --element-of - H-U.gl.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > Hgain-loss.TFBS.bed.gz
+unstarch ../tfbs/tf.u.hg19.bed.starch | awk '($5 > 10) {print $0}' | bedops --element-of - conserved.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > conserved.TFBS.bed.gz
+rm H-U.gl.tmp.bed conserved.tmp.bed
+
+
+## Try also these specific TFBS: 
+
+#M6203_1.02/ELF1
+unstarch ../tfbs/tf.u.hg19.bed.starch | awk '($5 > 10) {print $0}' | bedops --element-of - H-U.gain-loss.dREG_HD.bed.gz | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > Hgain-loss.TFBS.bed.gz
+unstarch ../tfbs/tf.u.hg19.bed.starch | awk '($5 > 10) {print $0}' | bedops --element-of - conserved.dREG_HD.bed.gz | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > conserved.TFBS.bed.gz
+
+
+#M4505_1.02/GABPA
+#M6151_1.02/ARNT
+#M4490_1.02/YY1
+#M6352_1.02/MYCN
+#M6494_1.02/STAT2
+#M6180_1.02/CREB1
+

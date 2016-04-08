@@ -34,11 +34,11 @@ doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", 
 
 dev.off()
 
-pdf("PrimatePhyloP.chr1.pdf")
+pdf("PrimatePhyloP.pdf")
 
-doplot("/local/storage/data/hg19/all/phylopprimate/chr1.phyloP46way.bw", "H-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at Human LS dREG sites")
-doplot("/local/storage/data/hg19/all/phylopprimate/chr1.phyloP46way.bw", "C-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at Chimp LS dREG sites")
-doplot("/local/storage/data/hg19/all/phylopprimate/chr1.phyloP46way.bw", "M-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at R.Macaque LS dREG sites")
+doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "H-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at Human LS dREG sites")
+doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "C-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at Chimp LS dREG sites")
+doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "M-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at R.Macaque LS dREG sites")
 
 dev.off()
 
@@ -51,4 +51,10 @@ doplot("rm.ls.diff.bigWig", "M-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.b
 
 doplot("rm.ls.diff.bigWig", "H-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="R. macaque divergences, Human gains/ losses.") ## Control.
 
+dev.off()
+
+
+pdf("TFBS.pdf")
+doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "Hgain-loss.TFBS.bed.gz", "conserved.TFBS.bed.gz", halfWindow= 100, stp=3, main="100-way")
+doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "Hgain-loss.TFBS.bed.gz", "conserved.TFBS.bed.gz", halfWindow=100, stp=3, main="Primate PhyloP")
 dev.off()

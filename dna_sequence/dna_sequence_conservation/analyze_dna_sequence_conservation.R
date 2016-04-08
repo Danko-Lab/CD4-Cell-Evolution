@@ -152,14 +152,17 @@ pdf(paste("DNASequence.",word,".phyloP.Conservation.pdf", sep=""))
 
  ## Then add barplots...
  require(boot)
- b_dreg <- boot(data= tss[tss$V5=="Dist_UnSt",], R=1000, statistic= function(a, i) {fracConserved(a[i,])})
+ b_dreg <- boot(data= mean_con[bed_data[,7]==0 & rowSums(bed_data[,c(5:6)])==0], R=1000, statistic= function(a, i) {sum(a[i] > th)/NROW(i) })
+ b_se   <- boot(data= mean_con[bed_data[,7]>0], R=1000, statistic= function(a, i) {sum(a[i] > th)/NROW(i) })
+ b_loop <- boot(data= mean_con[rowSums(bed_data[,c(5:6)])>0], R=1000, statistic= function(a, i) {sum(a[i] > th)/NROW(i) })
+ b_null1   <- boot(data= mean_con_null1, R=1000, statistic= function(a, i) {sum(a[i] > th)/NROW(i) })
+ b_null2   <- boot(data= mean_con_null2, R=1000, statistic= function(a, i) {sum(a[i] > th)/NROW(i) })
 
- source("../lib/barplot.R")
- bars <- c(b_du$t0, b_du_loop$t0, b_ps$t0, b_ps_loop$t0)
- errs <- c(sqrt(var(b_du$t)), sqrt(var(b_du_loop$t)), sqrt(var(b_ps$t)), sqrt(var(b_ps_loop$t)))
- names<- c("All Enhancer", "Looped Enhancer", "All Promoter", "Looped Promoter")
+ source("../../lib/barplot.R")
+ bars <- c(b_dreg$t0, b_se$t0, b_loop$t0, b_null1$t0, b_null2$t0)
+ errs <- c(sqrt(var(b_dreg$t)), sqrt(var(b_se$t)), sqrt(var(b_loop$t)), sqrt(var(b_null1$t)), sqrt(var(b_null2$t)))
+ names<- c("Enhancer, noloop/ SE", "Super Enhancer", "Looped Enhancer", "NULL1", "NULL2")
  cd.barplot(bars, errs, names, fill=TRUE)
- 
 
 ## Now seperate by distance. 
 
