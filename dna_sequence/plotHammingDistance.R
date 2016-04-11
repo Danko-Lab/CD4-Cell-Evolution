@@ -1,4 +1,5 @@
 require(bigWig)
+source("../lib/avg.metaprofile.R")
 
 doplot <- function(bw_file, bed_file_conserved, bed_file_gain, bed_file_loss, stp=100, halfWindow=10000, ...) {
  bw <- load.bigWig(bw_file)
@@ -6,9 +7,9 @@ doplot <- function(bw_file, bed_file_conserved, bed_file_gain, bed_file_loss, st
  bedl <- read.table(bed_file_loss)
  bed_conserved <- read.table(bed_file_conserved)
 
- meta_g <- metaprofile.bigWig(center.bed(bedg, halfWindow, halfWindow), bw, step=stp)
- meta_l <- metaprofile.bigWig(center.bed(bedl, halfWindow, halfWindow), bw, step=stp)
- meta_conserved <- metaprofile.bigWig(center.bed(bed_conserved, halfWindow, halfWindow), bw, step=stp)
+ meta_g <- avg.metaprofile.bigWig(center.bed(bedg, halfWindow, halfWindow), bw, step=stp)
+ meta_l <- avg.metaprofile.bigWig(center.bed(bedl, halfWindow, halfWindow), bw, step=stp)
+ meta_conserved <- avg.metaprofile.bigWig(center.bed(bed_conserved, halfWindow, halfWindow), bw, step=stp)
 
  signal_g <- meta_g$middle
  signal_l <- meta_l$middle
@@ -28,7 +29,7 @@ doplot <- function(bw_file, bed_file_conserved, bed_file_gain, bed_file_loss, st
 
 
 tfbsdoplot <- function(bw, tf_name) {
-  doplot(bw, paste(tf_name,".Hgain-loss.TFBS.bed.gz", sep=""), paste(tf_name,".conserved.TFBS.bed.gz", sep=""), halfWindow=50, stp=1, main=tf_name)
+  doplot(bw, paste(tf_name,".conserved.TFBS.bed.gz", sep=""), paste(tf_name,".Hgain.TFBS.bed.gz", sep=""), paste(tf_name,".Hloss.TFBS.bed.gz", sep=""), halfWindow=50, stp=1, main=tf_name)
 }
 
 pdf("TFBS.pdf")
@@ -41,7 +42,7 @@ tfbsdoplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.b
 tfbsdoplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "YY1")
 tfbsdoplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "MYCN")
 tfbsdoplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "STAT2")
-tfbsdoplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "CREB")
+tfbsdoplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "CREB1")
 
 dev.off()
 
@@ -71,7 +72,12 @@ dev.off()
 
 pdf("DNASequence.pdf")
 
+doplot("hs.ls.diff.bigWig", "conserved.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", main="PhyloP at Human LS dREG sites", stp=300, halfWindow=25000)
+doplot("hs.ls.diff.bigWig", "conserved-distal.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", main="PhyloP at Human LS dREG sites", stp=300, halfWindow=25000)
 
+doplot("hs.ls.diff.bigWig", "conserved.TFBS.bed.gz", "Hgain.TFBS.bed.gz", "Hloss.TFBS.bed.gz", halfWindow= 100, stp=1, main="All TFs, 100-way")
+tfbsdoplot("hs.ls.diff.bigWig", "ELF1")
+tfbsdoplot("hs.ls.diff.bigWig", "STAT2")
 
 ## Changes.
 #doplot("hs.ls.diff.bigWig", "H-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="Human divergences, Human gains/ losses.") 
