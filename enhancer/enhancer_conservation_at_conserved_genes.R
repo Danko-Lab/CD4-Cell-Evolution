@@ -28,7 +28,7 @@ indx1TRE <- integer(0)
 indxGT1TRE<-integer(0)
 
  ## Get TSS of conserved, annotated protein coding genes.
- indx <- fdr_df$fdr_min > 0.15 & ca$type == "protein_coding" & abs(fdr_df$fc_min) < 0.5
+ indx <- fdr_df$fdr_min > 0.15 & ca$type == "protein_coding" & abs(fdr_df$fc_min) < 0.75
  tss   <- ca[indx,1:8]
  tss[tss[,6] == "+",2] <- tss[tss[,6] == "+",2]-250; tss[tss[,6] == "+",3] <- tss[tss[,6] == "+",2]+1
  tss[tss[,6] == "-",3] <- tss[tss[,6] == "-",3]+251; tss[tss[,6] == "-",2] <- tss[tss[,6] == "-",3]-1
@@ -57,7 +57,7 @@ indxGT1TRE<-integer(0)
   } 
 
   ## ... to more than 1 loop.
-  if(nloops > 4) {
+  if(nloops > 2) {
     if(NROW(indx1)>0) {
       indxGT1TRE <- c(indxGT1TRE, getOverlap(loops2[indx1,], tres))
     }
@@ -67,8 +67,8 @@ indxGT1TRE<-integer(0)
   }
  }
 
-indx1TRE <- unique(sort(indx1TRE))
-indxGT1TRE <- unique(sort(indxGT1TRE))
+indx1TRE <- unique(sort(indx1TRE)); NROW(indx1TRE)
+indxGT1TRE <- unique(sort(indxGT1TRE)); NROW(indxGT1TRE)
 
 #########
 ## Do enhancers that loop to exactly 1 TRE change less frequently?
