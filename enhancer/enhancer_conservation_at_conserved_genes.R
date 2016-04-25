@@ -7,7 +7,7 @@
 source("../lib/getOverlap.R")
 
 ##Prepare loops.
-dist<- 1000 # 15000
+dist<- 1500 # 1000
 loops <- read.table("/local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz")
 loopdist <- function(i) { ## Get the actual distance in the detected loop interaction.
  loop1 <- sapply(strsplit(as.character(loops$V4), split=";"), function(x) {x[[i]]})
@@ -97,11 +97,12 @@ doesChange <- function(re) {
  chang <- sum(re$V20 == 0 & !is.na(re$mapSize) & re$fdr_min < 0.05 & (re$V7 > 0.7 | re$V8 > 0.7 | re$V9 > 0.7) & (re$V7 > 0.1 & re$V8 > 0.1 & re$V9 > 0.1)) # 'High-confidence'
  allcng<- sum(re$V20 == 0 & !is.na(re$mapSize) & re$fdr_min < 0.05)
 
-  tot <- total-one2m
-  con <- total-one2m-unmap-chang-lccng
+ tot <- total-one2m
+ con <- total-one2m-unmap-chang-lccng
 
-  return(con/tot)
+ print(paste(tot, con))
 
+ return(con/tot)
 }
 
 doesChange(tres[indx1TRE,])
