@@ -108,5 +108,8 @@ doesChange <- function(re) {
 doesChange(tres[indx1TRE,])
 doesChange(tres[indxGT1TRE,])
 
+## Write out location files for DNA sequence analysis.
+write.table(tres[indx1TRE,1:4],   "loopsToOneTRE.bed", sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)
+write.table(tres[indxGT1TRE,1:4], "loopsToMoreTRE.bed", sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)
 
 
