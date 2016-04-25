@@ -132,21 +132,21 @@ summary(mean_con[bed[,7]>0])
 summary(mean_con[bed$V7==0])
 
 pdf(paste("DNASequence.",word,".phyloP.Conservation.pdf", sep=""))
- ld<- 3; xlim_s=c(-0.75,3) #xlim_s=c(-0.75, 0.5) #c(-0.4, 0.5) #PRIMATE
+ ld<- 5; xlim_s=c(-0.75,3) #xlim_s=c(-0.75, 0.5) #c(-0.4, 0.5) #PRIMATE
 
- plot(ecdf(mean_con[bed_data[,7]>0]), col="#00A63E", xlim=xlim_s, lwd=ld)
+ plot(ecdf(mean_con_null1), col="gray", lwd=ld, xlim=xlim_s)
+ plot(ecdf(mean_con_null2), col="dark gray", add=TRUE, lwd=ld)
+ plot(ecdf(mean_con[bed_data[,7]>0]), col="#00A63E", add=TRUE, lwd=ld)
  plot(ecdf(mean_con[bed_data[,7]==0 & rowSums(bed_data[,c(5:6)])==0]), col="black", add=TRUE, lwd=ld)
  plot(ecdf(mean_con[rowSums(bed_data[,c(5:6)])>0]), col="#b70000", add=TRUE, lwd=ld)
- plot(ecdf(mean_con_null1), col="gray", add=TRUE, lwd=ld)
- plot(ecdf(mean_con_null2), col="dark gray", add=TRUE, lwd=ld)
 
 ## Plot smaller version for figs.
- npts <- 25000
- plot(ecdf(mean_con[sample(which(bed_data[,7]>0), npts)]), col="#00A63E", xlim=xlim_s, lwd=ld)
- plot(ecdf(mean_con[sample(which(bed_data[,7]==0 & rowSums(bed_data[,c(5:6)])==0), npts)]), col="black", add=TRUE, lwd=ld)
- plot(ecdf(mean_con[sample(which(rowSums(bed_data[,c(5:6)])>0), npts)]), col="#b70000", add=TRUE, lwd=ld)
- plot(ecdf(mean_con_null1[sample(1:NROW(mean_con_null1), npts)]), col="gray", add=TRUE, lwd=ld)
- plot(ecdf(mean_con_null2[sample(1:NROW(mean_con_null2), npts)]), col="dark gray", add=TRUE, lwd=ld)
+# npts <- 5000
+# plot(ecdf(mean_con[sample(which(bed_data[,7]>0), npts)]), col="#00A63E", xlim=xlim_s, lwd=ld)
+# plot(ecdf(mean_con[sample(which(bed_data[,7]==0 & rowSums(bed_data[,c(5:6)])==0), npts)]), col="black", add=TRUE, lwd=ld)
+# plot(ecdf(mean_con[sample(which(rowSums(bed_data[,c(5:6)])>0), npts)]), col="#b70000", add=TRUE, lwd=ld)
+# plot(ecdf(mean_con_null1[sample(1:NROW(mean_con_null1), npts)]), col="gray", add=TRUE, lwd=ld)
+# plot(ecdf(mean_con_null2[sample(1:NROW(mean_con_null2), npts)]), col="dark gray", add=TRUE, lwd=ld)
 
 
 ## Cut at 0.75

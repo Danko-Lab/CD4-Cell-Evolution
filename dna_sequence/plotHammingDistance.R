@@ -46,6 +46,12 @@ tfbsdoplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.b
 
 dev.off()
 
+pdf("TFBS.byDist.pdf")
+
+doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "tfbs.all.dist_0-10kb.bed.gz", "tfbs.all.dist_10-100kb.bed.gz", "tfbs.all.dist_100-1000kb.bed.gz", halfWindow= 100, stp=1, main="All TFs, 100-way")
+doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "tfbs.all.dist_0-10kb.bed.gz", "tfbs.all.dist_10-100kb.bed.gz", "tfbs.all.dist_100-1000kb.bed.gz", halfWindow= 100, stp=1, main="All TFs, 100-way")
+
+dev.off()
 
 
 pdf("PhyloP_100way.pdf")

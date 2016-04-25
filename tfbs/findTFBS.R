@@ -20,6 +20,6 @@ library(rtfbsdb)
 load("APCluster.rdata")
 
 ## Now scan the human genome for all TFBS.
-tfbs.scanTFsite(tfs, file.twoBit_path, return.type="writedb", file.prefix= "H.motifs.starch", ncores=10, threshold= 8, threshold.type="score")
+tfbs.scanTFsite(tfs, file.twoBit_path, return.type="writedb", file.prefix= "H.motifs.th8", ncores=20, threshold= 8, threshold.type="score")
 
 

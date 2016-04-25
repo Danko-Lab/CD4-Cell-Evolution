@@ -24,6 +24,13 @@ zcat tfs.tmp.gz | bedops --element-of - H-U.gl.tmp.bed | awk '(($3-$2)> 5) {prin
 zcat tfs.tmp.gz | bedops --element-of - H-U.gain.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > Hgain.TFBS.bed.gz
 zcat tfs.tmp.gz | bedops --element-of - H-U.loss.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > Hloss.TFBS.bed.gz
 zcat tfs.tmp.gz | bedops --element-of - conserved.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > conserved.TFBS.bed.gz
+
+## Also compare distance.
+zcat ../tss_caller/refGene.hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$6=="+"?$2:$3-1,$6=="+"?$2+1:$3,$4,$5,$6}' | sort-bed - | bedtools closest -d -t "first" -a tfs.tmp.gz -b stdin | awk 'BEGIN{OFS="\t"} (($3-$2)> 5 && ($2 > 500)) {print $1,$2,$3,$16}' | grep -v "hap|random"  | sort-bed - | gzip > tfbs.all.dist.bed.gz
+zcat tfbs.all.dist.bed.gz | awk 'BEGIN{OFS="\t"} ($4< 10000){print $1,$2,$3}' | gzip > tfbs.all.dist_0-10kb.bed.gz
+zcat tfbs.all.dist.bed.gz | awk 'BEGIN{OFS="\t"} ($4< 100000 && $4> 10000){print $1,$2,$3}' | gzip > tfbs.all.dist_10-100kb.bed.gz
+zcat tfbs.all.dist.bed.gz | awk 'BEGIN{OFS="\t"} ($4< 1000000 && $4> 100000){print $1,$2,$3}' | gzip > tfbs.all.dist_100-1000kb.bed.gz
+
 rm tfs.tmp.gz
 
 ## Try also these specific TFBS: 
