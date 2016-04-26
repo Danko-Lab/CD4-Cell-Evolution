@@ -14,8 +14,8 @@ tss <- data.frame(tss, tss_aln[match(tss$V4, tss_aln$name),c(9,33:50)])
 stab <- rowMax(tss[,17:18])
 dist <- tss[,13]
 class <- rep("tss", NROW(tss)) ## tss is then unclassified as a promoter or enhancer
-class[stab < 0.1 & dist < 500]  <- "Prox_Stab" ## Clearly protein coding promoter
-class[stab > 0.1  & dist > 10000] <- "Dist_UnSt" ## Clearly distal enhancer
+class[stab < 0.1 & dist < 500]  <- "Prox_Stab" ## Clearly protein coding promoter; 50
+class[stab > 0.1  & dist > 10000] <- "Dist_UnSt" ## Clearly distal enhancer; 1000
 class[stab < 0.1  & dist > 125000] <- "Dist_Stab" ## Clearly stable, but distal
 summary(as.factor(class))
 tss$V5 <- as.factor(class)
@@ -347,13 +347,14 @@ dev.off()
 #################################################################
 ## Do more loops make a promtoer more likely to be conserved?
 
-getCex <- function(n) { y=0.0138*n+0.1; y[y>3] <- 3; y[y<0.1] <- 0.1; y }
+getCex <- function(n) { y=0.075*n+0.1; y[y>3] <- 3; y[y<0.1] <- 0.1; y }
 n <- summary(as.factor(rowSums(loop[,5:6])))
 nloops <- 0:12
 
 ## Correlation between promoter conservation and the number of chromatin loops to a promoter ...
 loop_cons <- sapply(nloops, function(i) {fracConserved(tss[rowSums(loop[,5:6]) == i & tss$V5=="Prox_Stab",])})  ## Conservation of unlooped. 
-loop_cons_df <- data.frame(nloops= 0:12, conservation= loop_cons, n= summary(as.factor(rowSums(loop[,5:6]))), t0=rep(NA), sd=rep(NA))
+n_s <- sapply(nloops, function(i) { sum(rowSums(loop[,5:6]) == i & tss$V5=="Prox_Stab") })
+loop_cons_df <- data.frame(nloops= 0:12, conservation= loop_cons, n= n_s, t0=rep(NA), sd=rep(NA))
 cor.test(c(0:12), loop_cons)
 indx <- !is.na(loop_cons)
 corr(loop_cons_df[indx,1:2], w = n[indx]/sum(n[indx]))
@@ -385,7 +386,7 @@ for(x in nloops) {
 
 use <- !is.na(loop_cons_df$t0)
 pdf("NumberOfLoops.Promoter.pdf")
-  plot(0:12, loop_cons, pch=19, cex=3*getCex(n), xlab= "Number of loops to promoter", ylab= "Fraction conserved")
+  plot(0:12, loop_cons, pch=19, cex=3*getCex(n_s), xlab= "Number of loops to promoter", ylab= "Fraction conserved")
   abline(fit_line)
   cd.barplot(loop_cons_df$t0[use], loop_cons_df$sd[use], as.character(nloops)[use], fill=TRUE, order=FALSE)
   plot(loop_swap)
@@ -398,6 +399,27 @@ cmpFracConserved(tss[rowSums(loop[,5:6]) > 0 & rowSums(loop[,5:6]) <= 2,], tss[r
 expr <- rowSums(rpkm_df[,2:9])
 loop_expr <- sapply(nloops, function(i) {median(expr[rowSums(loop[,5:6]) == i & tss$V5=="Prox_Stab"])})  ## Conservation of unlooped. 
 plot(loop_expr)
+
+###################################################
+## What about enhancers?
+
+loop_cons_enh <- sapply(nloops, function(i) {fracConserved(tss[rowSums(loop[,5:6]) == i & tss$V5=="Dist_UnSt",])})  ## Conservation of unlooped. 
+n_s <- sapply(nloops, function(i) { sum(rowSums(loop[,5:6]) == i & tss$V5=="Dist_UnSt") })
+loop_cons_enh_df <- data.frame(nloops= 0:12, conservation= loop_cons_enh, n= n_s, t0=rep(NA), sd=rep(NA))
+cor.test(c(0:12), loop_cons_enh)
+indx <- !is.na(loop_cons_enh)
+corr(loop_cons_enh_df[indx,1:2], w = n[indx]/sum(n[indx]))
+
+pdf("NumberOfLoops.Enhancer.pdf")
+  plot(0:12, loop_cons_enh, pch=19, cex=3*getCex(n_s), xlab= "Number of loops to enhancer", ylab= "Fraction conserved")
+dev.off()
+
+cmpFracConserved(tss[(rowSums(loop[,5:6]) ==2 | rowSums(loop[,5:6]) ==3) & tss$V5=="Dist_UnSt",], tss[rowSums(loop[,5:6]) >= 4 & tss$V5=="Dist_UnSt",], i=2) ## Enhancers
+cmpFracConserved(tss[(rowSums(loop[,5:6]) ==2 | rowSums(loop[,5:6]) ==3),], tss[rowSums(loop[,5:6]) >= 4,], i=2) ## Enhancers
+cmpFracConserved(tss[(rowSums(loop[,5:6]) ==2 | rowSums(loop[,5:6]) ==3),], tss[rowSums(loop[,5:6]) >= 4,], i=3) ## Promoters
+
+cmpFracConserved(tss[(rowSums(loop[,5:6]) ==1 | rowSums(loop[,5:6]) ==2 | rowSums(loop[,5:6]) ==3),], tss[rowSums(loop[,5:6]) >= 4,], i=2) ## Enhancers
+
 
 ####################################################
 ## How much are SE over-represented in the loop set?
