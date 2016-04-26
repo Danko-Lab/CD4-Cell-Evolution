@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+bedtools makewindows -w 50000 -g /local/storage/data/hg19/hg19.chromInfo | bedtools coverage -a stdin -b ../tss.tsv | gzip > dREG.cluster.tsv.gz
+zcat dREG.cluster.tsv.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | bedmap --echo --max ../tss.tsv - | sed "s/|/\t/g" > tss.nNearby.tsv
+
+
