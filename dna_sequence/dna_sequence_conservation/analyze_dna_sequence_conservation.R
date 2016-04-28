@@ -234,6 +234,36 @@ ks<- ks.test(mean_con[bed[,7]>0], mean_con[bed[,7]==0])
 ks; ks$p.value
 
 
+########################
+## Add TRE density.
+summary(as.factor(bed$V8))
+vioplot(bed$V8, mean_con)
+plot(bed$V8, mean_con)
+
+x_l <- 0:21
+points(x_l, sapply(x_l, function(x) {median(mean_con[bed$V8==x])}), type="l")
+points(x_l, sapply(x_l, function(x) {quantile(mean_con[bed$V8==x], 0.9)}), col="gray", type="l")
+points(x_l, sapply(x_l, function(x) {quantile(mean_con[bed$V8==x], 0.1)}), col="gray", type="l")
+points(x_l, sapply(x_l, function(x) {quantile(mean_con[bed$V8==x], 0.75)}), col="gray", type="l")
+points(x_l, sapply(x_l, function(x) {quantile(mean_con[bed$V8==x], 0.25)}), col="gray", type="l")
+
+cor.test(bed$V8, mean_con)
+cor.test(bed$V8, mean_con, method="spearman")
+
+
+xlt <- 0:16
+ld<-2; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
+plot(ecdf(mean_con), col="light gray", lwd=ld, xlim=xlim_s)
+plot(ecdf(mean_con[rowSums(bed[,c(5:6)])>0]), col="gray", lwd=ld, add=TRUE)
+
+bk <- seq(min(xlt), max(xlt), 1)
+colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(length(bk))
+
+for(i in length(bk):1) {
+ plot(ecdf(mean_con[bed[,8]==i]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
+}
+
+
 
 ##########################################################################################################
 

@@ -9,3 +9,6 @@ run_all:
 	make -C ../annotations/
 	make run_2 -C ../tss_caller/
 	make run_2 -C ../enhancer/
+	make -C ../enhancer/superenhancer
+	make -C ../../dna_sequence
+	make -C dna_sequence_conservation/

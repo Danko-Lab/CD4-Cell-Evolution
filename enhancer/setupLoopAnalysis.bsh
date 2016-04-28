@@ -12,7 +12,7 @@ zcat /local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz |
 cat second | bedmap --echo --indicator --echo-map - tss.tmp | grep "|1|" | sed "s/|1|/\t/g" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,$8}' > second.tss
 
 ## Get info on whether enhancers for a loop ...
-cat tss.tsv | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4}' > tss.tsv.reduced
+cat tss.tsv | sort-bed - | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4}' > tss.tsv.reduced
 cat tss.tsv.reduced | bedmap --count - first  > tss.tsv.first
 cat tss.tsv.reduced | bedmap --count - second > tss.tsv.second
 paste tss.tsv.reduced tss.tsv.first tss.tsv.second > tss.tsv.loop
