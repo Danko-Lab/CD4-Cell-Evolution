@@ -80,14 +80,11 @@ doesChange <- function(re) {
  return(con/tot)
 }
 
-for(i in 1:10) {
- print(i)
- doesChange(tres[unique(sort(indxTREs[[i]])),])
-}
+dc <- sapply(1:10, function(i) {doesChange(tres[unique(sort(indxTREs[[i]])),])})
 
-doesChange(tres[unique(sort(indxTREs[[1]])),])
-doesChange(tres[unique(sort(indxTREs[[3]])),])
-doesChange(tres[unique(sort(indxTREs[[5]])),])
+data.frame(nloops= 1:10, conservation=dc)
+plot(1:10, dc, xlab="Number of loops", ylab="Conservation")
+
 
 
 
