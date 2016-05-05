@@ -7,8 +7,19 @@ write.starchbed <- function(bed, file.starch) {
                 cat("! Failed to write starch file (", file.starch, ") using the sort-bed and starch commands.\n");
 }
 
-str.u<- sapply(1:NROW(tf.u), function(x) { y <- tf.u[x, c(10:12)]; y <- y[!is.na(y)]; return(y[1]) })
-str.pi<- sapply(1:NROW(tf.pi), function(x) { y <- tf.pi[x, c(10:12)]; y <- y[!is.na(y)]; return(y[1]) })
+fix.str <- function(tf) {
+  str <- tf[,10]
+  isna <- is.na(str);str[isna] <- tf[isna,11]
+  isna <- is.na(str);str[isna] <- tf[isna,12]
+
+  return(str)
+}
+
+str.u <- fix.str(tf.u)
+str.pi<- fix.str(tf.pi)
+
+#str.u<- sapply(1:NROW(tf.u), function(x) { y <- tf.u[x, c(10:12)]; y <- y[!is.na(y)]; return(y[1]) })
+#str.pi<- sapply(1:NROW(tf.pi), function(x) { y <- tf.pi[x, c(10:12)]; y <- y[!is.na(y)]; return(y[1]) })
 
 write.starchbed(data.frame(tf.u$V1, tf.u$V2, tf.u$V3, tf.u$motif.id, tf.u$max.score, str.u, tf.u$tf.name, tf.u$score1, tf.u$score2, tf.u$score3), "tf.u.hg19.bed.starch")
 write.starchbed(data.frame(tf.pi$V1, tf.pi$V2, tf.pi$V3, tf.pi$motif.id, tf.pi$max.score, str.pi, tf.pi$tf.name, tf.pi$score1, tf.pi$score2, tf.pi$score3), "tf.pi.hg19.bed.starch")

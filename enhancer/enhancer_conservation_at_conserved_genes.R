@@ -24,12 +24,10 @@ load("../annotations/fdr.RData")
 
 ############
 ## Get enhancers interacting with conserved promoters...
-indx1TRE <- integer(0)
-indxGT1TRE<-integer(0)
-loopsToEnh<-data.frame(nloops=integer(), nenh=integer())
+indxTREs <- list(); for(i in 1:50) {indxTREs[[i]] <- integer()}
 
  ## Get TSS of conserved, annotated protein coding genes.
- indx <- fdr_df$fdr_min > 0.15 & ca$type == "protein_coding" & abs(fdr_df$fc_min) < 0.75
+ indx <- fdr_df$fdr_min > 0.1 & ca$type == "protein_coding" & abs(fdr_df$fc_min) < 1
  tss   <- ca[indx,1:8]
  tss[tss[,6] == "+",2] <- tss[tss[,6] == "+",2]-250; tss[tss[,6] == "+",3] <- tss[tss[,6] == "+",2]+1
  tss[tss[,6] == "-",3] <- tss[tss[,6] == "-",3]+251; tss[tss[,6] == "-",2] <- tss[tss[,6] == "-",3]-1
@@ -39,7 +37,7 @@ loopsToEnh<-data.frame(nloops=integer(), nenh=integer())
  tre <- read.table("tss.tsv")
  tres <- data.frame(tre, tre_aln[match(tre$V4, tre_aln$name),c(9,33:50,7:8,10)])
  tres$V7[is.na(tres$V7)] = 0; tres$V8[is.na(tres$V8)] = 0; tres$V9[is.na(tres$V9)] = 0
- 
+
  ## Find out which loops intersect.
  for(i in c(1:NROW(tss))) {
   if((i %% 100) == 0) print(i)
@@ -50,40 +48,17 @@ loopsToEnh<-data.frame(nloops=integer(), nenh=integer())
   nloops <- NROW(indx1) + NROW(indx2)
 
   ## ... then compare with loops on the other end.
-  ## Compare 1 loop ...
-  enhLoops <- integer(0)
+  ## Compare loops ...
   if(nloops == 1) {
     if(NROW(indx1)>0) {
-      indx1TRE <- c(indx1TRE, getOverlap(loops2[indx1,], tres))
-      enhLoops <- c(enhLoops, getOverlap(loops2[indx1,], tres))
+      indxTREs[[nloops]] <- c(indxTREs[[nloops]], getOverlap(loops2[indx1,], tres))
     }
     if(NROW(indx2)>0) {
-      indx1TRE <- c(indx1TRE, getOverlap(loops1[indx2,], tres))
-      enhLoops <- c(enhLoops, getOverlap(loops1[indx2,], tres))
+      indxTREs[[nloops]] <- c(indxTREs[[nloops]], getOverlap(loops1[indx2,], tres))
     }
   } 
 
-  ## ... to more than 2 loops.
-  if(nloops > 2) {
-    if(NROW(indx1)>0) {
-      indxGT1TRE <- c(indxGT1TRE, getOverlap(loops2[indx1,], tres))
-      enhLoops <- c(enhLoops, getOverlap(loops2[indx1,], tres))
-    }
-    if(NROW(indx2)>0) {
-      indxGT1TRE <- c(indxGT1TRE, getOverlap(loops1[indx2,], tres))
-      enhLoops <- c(enhLoops, getOverlap(loops1[indx2,], tres))
-    }
-  }
-
- loopsToEnh <- rbind(loopsToEnh, data.frame(nloops, NROW(enhLoops)))
- # if(nloops > 0) print(paste(nloops, NROW(enhLoops)))
-
  }
-
-indx1TRE <- unique(sort(indx1TRE)); NROW(indx1TRE)
-indxGT1TRE <- unique(sort(indxGT1TRE)); NROW(indxGT1TRE)
-
-plot(loopsToEnh)
 
 #########
 ## Do enhancers that loop to exactly 1 TRE change less frequently?
@@ -105,8 +80,9 @@ doesChange <- function(re) {
  return(con/tot)
 }
 
-doesChange(tres[indx1TRE,])
-doesChange(tres[indxGT1TRE,])
+doesChange(tres[unique(sort(indxTREs[[1]])),])
+doesChange(tres[unique(sort(indxTREs[[2]])),])
+doesChange(tres[unique(sort(indxTREs[[5]])),])
 
 ## Write out location files for DNA sequence analysis.
 write.table(tres[indx1TRE,1:4],   "loopsToOneTRE.bed", sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)

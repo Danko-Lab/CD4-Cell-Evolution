@@ -148,7 +148,6 @@ pdf(paste("DNASequence.",word,".phyloP.Conservation.pdf", sep=""))
 # plot(ecdf(mean_con_null1[sample(1:NROW(mean_con_null1), npts)]), col="gray", add=TRUE, lwd=ld)
 # plot(ecdf(mean_con_null2[sample(1:NROW(mean_con_null2), npts)]), col="dark gray", add=TRUE, lwd=ld)
 
-
 ## Cut at 0.75
  th <- 0.75
  abline(v=th)
@@ -218,6 +217,7 @@ vioplot(mean_con[rowSums(bed[,c(5:6)])>0], mean_con[rowSums(bed[,c(5:6)])==0])
 summary(mean_con[rowSums(bed[,c(5:6)])>0])
 summary(mean_con[rowSums(bed[,c(5:6)])==0])
 
+ld<- 3; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
 plot(ecdf(mean_con[rowSums(bed[,c(5:6)])>0]), col="red", xlim=xlim_s)
 plot(ecdf(mean_con[rowSums(bed[,c(5:6)])==0]), col="black", add=TRUE)
 
@@ -233,9 +233,29 @@ wt; wt$p.value
 ks<- ks.test(mean_con[bed[,7]>0], mean_con[bed[,7]==0])
 ks; ks$p.value
 
+########################
+## Number of loops correlated with conservation?
+
+#indx <- abs(bed$V4) > 10000 
+indx <- rep(TRUE, NROW(bed))
+
+plot(ecdf(mean_con[indx & rowSums(bed[,c(5:6)]) == 0]), col="light gray", lwd=ld, xlim=xlim_s)
+plot(ecdf(mean_con[indx & rowSums(bed[,c(5:6)])>0]), col="gray", lwd=ld, xlim=xlim_s, add=TRUE)
+
+bk <- seq(0, 6, 1)
+colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(length(bk))
+
+for(i in bk) {
+ print(i)
+ plot(ecdf(mean_con[indx & rowSums(bed[,5:6])==i]), col=colrs[i+1], xlim=xlim_s, lwd=ld, add=TRUE)
+}
 
 ########################
 ## Add TRE density.
+
+indx <- abs(bed$V4) > 10000 
+#indx <- rep(TRUE, NROW(bed))
+
 summary(as.factor(bed$V8))
 vioplot(bed$V8, mean_con)
 plot(bed$V8, mean_con)
@@ -253,30 +273,80 @@ cor.test(bed$V8, mean_con, method="spearman")
 
 xlt <- 0:16
 ld<-2; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
-plot(ecdf(mean_con), col="light gray", lwd=ld, xlim=xlim_s)
-plot(ecdf(mean_con[rowSums(bed[,c(5:6)])>0]), col="gray", lwd=ld, add=TRUE)
+plot(ecdf(mean_con[indx]), col="light gray", lwd=ld, xlim=xlim_s)
+plot(ecdf(mean_con[indx & rowSums(bed[,c(5:6)])>0]), col="gray", lwd=ld, add=TRUE)
 
 bk <- seq(min(xlt), max(xlt), 1)
 colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(length(bk))
 
 for(i in length(bk):1) {
- plot(ecdf(mean_con[bed[,8]==i]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
+ print(i) 
+ plot(ecdf(mean_con[indx & bed[,8]==i]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
 }
 
-
-
 ##########################################################################################################
-
-######################################################
-## Specifically get loops with gene at the other end.
+# For promoters with N loops, find genes on the other end.
 loops <- read.table("/local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz")
+dist <- 500
 loopdist <- function(i) { ## Get the actual distance in the detected loop interaction.
  loop1 <- sapply(strsplit(as.character(loops$V4), split=";"), function(x) {x[[i]]})
  sapply(strsplit(loop1, split="-"), function(x) {as.double(x[[2]])-as.double(x[[1]])})
 }
-loops1<- loops; loops1[,3] <- loops[,2]+loopdist(1) #+dist
-loops2<- loops; loops2[,2] <- loops[,3]-loopdist(2) #-dist
+loops1<- loops; loops1[,3] <- loops[,2]+loopdist(1) +dist
+loops2<- loops; loops2[,2] <- loops[,3]-loopdist(2) -dist
 
+nsamp <- 400
+
+indx_distal <- list()
+indx_proximal<-list()
+
+for(i in 1:6) {
+ print(paste(i, sum(rowSums(bed[,5:6]) == i)))
+ indx_distal[[i]] <- integer()
+ indx_proximal[[i]]<-integer()
+ 
+ for(j in sample(which(rowSums(bed[,5:6]) == i), min(nsamp, NROW(rowSums(bed[,5:6]) == i)))) {
+   indx_proximal[[i]]<-c(indx_proximal[[i]], j)
+
+   indx1 <- getOverlap(bed[j,], loops1)
+   indx2 <- getOverlap(bed[j,], loops2)
+   nloops <- NROW(indx1) + NROW(indx2)
+   
+   if(NROW(indx1)> 0) {
+     indx_distal[[i]] <- c(indx_distal[[i]], getOverlap(loops2[indx1,], bed))
+   }
+   if(NROW(indx2)> 0) {
+     indx_distal[[i]] <- c(indx_distal[[i]], getOverlap(loops1[indx2,], bed))
+   }
+ }
+
+}
+
+
+## Distal.  Are low loop numbers more conserved?
+plot(ecdf(mean_con[rowSums(bed[,5:6]) == 0]), col="light gray", lwd=ld, xlim=xlim_s)
+
+bk <- seq(1, 6, 1)
+colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(max(bk))
+for(i in bk) {
+ print(i)
+ plot(ecdf(mean_con[indx_distal[[i]]]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
+}
+
+## Proximal.  Are high loop numbers more conserved?
+plot(ecdf(mean_con[rowSums(bed[,5:6]) == 0]), col="light gray", lwd=ld, xlim=xlim_s)
+
+bk <- seq(1, 6, 1)
+colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(max(bk))
+for(i in bk) {
+ print(i)
+ plot(ecdf(mean_con[indx_proximal[[i]]]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
+}
+
+
+
+######################################################
+## Specifically get loops with gene at the other end.
 tss   <- read.table("../../tss_caller/refGene.hg19.bed.gz")
 tss[tss[,6] == "+",2] <- tss[tss[,6] == "+",2]; tss[tss[,6] == "+",3] <- tss[tss[,6] == "+",2]+1
 tss[tss[,6] == "-",3] <- tss[tss[,6] == "-",3]; tss[tss[,6] == "-",2] <- tss[tss[,6] == "-",3]-1
