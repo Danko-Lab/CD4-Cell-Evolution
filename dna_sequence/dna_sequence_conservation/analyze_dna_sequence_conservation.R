@@ -322,6 +322,7 @@ for(i in 1:6) {
 
 }
 
+save.image("enhancer_sequence_conservation_at_multi_loop_genes.RData")
 
 ## Distal.  Are low loop numbers more conserved?
 plot(ecdf(mean_con[rowSums(bed[,5:6]) == 0]), col="light gray", lwd=ld, xlim=xlim_s)

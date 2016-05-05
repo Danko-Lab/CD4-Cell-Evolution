@@ -49,16 +49,16 @@ indxTREs <- list(); for(i in 1:50) {indxTREs[[i]] <- integer()}
 
   ## ... then compare with loops on the other end.
   ## Compare loops ...
-  if(nloops == 1) {
-    if(NROW(indx1)>0) {
-      indxTREs[[nloops]] <- c(indxTREs[[nloops]], getOverlap(loops2[indx1,], tres))
-    }
-    if(NROW(indx2)>0) {
-      indxTREs[[nloops]] <- c(indxTREs[[nloops]], getOverlap(loops1[indx2,], tres))
-    }
-  } 
+  if(NROW(indx1)>0) {
+    indxTREs[[nloops]] <- c(indxTREs[[nloops]], getOverlap(loops2[indx1,], tres))
+  }
+  if(NROW(indx2)>0) {
+    indxTREs[[nloops]] <- c(indxTREs[[nloops]], getOverlap(loops1[indx2,], tres))
+  }
 
  }
+
+save.image("enhancer_conservation_at_conserved_genes.RData")
 
 #########
 ## Do enhancers that loop to exactly 1 TRE change less frequently?
@@ -80,12 +80,15 @@ doesChange <- function(re) {
  return(con/tot)
 }
 
+for(i in 1:10) {
+ print(i)
+ doesChange(tres[unique(sort(indxTREs[[i]])),])
+}
+
 doesChange(tres[unique(sort(indxTREs[[1]])),])
-doesChange(tres[unique(sort(indxTREs[[2]])),])
+doesChange(tres[unique(sort(indxTREs[[3]])),])
 doesChange(tres[unique(sort(indxTREs[[5]])),])
 
-## Write out location files for DNA sequence analysis.
-write.table(tres[indx1TRE,1:4],   "loopsToOneTRE.bed", sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)
-write.table(tres[indxGT1TRE,1:4], "loopsToMoreTRE.bed", sep="\t", quote=FALSE, row.names=FALSE, col.names=FALSE)
+
 
 
