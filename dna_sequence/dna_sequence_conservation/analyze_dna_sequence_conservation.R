@@ -287,7 +287,7 @@ for(i in length(bk):1) {
 ##########################################################################################################
 # For promoters with N loops, find genes on the other end.
 loops <- read.table("/local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz")
-dist <- 500
+dist <- 2500 # 500
 loopdist <- function(i) { ## Get the actual distance in the detected loop interaction.
  loop1 <- sapply(strsplit(as.character(loops$V4), split=";"), function(x) {x[[i]]})
  sapply(strsplit(loop1, split="-"), function(x) {as.double(x[[2]])-as.double(x[[1]])})
@@ -295,7 +295,7 @@ loopdist <- function(i) { ## Get the actual distance in the detected loop intera
 loops1<- loops; loops1[,3] <- loops[,2]+loopdist(1) +dist
 loops2<- loops; loops2[,2] <- loops[,3]-loopdist(2) -dist
 
-nsamp <- 400
+nsamp <- 1000
 
 indx_distal <- list()
 indx_proximal<-list()
@@ -305,7 +305,8 @@ for(i in 1:6) {
  indx_distal[[i]] <- integer()
  indx_proximal[[i]]<-integer()
  
- for(j in sample(which(rowSums(bed[,5:6]) == i), min(nsamp, NROW(rowSums(bed[,5:6]) == i)))) {
+ criterion <- which(rowSums(bed[,5:6]) == i & abs(bed$V4) < 10000)
+ for(j in sample(criterion, min(nsamp, NROW(criterion)))) {
    indx_proximal[[i]]<-c(indx_proximal[[i]], j)
 
    indx1 <- getOverlap(bed[j,], loops1)
@@ -324,15 +325,23 @@ for(i in 1:6) {
 
 save.image("enhancer_sequence_conservation_at_multi_loop_genes.RData")
 
+pdf("Proximal.Distal.Loop.pdf")
 ## Distal.  Are low loop numbers more conserved?
+ld<-2; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
 plot(ecdf(mean_con[rowSums(bed[,5:6]) == 0]), col="light gray", lwd=ld, xlim=xlim_s)
 
 bk <- seq(1, 6, 1)
 colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(max(bk))
 for(i in bk) {
  print(i)
- plot(ecdf(mean_con[indx_distal[[i]]]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
+ plot(ecdf(mean_con[unique(sort(indx_distal[[i]]))]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
 }
+
+enh_med <- sapply(bk, function(i) {median(mean_con[unique(sort(indx_distal[[i]]))])})
+
+## Significant difference in conservation.
+ks.test(mean_con[unique(sort(indx_distal[[1]]))], mean_con[unique(sort(indx_distal[[5]]))])
+ks.test(mean_con[unique(sort(indx_distal[[1]]))], mean_con[unique(sort(indx_distal[[6]]))])
 
 ## Proximal.  Are high loop numbers more conserved?
 plot(ecdf(mean_con[rowSums(bed[,5:6]) == 0]), col="light gray", lwd=ld, xlim=xlim_s)
@@ -344,7 +353,11 @@ for(i in bk) {
  plot(ecdf(mean_con[indx_proximal[[i]]]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
 }
 
+## Significant difference in conservation.
+ks.test(mean_con[unique(sort(indx_proximal[[1]]))], mean_con[unique(sort(indx_proximal[[5]]))])
+ks.test(mean_con[unique(sort(indx_proximal[[1]]))], mean_con[unique(sort(indx_proximal[[6]]))])
 
+dev.off()
 
 ######################################################
 ## Specifically get loops with gene at the other end.

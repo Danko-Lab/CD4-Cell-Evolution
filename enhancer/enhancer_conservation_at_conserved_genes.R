@@ -3,20 +3,22 @@
 # If gene expression is conserved, are enhancers that make one loop interaction more conserved than those which make several?
 #
 
+require(Hmisc)
+
 ## Returns indices in BED2 that intersect BED1.
 source("../lib/getOverlap.R")
 
 ##Prepare loops.
-dist<- 2500 # 1000
+dist<- 0 # 1000
 loops <- read.table("/local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz")
 loopdist <- function(i) { ## Get the actual distance in the detected loop interaction.
  loop1 <- sapply(strsplit(as.character(loops$V4), split=";"), function(x) {x[[i]]})
  sapply(strsplit(loop1, split="-"), function(x) {as.double(x[[2]])-as.double(x[[1]])})
 }
-loops1<- loops; loops1[,2] <- loops[,2]+as.integer(loopdist(1)/2)-dist; loops1[,3] <- loops[,2]+as.integer(loopdist(1)/2)+dist
-loops2<- loops; loops2[,2] <- loops[,3]+as.integer(loopdist(2)/2)-dist; loops2[,3] <- loops[,3]+as.integer(loopdist(2)/2)+dist
-#loops1<- loops; loops1[,3] <- loops[,2]+loopdist(1) #+dist
-#loops2<- loops; loops2[,2] <- loops[,3]-loopdist(2) #-dist
+#loops1<- loops; loops1[,2] <- loops[,2]+as.integer(loopdist(1)/2)-dist; loops1[,3] <- loops[,2]+as.integer(loopdist(1)/2)+dist
+#loops2<- loops; loops2[,2] <- loops[,3]+as.integer(loopdist(2)/2)-dist; loops2[,3] <- loops[,3]+as.integer(loopdist(2)/2)+dist
+loops1<- loops; loops1[,3] <- loops[,2]+loopdist(1) +dist
+loops2<- loops; loops2[,2] <- loops[,3]-loopdist(2) -dist
 hist(log(loops[,3]-loops[,2], 10), 20) ## Summary stats on loop distances.
 
 ## Load fdr.RData
@@ -27,7 +29,7 @@ load("../annotations/fdr.RData")
 indxTREs <- list(); for(i in 1:50) {indxTREs[[i]] <- integer()}
 
  ## Get TSS of conserved, annotated protein coding genes.
- indx <- fdr_df$fdr_min > 0.1 & ca$type == "protein_coding" & abs(fdr_df$fc_min) < 1
+ indx <- ca$type == "protein_coding" #fdr_df$fdr_min > 0.1 & ca$type == "protein_coding" & abs(fdr_df$fc_min) < 1 ## To focus on conserved ... or not?
  tss   <- ca[indx,1:8]
  tss[tss[,6] == "+",2] <- tss[tss[,6] == "+",2]-250; tss[tss[,6] == "+",3] <- tss[tss[,6] == "+",2]+1
  tss[tss[,6] == "-",3] <- tss[tss[,6] == "-",3]+251; tss[tss[,6] == "-",2] <- tss[tss[,6] == "-",3]-1
@@ -80,12 +82,22 @@ doesChange <- function(re) {
  return(con/tot)
 }
 
-dc <- sapply(1:10, function(i) {doesChange(tres[unique(sort(indxTREs[[i]])),])})
+nloops <- 1:8
+dc <- sapply(nloops, function(i) {doesChange(tres[unique(sort(indxTREs[[i]])),])})
 
-data.frame(nloops= 1:10, conservation=dc)
-plot(1:10, dc, xlab="Number of loops", ylab="Conservation")
+data.frame(nloops= nloops, conservation=dc)
+plot(nloops, dc, xlab="Number of loops", ylab="Conservation")
+cor.test(nloops, dc)
 
+#########
+## Scatterplot, with points sized by number of points.
 
+getCex <- function(n) { y=0.0138888*n+0.1; y[y>3] <- 3; y[y<0.1] <- 0.1; y }
+n <- sapply(nloops, function(x) {NROW(unique(sort(indxTREs[[x]])))})
+
+pdf("DistalEnhancer.ChangeOverDistance.pdf")
+ plot(nloops, dc, type="p", xlab="Number of Loops (proximal end)", ylab="% Conserved", pch=19, cex=getCex(n))
+dev.off()
 
 
 
