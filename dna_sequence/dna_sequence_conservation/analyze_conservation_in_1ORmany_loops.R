@@ -39,9 +39,9 @@ boxplot(mean1_con, mean2_con)
 pdf(paste("OneVMany.DNAsequence.",word,".phyloP.Conservation.pdf", sep=""))
  ld<- 1; xlim_s=c(-0.75,3) #xlim_s=c(-0.75, 0.5) #c(-0.4, 0.5) #PRIMATE
 
- plot(ecdf(mean1_con), col="dark red", lwd=ld, xlim=xlim_s)
- plot(ecdf(mean2_con), col="dark green", add=TRUE, lwd=ld)
- plot(ecdf(mean_con),  col="dark gray", add=TRUE, lwd=ld)
+ plot(cd.cdf(mean1_con), col="dark red", lwd=ld, xlim=xlim_s, type="l")
+ plot(cd.cdf(mean2_con), col="dark green", add=TRUE, lwd=ld, type="l")
+ plot(cd.cdf(mean_con),  col="dark gray", add=TRUE, lwd=ld, type="l")
  
 dev.off()
 
