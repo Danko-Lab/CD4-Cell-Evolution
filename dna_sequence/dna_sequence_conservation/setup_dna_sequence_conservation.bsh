@@ -45,4 +45,8 @@ mv $CMPBED\.tmp  $CMPBED
 zcat ../../enhancer/superenhancer/dREG.cluster.tsv.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | bedmap --echo --max $CMPBED - | sed "s/|/\t/g" > $CMPBED\.tmp
 mv $CMPBED\.tmp  $CMPBED
 
+#########################################
+## Get changes in human.
+bedmap --echo --indicator $CMPBED ../../enhancer/distal.hg19.gain.loss.bed | grep "|1" | sed "s/|1//g" > $CMPBED.humanChanges.bed
+
 

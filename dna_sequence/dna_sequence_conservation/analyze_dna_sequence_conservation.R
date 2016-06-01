@@ -136,11 +136,11 @@ source("../../lib/cd.cdf.R")
 pdf(paste("DNASequence.",word,".phyloP.Conservation.pdf", sep=""))
  ld<- 5; xlim_s=c(-0.75,3) #xlim_s=c(-0.75, 0.5) #c(-0.4, 0.5) #PRIMATE
 
- plot(cd.cdf(mean_con_null1), col="gray", lwd=ld, xlim=xlim_s, type="l")
- plot(cd.cdf(mean_con_null2), col="dark gray", add=TRUE, lwd=ld, type="l")
- plot(cd.cdf(mean_con[bed_data[,7]>0]), col="#00A63E", add=TRUE, lwd=ld, type="l")
- plot(cd.cdf(mean_con[bed_data[,7]==0 & rowSums(bed_data[,c(5:6)])==0]), col="black", add=TRUE, lwd=ld, type="l")
- plot(cd.cdf(mean_con[rowSums(bed_data[,c(5:6)])>0]), col="#b70000", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con_null1, col="gray", lwd=ld, xlim=xlim_s, type="l")
+ cd.cdf(mean_con_null2, col="dark gray", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con[bed_data[,7]>0], col="#00A63E", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con[bed_data[,7]==0 & rowSums(bed_data[,c(5:6)])==0], col="black", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con[rowSums(bed_data[,c(5:6)])>0], col="#b70000", add=TRUE, lwd=ld, type="l")
 
 ## Plot smaller version for figs.
 # npts <- 5000
@@ -178,37 +178,37 @@ pdf(paste("DNASequence.",word,".phyloP.Conservation.pdf", sep=""))
 
  ## 1-10k
  indx <- abs(bed$V4) < 10000
- plot(cd.cdf(mean_con[bed[,7]>0 & indx]), col="#00A63E", xlim=xlim_s, lwd=ld, type="l")
- plot(cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx]), col="black", add=TRUE, lwd=ld, type="l")
- plot(cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx]), col="#b70000", add=TRUE, lwd=ld, type="l")
- plot(cd.cdf(mean_con_null1[abs(bed_null1$V4) < 10000]), col="gray", add=TRUE, lwd=ld, type="l")
- plot(cd.cdf(mean_con_null2[abs(bed_null2$V4) < 10000]), col="dark gray", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con[bed[,7]>0 & indx], col="#00A63E", xlim=xlim_s, lwd=ld, type="l")
+ cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx], col="black", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx], col="#b70000", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con_null1[abs(bed_null1$V4) < 10000], col="gray", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con_null2[abs(bed_null2$V4) < 10000], col="dark gray", add=TRUE, lwd=ld, type="l")
 
 
  ## 10-100k
  indx <- abs(bed$V4) < 100000 & abs(bed$V4) > 10000
- plot(cd.cdf(mean_con[bed[,7]>0 & indx]), col="#00A63E", xlim=xlim_s, lwd=ld, type="l")
- plot(cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx]), col="black", add=TRUE, lwd=ld, type="l")
- plot(cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx]), col="#b70000", add=TRUE, lwd=ld, type="l")
- plot(cd.cdf(mean_con_null1[abs(bed_null1$V4) > 10000 & abs(bed_null1$V4) < 100000]), col="gray", add=TRUE, lwd=ld, type="l")
- plot(cd.cdf(mean_con_null2[abs(bed_null2$V4) > 10000 & abs(bed_null2$V4) < 100000]), col="dark gray", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con[bed[,7]>0 & indx], col="#00A63E", xlim=xlim_s, lwd=ld, type="l")
+ cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx], col="black", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx], col="#b70000", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con_null1[abs(bed_null1$V4) > 10000 & abs(bed_null1$V4) < 100000], col="gray", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con_null2[abs(bed_null2$V4) > 10000 & abs(bed_null2$V4) < 100000], col="dark gray", add=TRUE, lwd=ld, type="l")
 
  ## 100-1,000k
  indx <- abs(bed$V4) < 1000000 & abs(bed$V4) > 100000
- plot(cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0  & indx]), col="black", xlim=xlim_s, lwd=ld, type="l")
- plot(cd.cdf(mean_con[bed[,7]>0 & indx]), col="#00A63E", add=TRUE, lwd=ld, type="l")
- plot(cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx]), col="#b70000", add=TRUE, lwd=ld, type="l")
- plot(cd.cdf(mean_con_null1[abs(bed_null1$V4) > 100000 & abs(bed_null1$V4) < 1000000]), col="gray", add=TRUE, lwd=ld, type="l")
- plot(cd.cdf(mean_con_null2[abs(bed_null2$V4) > 100000 & abs(bed_null2$V4) < 1000000]), col="dark gray", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0  & indx], col="black", xlim=xlim_s, lwd=ld, type="l")
+ cd.cdf(mean_con[bed[,7]>0 & indx], col="#00A63E", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx], col="#b70000", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con_null1[abs(bed_null1$V4) > 100000 & abs(bed_null1$V4) < 1000000], col="gray", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con_null2[abs(bed_null2$V4) > 100000 & abs(bed_null2$V4) < 1000000], col="dark gray", add=TRUE, lwd=ld, type="l")
 
  ## Difference based on distance...
  ld<- 3; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
  indx <- bed$V4 < 10000
- plot(cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx]), col="black", xlim=xlim_s, lwd=ld, type="l")
+ cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx], col="black", xlim=xlim_s, lwd=ld, type="l")
  indx <- bed$V4 < 100000 & bed$V4 > 10000
- plot(cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx]), col="dark gray", add=TRUE, lwd=ld, type="l")
+ cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx], col="dark gray", add=TRUE, lwd=ld, type="l")
  indx <- bed$V4 < 1000000 & bed$V4 > 100000
- plot(cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0  & indx]), col="gray", lwd=ld, add=TRUE, type="l")
+ cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0  & indx], col="gray", lwd=ld, add=TRUE, type="l")
 
 dev.off()
 
@@ -220,8 +220,8 @@ summary(mean_con[rowSums(bed[,c(5:6)])>0])
 summary(mean_con[rowSums(bed[,c(5:6)])==0])
 
 ld<- 3; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
-plot(cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0]), col="red", xlim=xlim_s, type="l")
-plot(cd.cdf(mean_con[rowSums(bed[,c(5:6)])==0]), col="black", add=TRUE, type="l")
+cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0], col="red", xlim=xlim_s, type="l")
+cd.cdf(mean_con[rowSums(bed[,c(5:6)])==0], col="black", add=TRUE, type="l")
 
 wt<- wilcox.test(mean_con[rowSums(bed[,c(5:6)])>0], mean_con[rowSums(bed[,c(5:6)])==0])
 wt; wt$p.value
@@ -241,15 +241,15 @@ ks; ks$p.value
 #indx <- abs(bed$V4) > 10000 
 indx <- rep(TRUE, NROW(bed))
 
-plot(cd.cdf(mean_con[indx & rowSums(bed[,c(5:6)]) == 0]), col="light gray", lwd=ld, xlim=xlim_s, type="l")
-plot(cd.cdf(mean_con[indx & rowSums(bed[,c(5:6)])>0]), col="gray", lwd=ld, xlim=xlim_s, add=TRUE, type="l")
+cd.cdf(mean_con[indx & rowSums(bed[,c(5:6)]) == 0], col="light gray", lwd=ld, xlim=xlim_s, type="l")
+cd.cdf(mean_con[indx & rowSums(bed[,c(5:6)])>0], col="gray", lwd=ld, xlim=xlim_s, add=TRUE, type="l")
 
 bk <- seq(0, 6, 1)
 colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(length(bk))
 
 for(i in bk) {
  print(i)
- plot(cd.cdf(mean_con[indx & rowSums(bed[,5:6])==i]), col=colrs[i+1], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
+ cd.cdf(mean_con[indx & rowSums(bed[,5:6])==i], col=colrs[i+1], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
 }
 
 ########################
@@ -272,19 +272,42 @@ points(x_l, sapply(x_l, function(x) {quantile(mean_con[bed$V8==x], 0.25)}), col=
 cor.test(bed$V8, mean_con)
 cor.test(bed$V8, mean_con, method="spearman")
 
+source("../../lib/cd.cdf.R")
+
+df <- data.frame(i= length(bk):1, median_con= sapply(length(bk):1, function(i) {median(mean_con[indx & bed[,8]==i])}), n= sapply(length(bk):1, function(i) {sum(indx & bed[,8] == i)}))
+
+
+pdf("TRE_density.DNASequence_conservation.pdf")
 
 xlt <- 0:16
 ld<-2; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
-plot(cd.cdf(mean_con[indx]), col="light gray", lwd=ld, xlim=xlim_s, type="l")
-plot(cd.cdf(mean_con[indx & rowSums(bed[,c(5:6)])>0]), col="gray", lwd=ld, add=TRUE, type="l")
+#cd.cdf(mean_con[indx], col="light gray", lwd=ld, xlim=xlim_s, type="l")
+#cd.cdf(mean_con[indx & rowSums(bed[,c(5:6)])>0], col="gray", lwd=ld, add=TRUE, type="l")
+plot(ecdf(mean_con[indx]), col="light gray", lwd=ld, xlim=xlim_s)
+plot(ecdf(mean_con[indx & rowSums(bed[,c(5:6)])>0]), col="gray", lwd=ld, add=TRUE)
 
 bk <- seq(min(xlt), max(xlt), 1)
 colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(length(bk))
 
 for(i in length(bk):1) {
  print(i) 
- plot(cd.cdf(mean_con[indx & bed[,8]==i]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
+# cd.cdf(mean_con[indx & bed[,8]==i], col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
+ plot(ecdf(mean_con[indx & bed[,8]==i]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
 }
+
+plot(df$i, df$median_con, pch=19, cex=3, xlab="Number of sites", ylab="Median phyloP")
+
+dev.off()
+
+df
+cor.test(df$i, df$median_con)
+
+
+wilcox.test(mean_con[indx & bed[,8]==1], mean_con[indx & bed[,8]==10])
+wilcox.test(mean_con[indx & bed[,8]==1], mean_con[indx & bed[,8]==12])
+
+summary(mean_con[indx & bed[, 8] == 1])
+summary(mean_con[indx & bed[, 8] == 12])
 
 ##########################################################################################################
 # For promoters with N loops, find genes on the other end.
@@ -330,13 +353,13 @@ save.image("enhancer_sequence_conservation_at_multi_loop_genes.RData")
 pdf("Proximal.Distal.Loop.pdf")
 ## Distal.  Are low loop numbers more conserved?
 ld<-2; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
-plot(cd.cdf(mean_con[rowSums(bed[,5:6]) == 0]), col="light gray", lwd=ld, xlim=xlim_s, type="l")
+cd.cdf(mean_con[rowSums(bed[,5:6]) == 0], col="light gray", lwd=ld, xlim=xlim_s, type="l")
 
 bk <- seq(1, 6, 1)
 colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(max(bk))
 for(i in bk) {
  print(i)
- plot(cd.cdf(mean_con[unique(sort(indx_distal[[i]]))]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
+ cd.cdf(mean_con[unique(sort(indx_distal[[i]]))], col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
 }
 
 enh_med <- sapply(bk, function(i) {median(mean_con[unique(sort(indx_distal[[i]]))])})
@@ -346,13 +369,13 @@ ks.test(mean_con[unique(sort(indx_distal[[1]]))], mean_con[unique(sort(indx_dist
 ks.test(mean_con[unique(sort(indx_distal[[1]]))], mean_con[unique(sort(indx_distal[[6]]))])
 
 ## Proximal.  Are high loop numbers more conserved?
-plot(cd.cdf(mean_con[rowSums(bed[,5:6]) == 0]), col="light gray", lwd=ld, xlim=xlim_s, type="l")
+cd.cdf(mean_con[rowSums(bed[,5:6]) == 0], col="light gray", lwd=ld, xlim=xlim_s, type="l")
 
 bk <- seq(1, 6, 1)
 colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(max(bk))
 for(i in bk) {
  print(i)
- plot(cd.cdf(mean_con[indx_proximal[[i]]]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
+ cd.cdf(mean_con[indx_proximal[[i]]], col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
 }
 
 ## Significant difference in conservation.

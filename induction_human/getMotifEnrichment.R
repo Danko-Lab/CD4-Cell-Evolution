@@ -26,6 +26,7 @@ gencode.gtf             <- "/local/storage/data/hg19/all/gencode/gencode.v19.ann
 h.PROseq.plus           <- "/local/storage/projects/NHP/AllData/All_Merge/H-U_plus.bw"
 h.PROseq.minus          <- "/local/storage/projects/NHP/AllData/All_Merge/H-U_minus.bw"
 
+options=list(abline = NULL,title  = "",xlab   = "Order",ylab   = "-log10(p-value)",y.max  = NULL,top.motif.labels = 5,bottom.motif.labels = 5, color.scheme = 2, width = 4, height = 7, zoom.tick = 1, zoom.label = 1,zoom.motif.logo = 1.5, zoom.legend.label=1,zoom.motif.label = 1 );
 
 enh <- read.table("results/human-changed.TREs.tsv"); enh$V4 <- 1:NROW(enh$V4)
 enh <- enh[(enh$V3 - enh$V2)>0,] ## CURRENTLY BUGGED.
@@ -44,6 +45,7 @@ tf_up <- tfbs.enrichmentTest(
         threshold = mTH,
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_up, file.pdf="Human.TF-up.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
+tfbs.plotEnrichment(tfs, tf_up, file.pdf=paste("Human.TF-up.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options)
 
 tf_dn <- tfbs.enrichmentTest(
         tfbs= tfs,
@@ -55,6 +57,7 @@ tf_dn <- tfbs.enrichmentTest(
         threshold = mTH,
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_dn, file.pdf="Human.TF-dn.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
+tfbs.plotEnrichment(tfs, tf_dn, file.pdf=paste("Human.TF-dn.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options)
 
 ##
 ## Now do the non-human primates.
@@ -77,6 +80,7 @@ tf_up <- tfbs.enrichmentTest(
         threshold = mTH,
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_up, file.pdf="Chimp.TF-up.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
+tfbs.plotEnrichment(tfs, tf_up, file.pdf=paste("Chimp.TF-up.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options)
 
 tf_dn <- tfbs.enrichmentTest(
         tfbs= tfs,
@@ -88,6 +92,7 @@ tf_dn <- tfbs.enrichmentTest(
         threshold = mTH,
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_dn, file.pdf="Chimp.TF-dn.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
+tfbs.plotEnrichment(tfs, tf_dn, file.pdf=paste("Chimp.TF-dn.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options)
 
 ## Do Rhesus in Rhesus genome coordinates.
 rhesus.twoBit_path        <- "/local/storage/data/2bit/rheMac3.2bit";
@@ -107,6 +112,7 @@ tf_up <- tfbs.enrichmentTest(
         threshold = mTH,
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_up, file.pdf="Rhesus.TF-up.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
+tfbs.plotEnrichment(tfs, tf_up, file.pdf=paste("Rhesus.TF-up.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options)
 
 tf_dn <- tfbs.enrichmentTest(
         tfbs= tfs,
@@ -118,5 +124,6 @@ tf_dn <- tfbs.enrichmentTest(
         threshold = mTH,
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_dn, file.pdf="Rhesus.TF-dn.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
+tfbs.plotEnrichment(tfs, tf_dn, file.pdf=paste("Rhesus.TF-dn.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options)
 
 

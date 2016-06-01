@@ -35,6 +35,9 @@ cat $dir/A.plus.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0","+"}' > $dir/
 cat $dir/A.minus.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0","-"}' >> $dir/A.bed
 cat $dir/A.bed | sort-bed - | gzip > $dir/A.bed.gz
 
+echo "Total number of TUs inferred in the primate ancestor:"
+zcat $dir/A.bed.gz | grep "" -c
+
 ########
 ## Now, look for cases in which TU in one species are completely independent of the ancestral TU.  
 ## Add these branch-specific gains back to a set which we will scan for expression. 
@@ -50,6 +53,9 @@ getGains M
 cat $dir/*.gain.plus.bed $dir/A.plus.bed | sort-bed - | bedops --merge - | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0","+"}' > $dir/A.wGain.bed
 cat $dir/*.gain.minus.bed $dir/A.minus.bed | sort-bed - | bedops --merge - | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n","0","-"}' >> $dir/A.wGain.bed
 cat $dir/A.wGain.bed | sort-bed - | gzip > $dir/A.wGain.bed.gz
+
+echo "Total number of TUs including species-specific:"
+zcat $dir/A.wGain.bed.gz | grep "" -c
 
 #######
 ## Cleanup...

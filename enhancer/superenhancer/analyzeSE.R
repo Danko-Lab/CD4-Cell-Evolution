@@ -68,8 +68,10 @@ enh_n_s <- sapply(ndreg, function(i) { sum(tss$V21 == i & tss$V5=="Dist_UnSt") }
 
 data.frame(prom_cluster_cons, prom_n_s, enh_cluster_cons, enh_n_s)
 
-plot(prom_cluster_cons)
-plot(enh_cluster_cons)
+pdf("TRE_density.TRE_conservation.pdf")
 
+plot(prom_cluster_cons, pch=19, cex=3, main="Promoter", xlab="Number of TREs in 50kb", ylab="Pol II loading Conservation")
+plot(enh_cluster_cons, pch=19, cex=3, main="Enhancer", xlab="Number of TREs in 50kb", ylab="Pol II loading Conservation")
 
+dev.off()
 

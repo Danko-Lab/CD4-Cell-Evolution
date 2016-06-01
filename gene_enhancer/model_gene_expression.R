@@ -2,7 +2,7 @@
 source("../lib/getOverlap.R")
 
 ##Prepare loops.
-dist<- 1000 # 15000
+dist<- 5000 # 15000 # 1000
 loops <- read.table("/local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz")
 loopdist <- function(i) { ## Get the actual distance in the detected loop interaction.
  loop1 <- sapply(strsplit(as.character(loops$V4), split=";"), function(x) {x[[i]]})
@@ -94,6 +94,10 @@ getLoopNearby <- function(prefix="H", column=21, post_pro= ".change-U.tsv", post
 enh_pro_change <- rbind(getLoopNearby("H", 21),
                         getLoopNearby("C", 22),
                         getLoopNearby("M", 23))
+
+save.image("Enhancer-Promoter-Loops.RData")
+
+
 cor.test(enh_pro_change$pro, enh_pro_change$enh)
 plot(enh_pro_change$pro, enh_pro_change$enh, xlab= "Gene Expression", ylab="Mean Enhancers", pch=19)
 
