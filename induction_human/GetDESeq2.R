@@ -21,7 +21,7 @@ getCounts <- function(plus, minus, path, intervals= bodies) {
 
 raw_counts <- cbind(
 human_1_U= getCounts("H1-U_plus.bw", "H1-U_minus.bw", "../AllData/"),
-human_2_U= getCounts("H2-U.bed.gz_plus.bw", "H2-U.bed.gz_minus.bw", "../AllData/"),
+human_2_U= getCounts("H2-U_plus.bw", "H2-U_minus.bw", "../AllData/"),
 human_3_U= getCounts("H3-U.bed.gz_plus.bw", "H3-U.bed.gz_minus.bw", "../AllData/"),
 human_1_PI= getCounts("H1-PI_plus.bw", "H1-PI_minus.bw", "../AllData/"),
 human_2_PI= getCounts("H2-PI_plus.bw", "H2-PI_minus.bw", "../AllData/"),
@@ -105,7 +105,7 @@ getCountsE <- function(plus, minus, path, intervals= hd) {
 ## First focus on dREG ... just to get number of changed sites for the paper.
 counts_dreg <- cbind(
 human_1_U= getCountsE("H1-U_plus.bw", "H1-U_minus.bw", "../AllData/", intervals= dREG),
-human_2_U= getCountsE("H2-U.bed.gz_plus.bw", "H2-U.bed.gz_minus.bw", "../AllData/", intervals= dREG),
+human_2_U= getCountsE("H2-U_plus.bw", "H2-U_minus.bw", "../AllData/", intervals= dREG),
 human_3_U= getCountsE("H3-U.bed.gz_plus.bw", "H3-U.bed.gz_minus.bw", "../AllData/", intervals= dREG),
 human_1_PI= getCountsE("H1-PI_plus.bw", "H1-PI_minus.bw", "../AllData/", intervals= dREG),
 human_2_PI= getCountsE("H2-PI_plus.bw", "H2-PI_minus.bw", "../AllData/", intervals= dREG),
@@ -131,7 +131,7 @@ print(paste("Number of changes: ", sum(res$padj < 0.01, na.rm=TRUE))) ## Number 
 ### NOW FOCUS ON dREG-HD
 raw_counts <- cbind(
 human_1_U= getCountsE("H1-U_plus.bw", "H1-U_minus.bw", "../AllData/"),
-human_2_U= getCountsE("H2-U.bed.gz_plus.bw", "H2-U.bed.gz_minus.bw", "../AllData/"),
+human_2_U= getCountsE("H2-U_plus.bw", "H2-U_minus.bw", "../AllData/"),
 human_3_U= getCountsE("H3-U.bed.gz_plus.bw", "H3-U.bed.gz_minus.bw", "../AllData/"),
 human_1_PI= getCountsE("H1-PI_plus.bw", "H1-PI_minus.bw", "../AllData/"),
 human_2_PI= getCountsE("H2-PI_plus.bw", "H2-PI_minus.bw", "../AllData/"),
