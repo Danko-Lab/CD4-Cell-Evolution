@@ -46,9 +46,9 @@ doplot <- function(bw_file, bed_file_conserved, bed_file_gain, bed_file_loss, be
  else typ="l"
 
  plot(-500, -500, ylim=ylim, xlim=c(min(x), max(x)), xlab= "Distance [bp]", ylab= "Signal", ...) ## ylab= "Divergences/ 100 bp"
- lines(x, signal_g, col="dark red", type=typ)
- lines(x, signal_l, col="dark blue", type=typ)
- lines(x, signal_conserved, col="dark green", type=typ)
+ lines(x, signal_g, col="dark red", type=typ, pch=19)
+ lines(x, signal_l, col="dark blue", type=typ, pch=19)
+ lines(x, signal_conserved, col="dark green", type=typ, pch=19)
 
 }
 
