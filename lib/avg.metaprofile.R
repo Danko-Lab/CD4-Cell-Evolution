@@ -14,14 +14,14 @@
 # . top, middle, bottom vectors
 #
 
-avg.metaprofile.bigWig <- function(bed, bw.plus, bw.minus = NULL, step = 1, name = "Signal", matrix.op = NULL, profile.op = subsampled.quantiles.metaprofile, ...) {
+avg.metaprofile.bigWig <- function(bed, bw.plus, bw.minus = NULL, step = 1, name = "Signal", matrix.op = NULL, profile.op = subsampled.quantiles.metaprofile, abs.value = TRUE, ...) {
   #
   # 1. collect data
   N = dim(bed)[2]
   mat = NULL
   if (N >= 6) {
     stopifnot(bw.minus != NULL)
-    mat = bed6.step.bpQuery.bigWig(bw.plus, bw.minus, bed, step, op = "avg", abs.value = TRUE, as.matrix = TRUE, follow.strand = TRUE)
+    mat = bed6.step.bpQuery.bigWig(bw.plus, bw.minus, bed, step, op = "avg", abs.value = abs.value, as.matrix = TRUE, follow.strand = TRUE) #TRUE
   } else {
     if (!is.null(bw.minus))
       warning("bw.minus != NULL but BED contains no strand information")

@@ -29,9 +29,9 @@ doplot <- function(bw_file, bed_file_conserved, bed_file_gain, bed_file_loss, be
  bedl <- read.table(bed_file_loss)
  bed_conserved <- read.table(bed_file_conserved)
 
- meta_g <- avg.metaprofile.bigWig(bed.op(bedg, halfWindow), bw, bw, step=stp) # bedg[,6] == "+",1:3
- meta_l <- avg.metaprofile.bigWig(bed.op(bedl, halfWindow), bw, bw, step=stp) # bedl[,6] == "+",1:3
- meta_conserved <- avg.metaprofile.bigWig(bed.op(bed_conserved, halfWindow), bw, bw, step=stp) # bed_conserved[bed_conserved[,6] == "+",1:3
+ meta_g <- avg.metaprofile.bigWig(bed.op(bedg, halfWindow), bw, bw, step=stp, abs.value = FALSE) # bedg[,6] == "+",1:3
+ meta_l <- avg.metaprofile.bigWig(bed.op(bedl, halfWindow), bw, bw, step=stp, abs.value = FALSE) # bedl[,6] == "+",1:3
+ meta_conserved <- avg.metaprofile.bigWig(bed.op(bed_conserved, halfWindow), bw, bw, step=stp, abs.value = FALSE) # bed_conserved[bed_conserved[,6] == "+",1:3
 
  signal_g <- meta_g$middle
  signal_l <- meta_l$middle
