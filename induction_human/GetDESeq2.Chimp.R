@@ -85,7 +85,7 @@ q("no")
 hdU <- read.table("../dREG_HD/C-U_dREG_HD.bed")
 hdPI<- read.table("../dREG_HD/C-PI_dREG_HD.bed")
 
-hd <- rbind(hdU, hdPI)
+hd <- read.table("../dREG_HD/dREG_HD.merge.HCM.UPI.chimp.bed") #rbind(hdU, hdPI)
 hd$V2 <- hd$V2-250; hd$V2[hd$V2 < 0] = 0
 hd$V3 <- hd$V3+250
 
@@ -126,7 +126,8 @@ print(paste("Number of changes: ", sum(res$padj < 0.01, na.rm=TRUE))) ## Number 
 #print(paste("Number of unique genes: ", NROW(unique(refGene$V7[res$padj < 0.01])))) ## Number of genes.
 
 ## Write out dREG-HD TREs for motif analysis.
-hd <- rbind(hdU, hdPI); hd <- hd[grep("random|Un", hd$V1, invert=TRUE),]
+hd <- read.table("../dREG_HD/dREG_HD.merge.HCM.UPI.chimp.bed") #rbind(hdU, hdPI); 
+hd <- hd[grep("random|Un", hd$V1, invert=TRUE),]
 
 PE <- cbind(hd, res)
 PE <- PE[order(PE$padj),]

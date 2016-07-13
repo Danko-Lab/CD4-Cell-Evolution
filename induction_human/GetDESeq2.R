@@ -90,7 +90,8 @@ dREG<- read.table("../tss_caller/Human-U.dREG.bed.gz")
 hdU <- read.table("../dREG_HD/H-U_dREG_HD.bed")
 hdPI<- read.table("../dREG_HD/H-PI_dREG_HD.bed")
 
-hd <- rbind(hdU, hdPI)
+#hd <- rbind(hdU, hdPI)
+hd <- read.table("../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed")
 hd$V2 <- hd$V2-250; hd$V2[hd$V2 < 0] = 0
 hd$V3 <- hd$V3+250
 
@@ -151,7 +152,8 @@ print(paste("Number of changes: ", sum(res$padj < 0.01, na.rm=TRUE))) ## Number 
 #print(paste("Number of unique genes: ", NROW(unique(refGene$V7[res$padj < 0.01])))) ## Number of genes.
 
 ## Write out dREG-HD TREs for motif analysis.
-PE <- cbind(rbind(hdU, hdPI), res)
+#PE <- cbind(rbind(hdU, hdPI), res)
+PE <- cbind(read.table("../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed"), res)
 PE <- PE[order(PE$padj),]
 write.table(PE, "results/human-changed.TREs.tsv", sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 

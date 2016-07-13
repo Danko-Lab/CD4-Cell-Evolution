@@ -1,6 +1,7 @@
-## Alternative to Andre's bigWig metaProfile functions that 
-
-
+## Alternative to Andre's bigWig metaProfile function.
+## only change is that op= "avg" insteand of "sum".
+##
+## Provides more interpretable Y-axis values for some data types (e.g., phylo-P).
 
 #
 # Convinience function

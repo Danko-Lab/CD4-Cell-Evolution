@@ -33,6 +33,10 @@ write.table(tss[indx_hg19_gain | indx_hg19_loss,], "hg19.gain.loss.bed", row.nam
 write.table(tss[indx_hg19_gain,], "hg19.gain.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 write.table(tss[indx_hg19_loss,], "hg19.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
+write.table(tss[(indx_hg19_gain | indx_hg19_loss) & abs(tss$HumanFC) > 5^(1/2) & tss$HumanFDR < 0.01,1:3], "hg19.gl.fold-GT5.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(tss[(indx_hg19_gain | indx_hg19_loss) & tss$HumanFDR < 0.01 & tss$HumanFDR_PI < 0.01,1:3], "hg19.gl-UPI-HC.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+
+
               ##     1:1 ortholog,  mappable,             complete gain/ loss,                            gain/ loss in magnitude.
 indx_rheMac3_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V9 > 0.7 & tss$V8 < 0.1 & tss$V7 < 0.1) | (tss$MacaqueFDR < 0.05 & tss$MacaqueFC > 0))
 indx_rheMac3_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V9 < 0.1 & tss$V8 > 0.7 & tss$V7 > 0.7) | (tss$MacaqueFDR < 0.05 & tss$MacaqueFC < 0))
@@ -58,36 +62,41 @@ write.table(tss[indx,], "all.conserved.bed", row.names=FALSE, col.names=FALSE, q
 
 ## Validation in humans.
 require(bigWig)
-makePlot <- function(bed, mark, bwpath= "/local/storage/data/hg19/cd4/epiRoadmap_histone/", halfWindow= 5000, step= 25) {
+source("../lib/avg.metaprofile.R")
+makePlot <- function(bed, mark, bwpath= "/local/storage/data/hg19/cd4/epiRoadmap_histone/", halfWindow= 5000, step= 25, ...) {
   bw <- load.bigWig(paste(bwpath, mark, ".bw", sep=""))
-  mp <- metaprofile.bigWig(center.bed(bed[,1:3], halfWindow, halfWindow), bw, step=step)
+  mp <- avg.metaprofile.bigWig(center.bed(bed[,1:3], halfWindow, halfWindow), bw, step=step, ...)
   plot(mp)
 }
 
-makePlot(tss[indx,], "H3K27ac")
-makePlot(tss[indx_hg19_gain,], "H3K27ac")
-makePlot(tss[indx_hg19_loss,], "H3K27ac") ## These include sites that are decreases.
-makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K27ac") ## Complete loss of dREG signal.
+pdf("dREG-Changes.pdf")
 
-makePlot(tss[indx,], "H3K27me3")
-makePlot(tss[indx_hg19_gain,], "H3K27me3")
-makePlot(tss[indx_hg19_loss,], "H3K27me3")
-makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K27me3")
+makePlot(tss[indx,], "H3K27ac", name="H3K27ac")
+makePlot(tss[indx_hg19_gain,], "H3K27ac", name="H3K27ac gain")
+makePlot(tss[indx_hg19_loss,], "H3K27ac", name="H3K27ac loss") ## These include sites that are decreases.
+makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K27ac", name="H3K27ac complete loss") ## Complete loss of dREG signal.
 
-makePlot(tss[indx,], "H3K4me3")
-makePlot(tss[indx_hg19_gain,], "H3K4me3")
-makePlot(tss[indx_hg19_loss,], "H3K4me3")
-makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K4me3")
+makePlot(tss[indx,], "H3K27me3", name="H3K27me3")
+makePlot(tss[indx_hg19_gain,], "H3K27me3", name="H3K27me3 gain")
+makePlot(tss[indx_hg19_loss,], "H3K27me3", name="H3K27me3 loss")
+makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K27me3", name="H3K27me3 complete loss")
 
-makePlot(tss[indx,], "H3K4me1")
-makePlot(tss[indx_hg19_gain,], "H3K4me1")
-makePlot(tss[indx_hg19_loss,], "H3K4me1")
-makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K4me1")
+makePlot(tss[indx,], "H3K4me3", name="H3K4me3")
+makePlot(tss[indx_hg19_gain,], "H3K4me3", name="H3K4me3 gain")
+makePlot(tss[indx_hg19_loss,], "H3K4me3", name="H3K4me3 loss")
+makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K4me3", name="H3K4me3 complete loss")
 
-makePlot(tss[indx,], "MeDIP-Seq")
-makePlot(tss[indx_hg19_gain,], "MeDIP-Seq")
-makePlot(tss[indx_hg19_loss,], "MeDIP-Seq")
-makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "MeDIP-Seq")
+makePlot(tss[indx,], "H3K4me1", name="H3K4me1")
+makePlot(tss[indx_hg19_gain,], "H3K4me1", name="H3K4me1 gain")
+makePlot(tss[indx_hg19_loss,], "H3K4me1", name="H3K4me1 loss")
+makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K4me1", name="H3K4me1 complete loss")
+
+makePlot(tss[indx,], "MeDIP-Seq", name="MeDIP-Seq")
+makePlot(tss[indx_hg19_gain,], "MeDIP-Seq", name="MeDIP-Seq gain")
+makePlot(tss[indx_hg19_loss,], "MeDIP-Seq", name="MeDIP-Seq loss")
+makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "MeDIP-Seq", name="MeDIP-Seq complete loss")
+
+dev.off()
 
 makeHeatmap <- function(bed, path, halfWindow=5000, step=25) {
 bw <- load.bigWig(paste("/local/storage/data/hg19/cd4/epiRoadmap_histone/H3K27ac.bw", sep="")) 

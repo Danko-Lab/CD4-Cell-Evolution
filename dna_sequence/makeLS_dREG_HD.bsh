@@ -35,11 +35,11 @@ rm tfs.tmp.gz
 
 ## Try also these specific TFBS: 
 function getTF {
-unstarch ../tfbs/tf.u.hg19.bed.starch | grep $1 | awk '($5 > 9) {print $0}' > tf.tmp
-cat tf.tmp | bedops --element-of - H-U.gl.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > ${2}.Hgain-loss.TFBS.bed.gz
-cat tf.tmp | bedops --element-of - H-U.gain.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > ${2}.Hgain.TFBS.bed.gz
-cat tf.tmp | bedops --element-of - H-U.loss.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > ${2}.Hloss.TFBS.bed.gz
-cat tf.tmp | bedops --element-of - conserved.tmp.bed | awk '(($3-$2)> 5) {print $0}' | bedops --merge - | gzip > ${2}.conserved.TFBS.bed.gz
+unstarch ../tfbs/tf.u.hg19.bed.starch | grep $1 | awk '($5 > 8) {print $0}' > tf.tmp
+cat tf.tmp | bedops --element-of - H-U.gl.tmp.bed | awk '(($3-$2)> 5) {print $0}' | gzip > ${2}.Hgain-loss.TFBS.bed.gz
+cat tf.tmp | bedops --element-of - H-U.gain.tmp.bed | awk '(($3-$2)> 5) {print $0}' | gzip > ${2}.Hgain.TFBS.bed.gz
+cat tf.tmp | bedops --element-of - H-U.loss.tmp.bed | awk '(($3-$2)> 5) {print $0}' | gzip > ${2}.Hloss.TFBS.bed.gz
+cat tf.tmp | bedops --element-of - conserved.tmp.bed | awk '(($3-$2)> 5) {print $0}' | gzip > ${2}.conserved.TFBS.bed.gz
 rm tf.tmp
 }
 

@@ -8,17 +8,18 @@ source("readData.R")
 ##
 ## Do PCA ...
 #rpkm_df <- log(rpkm_df[,c(2:9,11:17)]+1e-7)
-
-rpkm_df <- as.matrix(ca[,indx.good[c(2:9,11:17)]]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
-for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- log(1000*(rpkm_df[,i]+0.25)/sum(rpkm_df[,i]) *1000/(ca[,"mapSize"]))
+indx <- ca$type == "protein_coding"
+rpkm_df <- as.matrix(ca[indx,indx.good[c(2:10,12:19)]]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI
+for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- log(1000*(rpkm_df[,i]+0.25)/sum(rpkm_df[,i]) *1000/(ca[indx,"mapSize"]))
 
 
 #pca <- prcomp(rpkm_df[,1:8], center=FALSE, scale=FALSE) ## UNT
 #pca <- prcomp(rpkm_df[,9:15], center=FALSE, scale=FALSE) ## PI
-pca <- prcomp(rpkm_df, scale=FALSE, center=FALSE) ## ALL
+pca <- prcomp(rpkm_df, scale=TRUE, center=TRUE) ## ALL
 
-cols <- c(rep("red",3), rep("green",2), rep("blue", 3), rep("dark red", 3), rep("dark green", 2), rep("dark blue", 2), "black", "black")
-pch <- c(rep(19,8), rep(6,7), 9, 24)
+cols <- c(rep("red",3), rep("green",3), rep("blue", 3), rep("dark red", 3), rep("dark green", 3), rep("dark blue", 2))#, "black", "black")
+pch <- c(rep(19,9), rep(6,8))#, 9, 24)
+data.frame(colnames(rpkm_df), cols, pch)
 
 summary(pca) # Prints variance summary for all principal components.
 #plot(pca$rotation[,1], pca$rotation[,2], pch=19, col=cols)
@@ -26,6 +27,7 @@ pairs(pca$rotation[,1:5], col=cols, pch=pch)
 
 pdf("PC1.PC2.pdf")
 plot(y= pca$rotation[,1], x= pca$rotation[,2], col=cols, pch=pch, xlab="PC2", ylab="PC1")
+pairs(pca$rotation[,1:5], col=cols, pch=pch)
 dev.off()
 
 ## 
