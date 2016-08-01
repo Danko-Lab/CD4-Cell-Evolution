@@ -66,8 +66,8 @@ getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=H2.count.bed
-export BWPLUS=$BWPATH/H2-U.bed.gz_plus.bw
-export BWMINUS=$BWPATH/H2-U.bed.gz_minus.bw
+export BWPLUS=$BWPATH/H2-U_plus.bw
+export BWMINUS=$BWPATH/H2-U_minus.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
@@ -90,16 +90,16 @@ getCounts $TSSSITES $TSSINCR $COUNTTSS
 #getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=C3.count.bed
-export BWPLUS=$BWPATH/C3-U.bed.gz_plus.hg19.bw
-export BWMINUS=$BWPATH/C3-U.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/C3-U_plus.hg19.bw
+export BWMINUS=$BWPATH/C3-U_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=C4.count.bed
-export BWPLUS=$BWPATH/C4-U.bed.gz_plus.hg19.bw
-export BWMINUS=$BWPATH/C4-U.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/C4-U_plus.hg19.bw
+export BWMINUS=$BWPATH/C4-U_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
@@ -122,16 +122,16 @@ getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=M2.count.bed
-export BWPLUS=$BWPATH/M2-U.bed.gz_plus.hg19.bw
-export BWMINUS=$BWPATH/M2-U.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/M2-U_plus.hg19.bw
+export BWMINUS=$BWPATH/M2-U_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=M3.count.bed
-export BWPLUS=$BWPATH/M3-U.bed.gz_plus.hg19.bw
-export BWMINUS=$BWPATH/M3-U.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/M3-U_plus.hg19.bw
+export BWMINUS=$BWPATH/M3-U_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
@@ -179,16 +179,16 @@ getCounts $TSSSITES $TSSINCR $COUNTTSS
 #getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=C3.pi.count.bed
-export BWPLUS=$BWPATH/C3-PI.bed.gz_plus.hg19.bw
-export BWMINUS=$BWPATH/C3-PI.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/C3-PI_plus.hg19.bw
+export BWMINUS=$BWPATH/C3-PI_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=C4.pi.count.bed
-export BWPLUS=$BWPATH/C4-PI.bed.gz_plus.hg19.bw
-export BWMINUS=$BWPATH/C4-PI.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/C4-PI_plus.hg19.bw
+export BWMINUS=$BWPATH/C4-PI_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
@@ -211,16 +211,16 @@ getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=M2.pi.count.bed
-export BWPLUS=$BWPATH/M2-PI.bed.gz_plus.hg19.bw
-export BWMINUS=$BWPATH/M2-PI.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/M2-PI_plus.hg19.bw
+export BWMINUS=$BWPATH/M2-PI_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
 getCounts $TSSSITES $TSSINCR $COUNTTSS
 
 export COUNTFILE=M3.pi.count.bed
-export BWPLUS=$BWPATH/M3-PI.bed.gz_plus.hg19.bw
-export BWMINUS=$BWPATH/M3-PI.bed.gz_minus.hg19.bw
+export BWPLUS=$BWPATH/M3-PI_plus.hg19.bw
+export BWMINUS=$BWPATH/M3-PI_minus.hg19.bw
 getCounts $GENEBODIES $INCREMENTS $COUNTALL
 getCounts $PAUSESITES $PAUSEINCR $COUNTPAUSE
 #getPauseCounts $PAUSESITES $COUNTPAUSE
