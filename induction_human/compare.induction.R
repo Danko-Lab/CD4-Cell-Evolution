@@ -35,6 +35,13 @@ NROW(unique(hs$V7[cngAll])) ## Yep. 2,953.  A few that change directions.  Not m
 cor(cbind(hs$V9[cngAll], pt$V9[cngAll], rm$V9[cngAll]))
 pairs(cbind(hs$V9[cngAll], pt$V9[cngAll], rm$V9[cngAll]))
 
+pdf("CompareFoldChanges.pdf")
+ source("../lib/densScatterplot.R")
+ densScatterplot(hs$V9[cngAll], pt$V9[cngAll], xlab="Log2 fold-change Human", ylab="Log2 fold-change Chimp")
+ densScatterplot(hs$V9[cngAll], rm$V9[cngAll], xlab="Log2 fold-change Human", ylab="Log2 fold-change Rhesus")
+ densScatterplot(pt$V9[cngAll], rm$V9[cngAll], xlab="Log2 fold-change Chimp", ylab="Log2 fold-change Rhesus")
+dev.off() 
+
 cor(cbind(hs$V9[cngOne], pt$V9[cngOne], rm$V9[cngOne]))
 pairs(cbind(hs$V9[cngOne], pt$V9[cngOne], rm$V9[cngOne]))
 

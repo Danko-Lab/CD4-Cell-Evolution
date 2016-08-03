@@ -7,7 +7,7 @@ load("../annotations/fdr.RData")
 source("../lib/densScatterplot.R")
 
 ## Index extent of changes.
-isresp <- fdr_df$U2PIFDR_H < 0.05 #& fdr_df$U2PIFDDR_C < 0.05 & fdr_df$U2PIFDR_M < 0.05 ## Clearly responding in all three.
+isresp <- fdr_df$U2PIFDR_H < 0.05 & fdr_df$U2PIFDDR_C < 0.05 & fdr_df$U2PIFDR_M < 0.05 ## Clearly responding in all three.
 summary(isresp)
 cor(data.frame(fdr_df$U2PIFC_H[isresp], fdr_df$U2PIFC_C[isresp], fdr_df$U2PIFC_M[isresp]))
 

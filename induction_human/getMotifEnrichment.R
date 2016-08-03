@@ -17,8 +17,9 @@ load("APCluster.rdata")
 
 ## Now get enriched motifs...
 PVAL <- 0.01
-FOLD <- 1 #3
-mTH  <- 7.5
+FOLD <- 3 #1 #3
+mTH  <- 8 #7.5
+min.size <- 3000
 
 ## Do human
 file.twoBit_path        <- "/local/storage/data/hg19/hg19.2bit";
@@ -41,6 +42,7 @@ tf_up <- tfbs.enrichmentTest(
         positive.bed= enh.up,
         negative.bed= enh.unc,
         gc.correction=TRUE,
+	gc.min.sample= min.size,
         use.cluster=TRUE,
         threshold = mTH,
         ncores = 21);
@@ -53,6 +55,7 @@ tf_dn <- tfbs.enrichmentTest(
         positive.bed= enh.dn,
         negative.bed= enh.unc,
         gc.correction=TRUE,
+        gc.min.sample= min.size,
         use.cluster=TRUE,
         threshold = mTH,
         ncores = 21);
@@ -77,6 +80,7 @@ tf_up <- tfbs.enrichmentTest(
         positive.bed= enh.up,
         negative.bed= enh.unc,
         gc.correction=TRUE,
+        gc.min.sample= min.size,
         use.cluster=TRUE,
         threshold = mTH,
         ncores = 21);
@@ -89,6 +93,7 @@ tf_dn <- tfbs.enrichmentTest(
         positive.bed= enh.dn,
         negative.bed= enh.unc,
         gc.correction=TRUE,
+        gc.min.sample= min.size,
         use.cluster=TRUE,
         threshold = mTH,
         ncores = 21);
@@ -110,6 +115,7 @@ tf_up <- tfbs.enrichmentTest(
         positive.bed= enh.up,
         negative.bed= enh.unc,
         gc.correction=TRUE,
+        gc.min.sample= min.size,
         use.cluster=TRUE,
         threshold = mTH,
         ncores = 21);
@@ -122,6 +128,7 @@ tf_dn <- tfbs.enrichmentTest(
         positive.bed= enh.dn,
         negative.bed= enh.unc,
         gc.correction=TRUE,
+        gc.min.sample= min.size,
         use.cluster=TRUE,
         threshold = mTH,
         ncores = 21);
