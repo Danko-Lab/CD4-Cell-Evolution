@@ -18,8 +18,8 @@ load("APCluster.rdata")
 ## Now get enriched motifs...
 PVAL <- 0.01
 FOLD <- 3 #1 #3
-mTH  <- 8 #7.5
-min.size <- 3000
+mTH  <- 7.5
+min.size <- 2500
 
 ## Do human
 file.twoBit_path        <- "/local/storage/data/hg19/hg19.2bit";
@@ -133,6 +133,7 @@ tf_dn <- tfbs.enrichmentTest(
         threshold = mTH,
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_dn, file.pdf="Rhesus.TF-dn.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
-tfbs.plotEnrichment(tfs, tf_dn, file.pdf=paste("Rhesus.TF-dn.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options)
+options$y.max <- 6
+tfbs.plotEnrichment(tfs, tf_dn, file.pdf=paste("Rhesus.TF-dn.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options, y.max= -6)
 
 
