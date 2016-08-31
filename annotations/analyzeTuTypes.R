@@ -1,8 +1,8 @@
 ##
 ##
 load("fdr.RData")
-PVAL <- 0.01
-EXPR <- 0#5e-5
+PVAL <- 0.005
+EXPR <- 0
 
 toLogical <- function(indx, expLength) {
   var <- rep(FALSE, expLength)
@@ -12,7 +12,7 @@ toLogical <- function(indx, expLength) {
 
 ## Define TU types.
   indx.eRNA <- grepl("Dist_UnSt", fdr_df$type)#"dREG_ENH", fdr_df$type)
-  indx.lincRNA <- grepl("lincRNA|processed_transcript|sense_intronic|sense_overlapping", fdr_df$type)
+  indx.lincRNA <- grepl("lincRNA|processed_transcript", fdr_df$type) # "sense_intronic|sense_overlapping"
   indx.unannot <- grepl("INTERGENIC|GENE_BadMatch|AS_BadMatch", fdr_df$type)
   indx.pseudogene.rep <- grepl("pseudogene|GERST_PG|PSEUDOGENE+REP", fdr_df$type)
   indx.protein_coding <- grepl("protein_coding", fdr_df$type)
@@ -33,18 +33,19 @@ toLogical <- function(indx, expLength) {
 #		indx.antisense= data_sums[indx.antisense],
 #		indx.uas= data_sums[indx.uas],
 #		indx.srna= data_sums[indx.srna])
-#  ns <- norm.subsample.n(lnorm, plot.cdf=TRUE, dist=data_sums[indx.eRNA])
-  indx.eRNA <- toLogical(which(indx.eRNA))#[ns[[1]]])
-  indx.lincRNA <- toLogical(which(indx.lincRNA))#[ns[[2]]])
-  indx.unannot <- toLogical(which(indx.unannot))#[ns[[3]]])
-  indx.pseudogene.rep <- toLogical(which(indx.pseudogene.rep))#[ns[[4]]])
-  indx.protein_coding <- toLogical(which(indx.protein_coding))#[ns[[5]]])
-  indx.antisense <- toLogical(which(indx.antisense))#[ns[[6]]])
-  indx.uas <- toLogical(which(indx.uas))#[ns[[7]]])
-  indx.srna <- toLogical(which(indx.srna))#[ns[[8]]])
+#  ns <- norm.subsample.n(lnorm, plot.cdf=TRUE)#, dist=data_sums[indx.eRNA])
+
+  indx.eRNA <- toLogical(which(indx.eRNA), NROW(fdr_df)) # toLogical(ns[[1]], NROW(fdr_df)) 
+  indx.lincRNA <- toLogical(which(indx.lincRNA), NROW(fdr_df)) #toLogical(ns[[2]], NROW(fdr_df)) 
+  indx.unannot <- toLogical(which(indx.unannot), NROW(fdr_df)) # toLogical(ns[[3]], NROW(fdr_df))
+  indx.pseudogene.rep <- toLogical(which(indx.pseudogene.rep), NROW(fdr_df)) # toLogical(ns[[4]], NROW(fdr_df)) 
+  indx.protein_coding <- toLogical(which(indx.protein_coding), NROW(fdr_df)) # toLogical(ns[[5]], NROW(fdr_df)) 
+  indx.antisense <- toLogical(which(indx.antisense), NROW(fdr_df)) # toLogical(ns[[6]], NROW(fdr_df)) 
+  indx.uas <- toLogical(which(indx.uas), NROW(fdr_df)) # toLogical(ns[[7]], NROW(fdr_df)) 
+  indx.srna <- toLogical(which(indx.srna), NROW(fdr_df)) # toLogical(ns[[8]], NROW(fdr_df))
 
 ## UNDO THIS ONE!
-  indx.pseudogene.rep <- grepl("pseudogene|GERST_PG|PSEUDOGENE+REP", fdr_df$type)
+#  indx.pseudogene.rep <- grepl("pseudogene|GERST_PG|PSEUDOGENE+REP", fdr_df$type)
 
 
 getDifferences <- function(changeExpr, isExpr) {
@@ -148,7 +149,7 @@ sum(isExpr)/NROW(isExpr)
 isExprPI<-rowMax(rpkm_df[,11:17]) > EXPR
 sum(isExprPI)/NROW(isExprPI)
 
-getDifferences(changeExpr, isExpr)
+diff_all <- getDifferences(changeExpr, isExpr); diff_all
 
 ## Untreated
 hu <- getDifferences(fdr_t[,1]<PVAL, isExpr); hu # HUMAN
@@ -168,7 +169,19 @@ library(reshape2)
 pdf("tuTypeChanges.pdf")
 font_size <- 16
 
-  a <- ggplot(hu, aes(Type, Changed)) + xlab("") + ylab("Fraction of Transcripts Changed") +
+  aall <- ggplot(diff_all, aes(Type, Changed)) + xlab("") + ylab("Fraction of Transcripts Changed (all primates)") +
+    geom_bar(aes(fill=Type), stat="identity") +
+    scale_fill_brewer(palette = "Set1")
+
+  a <- ggplot(hu, aes(Type, Changed)) + xlab("") + ylab("Fraction of Transcripts Changed (human)") +
+    geom_bar(aes(fill=Type), stat="identity") +
+    scale_fill_brewer(palette = "Set1")
+
+  ac <- ggplot(cu, aes(Type, Changed)) + xlab("") + ylab("Fraction of Transcripts Changed (chimp)") +
+    geom_bar(aes(fill=Type), stat="identity") +
+    scale_fill_brewer(palette = "Set1")
+
+  am <- ggplot(mu, aes(Type, Changed)) + xlab("") + ylab("Fraction of Transcripts Changed (rhesus)") +
     geom_bar(aes(fill=Type), stat="identity") +
     scale_fill_brewer(palette = "Set1")
 
@@ -187,8 +200,10 @@ theme_update(axis.text.x = element_text(angle = 90, hjust = 1, size=font_size),
      axis.ticks = element_line(size=1), 
 	 legend.position = "none")
 
+aall
 a
-
+ac
+am
 b
 	 
 dev.off()

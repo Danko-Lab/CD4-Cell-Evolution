@@ -7,7 +7,7 @@
 source("../lib/getOverlap.R")
 
 ##Prepare loops.
-dist<- 1000 # 15000
+dist<- 5000 # 15000
 loops <- read.table("/local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz")
 loopdist <- function(i) { ## Get the actual distance in the detected loop interaction.
  loop1 <- sapply(strsplit(as.character(loops$V4), split=";"), function(x) {x[[i]]})
