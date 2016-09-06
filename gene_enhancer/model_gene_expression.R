@@ -77,13 +77,16 @@ getLoopNearby <- function(prefix="H", column=21, post_pro= ".change-U.tsv", post
   ## Get TREs in the same TAD, excluding the TSS.
   indxtss <- getOverlap(tss[i,], tres)
   indxtad <- getOverlap(tss[i,], TADs)
-  indx <- getOverlap(TADs[indxtad[1],], tres) ## Assume one TAD per tss.
-  truth_ <- rep(FALSE, NROW(tres)); truth_[indx] <- TRUE; truth_[indxtss] <- FALSE
-  indx <- which(truth_)
+  
+  if(NROW(indxtad)>0) {
+    indx <- getOverlap(TADs[indxtad[1],], tres) ## Assume one TAD per tss.
+    truth_ <- rep(FALSE, NROW(tres)); truth_[indx] <- TRUE; truth_[indxtss] <- FALSE
+    indx <- which(truth_)
 
-  if(NROW(indx)>0) {
+    if(NROW(indx)>0) {
 	tad_ <- mean(tres[indx, column])
 	RE_changes <- c(RE_changes, c(tres[indx, column]))
+    }
   }
 
   ## Add nearby TREs.
@@ -123,10 +126,20 @@ enh_pro_change <- rbind(getLoopNearby("H", 21),
 save.image("Enhancer-Promoter-Loops.RData")
 
 ## Treat missing values as 0s?!
-for(i in 3:NCOL(enh_pro_change)) enh_pro_change[is.na(enh_pro_change[,i]),i] <- 0
+for(i in 2:NCOL(enh_pro_change)) enh_pro_change[is.na(enh_pro_change[,i]),i] <- 0
 
 cor.test(enh_pro_change$pro, enh_pro_change$enh)
 plot(enh_pro_change$pro, enh_pro_change$enh, xlab= "Gene Expression", ylab="Mean Enhancers", pch=19)
+
+# Check correlation within TADs.
+indx <- which(enh_pro_change$tad != 0)
+cor.test(enh_pro_change$tad[indx], enh_pro_change$pro[indx], method="pearson")
+plot(enh_pro_change$pro[indx], enh_pro_change$tad[indx], xlab= "Gene Expression", ylab="ncRNAs in TAD", pch=19)
+
+# Check correlation of loops.
+indx <- which(enh_pro_change$loop != 0)
+cor.test(enh_pro_change$loop[indx], enh_pro_change$pro[indx], method="pearson")
+plot(enh_pro_change$pro[indx], enh_pro_change$loop[indx], xlab= "Gene Expression", ylab="Loop", pch=19)
 
 require(vioplot)
 vioplot(enh_pro_change$enh[enh_pro_change$pro < 0 & !is.nan(enh_pro_change$enh)], enh_pro_change$enh[enh_pro_change$pro > 0 & !is.nan(enh_pro_change$enh)]); abline(h=0)
@@ -137,20 +150,36 @@ cor.test(predict(gl, enh_pro_change), enh_pro_change$pro)
 cor.test(enh_pro_change$pro, enh_pro_change$enh)
 
 ## LM:
-indx<- rep(TRUE, NROW(enh_pro_change)) #indx <- enh_pro_change$uas!=0 || enh_pro_change$near!=0
+indx<- rep(TRUE, NROW(enh_pro_change)) 
+indx <- enh_pro_change$uas!=0 #|| enh_pro_change$near!=0
 cor.test(enh_pro_change$pro[indx], enh_pro_change$enh[indx])
 plot(enh_pro_change$pro[indx], enh_pro_change$enh[indx])
 
 sm_cng <- enh_pro_change[indx,]
 
-train <- sample(c(1:NROW(sm_cng)), NROW(sm_cng)*0.8)
+train <- sample(c(1:NROW(sm_cng)), NROW(sm_cng)*0.2)
 test  <- rep(TRUE, NROW(sm_cng)); test[train] <- FALSE; test <- which(test)
 
-gl <- glm(pro~near+uas+loop+as+enh+uas:enh+enh:loop, data=sm_cng[train,])
-cor.test(sm_cng$enh[test], sm_cng$pro[test])
-cor.test(sm_cng$enh[test], sm_cng$uas[test])
+gl <- glm(pro~near+uas+loop+as+tad+near:uas+near:tad+loop:tad+loop:near+uas:as+uas:near, data=sm_cng[train,])
+#cor.test(sm_cng$enh[test], sm_cng$pro[test])
+#cor.test(sm_cng$uas[test], sm_cng$pro[test])
 cor.test(predict(gl, sm_cng[test,]), sm_cng$pro[test])
-plot(predict(gl, sm_cng[test,]), sm_cng$pro[test]); abline(0,1)
+cor.test(predict(gl, sm_cng[train,]), sm_cng$pro[train])
+plot(predict(gl, sm_cng[test,]), sm_cng$pro[test], pch=19); abline(0,1)
 
+cor.test(predict(gl, sm_cng[test,]), sm_cng$pro[test], method="spearman")
+source("../lib/densScatterplot.R")
+densScatterplot(sm_cng$pro[test], predict(gl, sm_cng[test,]), xlab= "Fold Change in Gene Transcription", ylab="Predicted Change in Gene Transcription")
+abline(a=0, b=1)
+
+
+pdf("Predicting_Changes_in_transcription.pdf")
+  densScatterplot(sm_cng$pro[test], predict(gl, sm_cng[test,]), xlab= "Fold Change in Gene Transcription", ylab="Predicted Change in Gene Transcription")
+  abline(a=0, b=1)
+dev.off()
+
+#require(e1071)
+#sv <- svm(pro~near+uas+loop+as+tad+enh+uas:enh+enh:loop, data=sm_cng[train,])
+#cor.test(as.double(predict(sv, sm_cng[test,])), sm_cng$pro[test])
 
 

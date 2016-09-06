@@ -58,7 +58,7 @@ total <- summary(as.factor(tss$V5))
 one2m <- summary(as.factor(tss$V5[tss$V20 > 0])) ## Possible 1:many orthology
 unmap <- summary(as.factor(tss$V5[tss$V20 == 0 & is.na(tss$mapSize)])) ## INDEL
 lccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss$V20 == 0 & !is.na(tss$mapSize)])) # 'Low-confidence'
-chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7)])) # 'High-confidence'
+chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & (tss$V7 > 0.1 & tss$V8 > 0.1 & tss$V9 > 0.1)])) # 'High-confidence'
 hctot <- summary(as.factor(tss$V5[tss$V20 == 0 & tss$fdr_min < 0.05  & !is.na(tss$mapSize)])) # 'HC all'
 
 chang_U2PI <- summary(as.factor(tss$V5[tss$V20 > 0 & !is.na(tss$mapSize) & tss$U2PIFDR_H < 0.05]))
@@ -97,7 +97,7 @@ SElccng/(SEtotal - SEone2m - SEunmap)
 require(ggplot2)
 library(reshape2)
 
-dat <- data.frame(type= names(unmap), gap= unmap/(total - one2m), change= chang/(total - one2m), lc_change= lccng/(total - one2m), same=(total - one2m - unmap - chang - lccng)/(total - one2m))
+dat <- data.frame(type= names(unmap), gap= unmap/(total - one2m), change= chang/(total - one2m), lc_change= lccng/(total - one2m), same=(total - one2m - unmap - chang - lccng)/(total - one2m), hctot=hctot/(total - one2m) )
 dat <- melt(dat)
 
 SEdat <- data.frame(type= names(SEunmap), gap= SEunmap/(SEtotal - SEone2m), change= SEchang/(SEtotal - SEone2m), lc_change= SElccng/(SEtotal - SEone2m), same=(SEtotal - SEone2m - SEunmap - SEchang - SElccng)/(SEtotal - SEone2m))
@@ -116,7 +116,7 @@ SEc<-  qplot(x= factor(type), y= value, stat="identity", data= SEdat, geom="bar"
 pdf("enh.type.change.barplot.pdf")
         a
         b
-        c
+#        c
 dev.off()
 
 ## Density scatterplots at promoters and enhancers
@@ -386,14 +386,15 @@ for(x in nloops) {
 
 use <- !is.na(loop_cons_df$t0)
 pdf("NumberOfLoops.Promoter.pdf")
-  plot(0:12, loop_cons, pch=19, cex=3*getCex(n_s), xlab= "Number of loops to promoter", ylab= "Fraction conserved")
+  plot(0:12, loop_cons, pch=19, cex=3*getCex(n_s), xlab= "Number of loops to promoter", ylab= "Fraction conserved", ylim=c(0.55,0.9), xlim=c(-1,12))
   abline(fit_line)
   cd.barplot(loop_cons_df$t0[use], loop_cons_df$sd[use], as.character(nloops)[use], fill=TRUE, order=FALSE)
   plot(loop_swap)
 dev.off()
 
-cmpFracConserved(tss[rowSums(loop[,5:6]) > 0 & rowSums(loop[,5:6]) <= 1,], tss[rowSums(loop[,5:6]) >= 3,], i=3) ## Promoters
-cmpFracConserved(tss[rowSums(loop[,5:6]) > 0 & rowSums(loop[,5:6]) <= 2,], tss[rowSums(loop[,5:6]) >= 3,], i=3) ## Promoters
+cmpFracConserved(tss[rowSums(loop[,5:6]) >= 0 & rowSums(loop[,5:6]) <= 0,], tss[rowSums(loop[,5:6]) >= 3,], i=3) ## Promoters
+cmpFracConserved(tss[rowSums(loop[,5:6]) >= 0 & rowSums(loop[,5:6]) <= 1,], tss[rowSums(loop[,5:6]) >= 3,], i=3) ## Promoters
+cmpFracConserved(tss[rowSums(loop[,5:6]) >= 0 & rowSums(loop[,5:6]) <= 2,], tss[rowSums(loop[,5:6]) >= 3,], i=3) ## Promoters
 
 ## Do differences in expression explain loop correlation?
 expr <- rowSums(rpkm_df[,2:9])

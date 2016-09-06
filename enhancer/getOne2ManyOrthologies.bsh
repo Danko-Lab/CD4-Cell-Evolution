@@ -23,13 +23,27 @@ export NET=panTro4_net_rbest
 makeOrthoAnnot
 export NET=rheMac3_net_rbest
 makeOrthoAnnot
+export NET=mm10_net_rbest
+makeOrthoAnnot
+export NET=rn6_net_rbest
+makeOrthoAnnot
+
 
 export NET=netPanTro4
 makeOrthoAnnot
 export NET=netRheMac3
 makeOrthoAnnot
+export NET=netMm10
+makeOrthoAnnot
+export NET=netRn6
+makeOrthoAnnot
+
 
 ## Select gaps in recipBest NOT in standard nets.
 bedops --difference panTro4_net_rbest.gapMerge.save netPanTro4.gapMerge.save | starch - > panTro4.one2many.bed.starch
 bedops --difference rheMac3_net_rbest.gapMerge.save netRheMac3.gapMerge.save | starch - > rheMac3.one2many.bed.starch
+bedops --difference mm10_net_rbest.gapMerge.save netMm10.gapMerge.save | starch - > mm10.one2many.bed.starch
+bedops --difference rn6_net_rbest.gapMerge.save netRn6.gapMerge.save | starch - > rn6.one2many.bed.starch
+
+
 

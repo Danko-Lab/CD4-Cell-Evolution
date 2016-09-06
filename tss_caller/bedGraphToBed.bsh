@@ -30,21 +30,21 @@ MHS=HighScore
 rm -Rf $MHS
 mkdir $MHS
 TH=0.8
-writeBed
+#writeBed
 mv *.bed.gz $MHS
 
 MS=MedScore
 rm -Rf $MS
 mkdir $MS
 TH=0.7
-writeBed
+#writeBed
 mv *.bed.gz $MS
 
 LS=LowScore
 rm -Rf $LS
 mkdir $LS
 TH=0.3
-writeBed
+#writeBed
 mv *.bed.gz $LS
 
 
@@ -103,8 +103,8 @@ zcat $MERGE/H-*.TSS.bed.gz $MERGE/C-*.TSS_hg19.bed.gz $MERGE/M-*.TSS_hg19.bed.gz
 zcat H-U.TSS.bedGraph.gz      | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Hu.tmp
 zcat C-U.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Cu.tmp
 zcat M-U.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Mu.tmp
-zcat Mouse-U.TSS.hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Mouseu.tmp
-zcat Rat-U.TSS.hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Ratu.tmp
+zcat Mouse-U.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Mouseu.tmp
+zcat Rat-U.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Ratu.tmp
 zcat H-PI.TSS.bedGraph.gz      | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Hp.tmp
 zcat C-PI.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Cp.tmp
 zcat M-PI.TSS_hg19.bedGraph.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$4}' | sort-bed - | bedmap --max tmp.mr.bed - > Mp.tmp
