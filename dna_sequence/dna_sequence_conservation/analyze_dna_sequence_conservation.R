@@ -60,20 +60,20 @@ y_null2<-predict(null2.fit, newdata=x_val)
 pdf(paste(word,".PhyloPByDist.pdf", sep=""))
 ylims=c(-3,8) #c(-2, 0.75)
 
-plot(bed_data$V4, mean_con, xlim=c(-500000,500000), ylim=ylims, main="Mean Primate PhyloP per TFBS", xlab="Distance from nearest TSS", ylab="Phylo P")
+plot(bed_data$V4, mean_con, xlim=c(-500000,500000), ylim=ylims, main="Mean PhyloP per TFBS", xlab="Distance from nearest TSS", ylab="Phylo P")
 points(x_val, y_pred, type="l", col="dark red", lwd=3)
 abline(h=0, lty="dotted", col="gray")
 
-plot(bed_data$V4[idx], mean_con[idx], xlim=c(-500000,500000), ylim=ylims, main="Mean Primate PhyloP per LOOPED TFBS", xlab="Distance from nearest TSS", ylab="Phylo P")
+plot(bed_data$V4[idx], mean_con[idx], xlim=c(-500000,500000), ylim=ylims, main="Mean PhyloP per LOOPED TFBS", xlab="Distance from nearest TSS", ylab="Phylo P")
 points(x_val, y_pred, type="l", col="dark gray", lwd=3)
 points(x_val, y_loop, type="l", col="dark red", lwd=3)
 abline(h=0, lty="dotted", col="gray")
 
-plot(bed_null2$V4, mean_con_null2, xlim=c(-500000,500000), ylim=ylims, main="Mean Primate PhyloP, NULL2", xlab="Distance from nearest TSS", ylab="Phylo P")
+plot(bed_null2$V4, mean_con_null2, xlim=c(-500000,500000), ylim=ylims, main="Mean PhyloP, NULL2", xlab="Distance from nearest TSS", ylab="Phylo P")
 points(x_val, y_null2, type="l", col="dark red", lwd=3)
 abline(h=0, lty="dotted", col="gray")
 
-plot(bed_null1$V4, mean_con_null1, xlim=c(-500000,500000), ylim=ylims, main="Mean Primate PhyloP, NULL1", xlab="Distance from nearest TSS", ylab="Phylo P")
+plot(bed_null1$V4, mean_con_null1, xlim=c(-500000,500000), ylim=ylims, main="Mean PhyloP, NULL1", xlab="Distance from nearest TSS", ylab="Phylo P")
 points(x_val, y_null1, type="l", col="dark red", lwd=3)
 abline(h=0, lty="dotted", col="gray")
 
@@ -238,19 +238,27 @@ ks; ks$p.value
 ########################
 ## Number of loops correlated with conservation?
 
+pdf("Loops.DNA_sequence_conservation.pdf")
+
 #indx <- abs(bed$V4) > 10000 
 indx <- rep(TRUE, NROW(bed))
+loopdata_boxplot <- list()
 
-cd.cdf(mean_con[indx & rowSums(bed[,c(5:6)]) == 0], col="light gray", lwd=ld, xlim=xlim_s, type="l")
-cd.cdf(mean_con[indx & rowSums(bed[,c(5:6)])>0], col="gray", lwd=ld, xlim=xlim_s, add=TRUE, type="l")
+#cd.cdf(mean_con[indx & rowSums(bed[,c(5:6)]) == 0], col="light gray", lwd=ld, xlim=xlim_s, type="l")
+#cd.cdf(mean_con[indx & rowSums(bed[,c(5:6)])>0], col="gray", lwd=ld, xlim=xlim_s, add=TRUE, type="l")
 
 bk <- seq(0, 6, 1)
 colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(length(bk))
 
 for(i in bk) {
  print(i)
- cd.cdf(mean_con[indx & rowSums(bed[,5:6])==i], col=colrs[i+1], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
+ #cd.cdf(mean_con[indx & rowSums(bed[,5:6])==i], col=colrs[i+1], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
+ loopdata_boxplot[[i+1]] <- mean_con[indx & rowSums(bed[,5:6])==i]
 }
+
+boxplot(loopdata_boxplot)
+
+dev.off()
 
 ########################
 ## Add TRE density.
@@ -310,7 +318,7 @@ summary(mean_con[indx & bed[, 8] == 1])
 summary(mean_con[indx & bed[, 8] == 12])
 
 ##########################################################################################################
-# For promoters with N loops, find genes on the other end.
+# For promoters with N loops, find TREs on the other end.
 loops <- read.table("/local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz")
 dist <- 2500 # 500
 loopdist <- function(i) { ## Get the actual distance in the detected loop interaction.

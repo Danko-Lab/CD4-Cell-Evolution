@@ -42,7 +42,7 @@ hist(log(stab, 10))
 
 dev.off()
 
-## Change unscored to 0
+## Change unscored to 0.  Untested (reflects possible unmappable regions) to 1.
 for(i in 7:12) { tss[is.na(tss[,i]),i] <- 0 }
 
 ## H-C
@@ -61,37 +61,9 @@ lccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) &
 chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & (tss$V7 > 0.1 & tss$V8 > 0.1 & tss$V9 > 0.1)])) # 'High-confidence'
 hctot <- summary(as.factor(tss$V5[tss$V20 == 0 & tss$fdr_min < 0.05  & !is.na(tss$mapSize)])) # 'HC all'
 
-chang_U2PI <- summary(as.factor(tss$V5[tss$V20 > 0 & !is.na(tss$mapSize) & tss$U2PIFDR_H < 0.05]))
-lccng_U2PI <- summary(as.factor(tss$V5[tss$V20 > 0 & !is.na(tss$mapSize) & ((tss$V7 < 0.1 & tss$V10 > 0.7) | (tss$V7 > 0.7 & tss$V10 < 0.1))]))
-
-total
-one2m
-unmap
-chang
-lccng 
-chang_U2PI
-lccng_U2PI
-
-one2m/total ## Seems strange that there's such an enrichment in genes here ...
-unmap/(total - one2m)
-chang/(total - one2m - unmap) ## ADDED unmap to these sites b/c need to factor out for paper.
-lccng/(total - one2m - unmap)
-hctot/(total - one2m - unmap)
-
-chang_U2PI/(total - one2m - unmap)
-lccng_U2PI/(total - one2m - unmap)
-
-## Compare changes at superenhancers.
-SEtotal <- summary(as.factor(tss$V5[tss$V19 == 1]))
-SEone2m <- summary(as.factor(tss$V5[tss$V20 > 0 & tss$V19 == 1])) ## Possible 1:many orthology
-SEunmap <- summary(as.factor(tss$V5[tss$V20 == 0 & is.na(tss$mapSize) & tss$V19 == 1])) ## INDEL
-SElccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss$V20 == 0 & !is.na(tss$mapSize) & tss$V19 == 1])) # 'Low-confidence'
-SEchang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & (tss$V7 > 0.1 & tss$V8 > 0.1 & tss$V9 > 0.1) & tss$V19 == 1])) # 'High-confidence'
-
-SEone2m/SEtotal ## Seems strange that there's such an enrichment in genes here ...
-SEunmap/(SEtotal - SEone2m)
-SEchang/(SEtotal - SEone2m - SEunmap) ## ADDED unmap to these sites b/c need to factor out for paper.
-SElccng/(SEtotal - SEone2m - SEunmap)
+lccng_U2PI <- summary(as.factor(tss$V5[((tss$V7 < 0.1 & tss$V10 > 0.7) | (tss$V7 > 0.7 & tss$V10 < 0.1)) & !is.na(tss$mapSize)]))
+hccng_U2PI <- summary(as.factor(tss$V5[(tss$U2PIFDR_H < 0.05) & !((tss$V7 < 0.1 & tss$V10 > 0.7) | (tss$V7 > 0.7 & tss$V10 < 0.1)) & !is.na(tss$mapSize)]))
+ALLchang_U2PI <- summary(as.factor(tss$V5[tss$U2PIFDR_H < 0.05 & !is.na(tss$mapSize)]))
 
 ## Create a barplot.
 require(ggplot2)
@@ -99,9 +71,11 @@ library(reshape2)
 
 dat <- data.frame(type= names(unmap), gap= unmap/(total - one2m), change= chang/(total - one2m), lc_change= lccng/(total - one2m), same=(total - one2m - unmap - chang - lccng)/(total - one2m), hctot=hctot/(total - one2m) )
 dat <- melt(dat)
+dat
 
-SEdat <- data.frame(type= names(SEunmap), gap= SEunmap/(SEtotal - SEone2m), change= SEchang/(SEtotal - SEone2m), lc_change= SElccng/(SEtotal - SEone2m), same=(SEtotal - SEone2m - SEunmap - SEchang - SElccng)/(SEtotal - SEone2m))
-SEdat <- melt(SEdat)
+U2PIdat <- data.frame( type= names(unmap), gap= rep(0,4), change= hccng_U2PI/(total - one2m), lc_change= lccng_U2PI/(total - one2m), same=(total - one2m - unmap - hccng_U2PI - lccng_U2PI)/(total - one2m), hctot=ALLchang_U2PI/(total - one2m) )
+U2PIdat <- melt(U2PIdat)
+U2PIdat
 
 a <-  ggplot(dat, aes(x=variable, y=value)) + xlab("") + ylab("Fraction of Transcripts Changed") +
         geom_bar(aes(fill=type), stat="identity",position=position_dodge(), colour="black") + scale_fill_brewer(palette = "Set3")
@@ -109,13 +83,17 @@ a <-  ggplot(dat, aes(x=variable, y=value)) + xlab("") + ylab("Fraction of Trans
 b <-  ggplot(dat, aes(x=type, y=value)) + xlab("") + ylab("Fraction of Transcripts Changed") +
         geom_bar(aes(fill=variable), stat="identity",position=position_dodge(), colour="black") + scale_fill_brewer(palette = "Set3")
 
-c <-  qplot(x= factor(type), y= value, stat="identity", data= dat, geom="bar", fill=factor(variable))
-SEc<-  qplot(x= factor(type), y= value, stat="identity", data= SEdat, geom="bar", fill=factor(variable))
+aU2PI <-  ggplot(U2PIdat, aes(x=variable, y=value)) + xlab("") + ylab("Fraction of Transcripts Changed") +
+        geom_bar(aes(fill=type), stat="identity",position=position_dodge(), colour="black") + scale_fill_brewer(palette = "Set3")
 
+bU2PI <-  ggplot(U2PIdat, aes(x=type, y=value)) + xlab("") + ylab("Fraction of Transcripts Changed") +
+        geom_bar(aes(fill=variable), stat="identity",position=position_dodge(), colour="black") + scale_fill_brewer(palette = "Set3")
 
 pdf("enh.type.change.barplot.pdf")
         a
         b
+	aU2PI
+	bU2PI
 #        c
 dev.off()
 
@@ -347,7 +325,8 @@ dev.off()
 #################################################################
 ## Do more loops make a promtoer more likely to be conserved?
 
-getCex <- function(n) { y=0.075*n+0.1; y[y>3] <- 3; y[y<0.1] <- 0.1; y }
+#getCex <- function(n) { y=0.075*n+0.1; y[y>3] <- 3; y[y<0.1] <- 0.1; y }
+getCex <- function(n) { y=0.035*n+0.05; y[y>3] <- 3; y[y<0.05] <- 0.05; y } 
 n <- summary(as.factor(rowSums(loop[,5:6])))
 nloops <- 0:12
 
@@ -386,7 +365,7 @@ for(x in nloops) {
 
 use <- !is.na(loop_cons_df$t0)
 pdf("NumberOfLoops.Promoter.pdf")
-  plot(0:12, loop_cons, pch=19, cex=3*getCex(n_s), xlab= "Number of loops to promoter", ylab= "Fraction conserved", ylim=c(0.55,0.9), xlim=c(-1,12))
+  plot(0:12, loop_cons, pch=19, cex=3*getCex(n_s), xlab= "Number of loops to promoter", ylab= "Fraction conserved", ylim=c(0.55,0.95), xlim=c(-1,12))
   abline(fit_line)
   cd.barplot(loop_cons_df$t0[use], loop_cons_df$sd[use], as.character(nloops)[use], fill=TRUE, order=FALSE)
   plot(loop_swap)
