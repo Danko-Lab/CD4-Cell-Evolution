@@ -320,7 +320,7 @@ summary(mean_con[indx & bed[, 8] == 12])
 ##########################################################################################################
 # For promoters with N loops, find TREs on the other end.
 loops <- read.table("/local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz")
-dist <- 2500 # 500
+dist <- 0 #2500 # 500
 loopdist <- function(i) { ## Get the actual distance in the detected loop interaction.
  loop1 <- sapply(strsplit(as.character(loops$V4), split=";"), function(x) {x[[i]]})
  sapply(strsplit(loop1, split="-"), function(x) {as.double(x[[2]])-as.double(x[[1]])})
@@ -357,20 +357,27 @@ for(i in 1:6) {
 }
 
 save.image("enhancer_sequence_conservation_at_multi_loop_genes.RData")
+load("enhancer_sequence_conservation_at_multi_loop_genes.RData")
+
 
 pdf("Proximal.Distal.Loop.pdf")
 ## Distal.  Are low loop numbers more conserved?
 ld<-2; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
 cd.cdf(mean_con[rowSums(bed[,5:6]) == 0], col="light gray", lwd=ld, xlim=xlim_s, type="l")
+#plot(ecdf(mean_con[rowSums(bed[,5:6]) == 0]), col="light gray", lwd=ld, xlim=xlim_s)
 
 bk <- seq(1, 6, 1)
 colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(max(bk))
 for(i in bk) {
  print(i)
  cd.cdf(mean_con[unique(sort(indx_distal[[i]]))], col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
+ #plot(ecdf(mean_con[unique(sort(indx_distal[[i]]))]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
 }
 
-enh_med <- sapply(bk, function(i) {median(mean_con[unique(sort(indx_distal[[i]]))])})
+dist_med <- sapply(bk, function(i) {median(mean_con[unique(sort(indx_distal[[i]]))])})
+#dist_low <- sapply(bk, function(i) {quantile(mean_con[unique(sort(indx_distal[[i]]))], probs=0.25)})
+#dist_hig <- sapply(bk, function(i) {quantile(mean_con[unique(sort(indx_distal[[i]]))], probs=0.75)})
+plot(bk, dist_med, pch=6, lwd=6, cex=5, col="dark blue", main="Distal DNA sequence conservation", ylab="Median PhyloP (distal)", xlab="Num. Loops (proximal)")
 
 ## Significant difference in conservation.
 ks.test(mean_con[unique(sort(indx_distal[[1]]))], mean_con[unique(sort(indx_distal[[5]]))])
@@ -378,19 +385,27 @@ ks.test(mean_con[unique(sort(indx_distal[[1]]))], mean_con[unique(sort(indx_dist
 
 ## Proximal.  Are high loop numbers more conserved?
 cd.cdf(mean_con[rowSums(bed[,5:6]) == 0], col="light gray", lwd=ld, xlim=xlim_s, type="l")
+#plot(ecdf(mean_con[rowSums(bed[,5:6]) == 0]), col="light gray", lwd=ld, xlim=xlim_s)
 
 bk <- seq(1, 6, 1)
 colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(max(bk))
 for(i in bk) {
  print(i)
  cd.cdf(mean_con[indx_proximal[[i]]], col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
+ #plot(ecdf(mean_con[indx_proximal[[i]]]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
 }
+
+pro_med <- sapply(bk, function(i) {median(mean_con[unique(sort(indx_proximal[[i]]))])})
+plot(bk, pro_med, pch=6, lwd=6, cex=5, col="dark blue", main="Proximal DNA sequence conservation", ylab="Median PhyloP (proximal)", xlab="Num. Loops (proximal)")
 
 ## Significant difference in conservation.
 ks.test(mean_con[unique(sort(indx_proximal[[1]]))], mean_con[unique(sort(indx_proximal[[5]]))])
 ks.test(mean_con[unique(sort(indx_proximal[[1]]))], mean_con[unique(sort(indx_proximal[[6]]))])
 
 dev.off()
+
+## As a sanity check, call functional changes based on these.
+## Can't do this easily as we've from dREG sites to TF binding motifs ...
 
 ######################################################
 ## Specifically get loops with gene at the other end.

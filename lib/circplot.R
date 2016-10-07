@@ -13,7 +13,7 @@ cd.circle <- function(x, y, r) {
 } ## TEST!
 
 
-cd.circplot<- function(data, names, lims=c(min(data), max(data)), fill="black") {
+cd.circplot<- function(data, names, lims=c(min(data), max(data)), title= "name", fill="black") {
 	lab <- pretty(lims, n=5)
         data <- (data - min(lab)) / (max(lab) - min(lab))
 	labels <- unique(names)
@@ -63,6 +63,9 @@ cd.circplot<- function(data, names, lims=c(min(data), max(data)), fill="black") 
                 grid.text(labels[i], x= centerseq[i], y= 0.95, rot = 65, just=c("right", "top"))
 	}
 	popViewport()
+
+	## Title.
+	grid.text(title, x= 0.5, y= 0.05)
 }
 ## test:
 ## cd.circplot(c(1:10)/10, c(rep("A",4), rep("B", 2), rep("C", 4)))

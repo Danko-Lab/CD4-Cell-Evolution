@@ -28,7 +28,7 @@ load("../annotations/fdr.RData")
 ## Get enhancers interacting with conserved promoters...
 indxTREs <- list(); for(i in 1:50) {indxTREs[[i]] <- integer()}
 
- ## Get TSS of conserved, annotated protein coding genes.
+ ## Get TSS of protein coding genes.
  indx <- ca$type == "protein_coding" #fdr_df$fdr_min > 0.1 & ca$type == "protein_coding" & abs(fdr_df$fc_min) < 1 ## To focus on conserved ... or not?
  tss   <- ca[indx,1:8]
  tss[tss[,6] == "+",2] <- tss[tss[,6] == "+",2]-250; tss[tss[,6] == "+",3] <- tss[tss[,6] == "+",2]+1
@@ -87,17 +87,19 @@ dc <- sapply(nloops, function(i) {doesChange(tres[unique(sort(indxTREs[[i]])),])
 
 data.frame(nloops= nloops, conservation=dc)
 plot(nloops, dc, xlab="Number of loops", ylab="Conservation")
-cor.test(nloops, dc)
 
 #########
 ## Scatterplot, with points sized by number of points.
 
-getCex <- function(n) { y=0.0138888*n+0.1; y[y>3] <- 3; y[y<0.1] <- 0.1; y }
+getCex <- function(n) { y=0.035*n+0.05; y[y>3] <- 3; y[y<0.05] <- 0.05; y }
 n <- sapply(nloops, function(x) {NROW(unique(sort(indxTREs[[x]])))})
 
 pdf("DistalEnhancer.ChangeOverDistance.pdf")
- plot(nloops, dc, type="p", xlab="Number of Loops (proximal end)", ylab="% Conserved", pch=19, cex=getCex(n))
+ plot(nloops, dc, type="p", xlab="Number of Loops (proximal end)", ylab="% Conserved", pch=19, cex=3*getCex(n))
 dev.off()
 
+## Correlations...
+cor.test(nloops, dc)
+corr(as.matrix(cbind(nloops, dc)), w = n/sum(n))
 
 
