@@ -77,7 +77,7 @@ a <- makePlot(tss[indx,], "H3K27ac", name="H3K27ac")
 b <- makePlot(tss[indx_hg19_gain,], "H3K27ac", name="H3K27ac gain")
 c <- makePlot(tss[indx_hg19_loss,], "H3K27ac", name="H3K27ac loss") ## These include sites that are decreases.
 d <- makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K27ac", name="H3K27ac complete loss") ## Complete loss of dREG signal.
-vioplot(list(conserved= a, gain= b, loss= c, complete.loss= d), ylab="Reads per kilobase", main="H3K27ac", outline=FALSE)
+boxplot(list(conserved= a, gain= b, loss= c, complete.loss= d), ylab="Reads per kilobase", main="H3K27ac", outline=FALSE)
 
 a <- makePlot(tss[indx,], "H3K27me3", name="H3K27me3")
 b <- makePlot(tss[indx_hg19_gain,], "H3K27me3", name="H3K27me3 gain")
