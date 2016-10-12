@@ -67,34 +67,41 @@ makePlot <- function(bed, mark, bwpath= "/local/storage/data/hg19/cd4/epiRoadmap
   bw <- load.bigWig(paste(bwpath, mark, ".bw", sep=""))
   mp <- avg.metaprofile.bigWig(center.bed(bed[,1:3], halfWindow, halfWindow), bw, step=step, ...)
   plot(mp)
+
+  bed.region.bpQuery.bigWig(bw, bed[,1:3]) * 1000/(bed[,3]-bed[,2])
 }
 
 pdf("dREG-Changes.pdf")
 
-makePlot(tss[indx,], "H3K27ac", name="H3K27ac")
-makePlot(tss[indx_hg19_gain,], "H3K27ac", name="H3K27ac gain")
-makePlot(tss[indx_hg19_loss,], "H3K27ac", name="H3K27ac loss") ## These include sites that are decreases.
-makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K27ac", name="H3K27ac complete loss") ## Complete loss of dREG signal.
+a <- makePlot(tss[indx,], "H3K27ac", name="H3K27ac")
+b <- makePlot(tss[indx_hg19_gain,], "H3K27ac", name="H3K27ac gain")
+c <- makePlot(tss[indx_hg19_loss,], "H3K27ac", name="H3K27ac loss") ## These include sites that are decreases.
+d <- makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K27ac", name="H3K27ac complete loss") ## Complete loss of dREG signal.
+vioplot(list(conserved= a, gain= b, loss= c, complete.loss= d), ylab="Reads per kilobase", main="H3K27ac", outline=FALSE)
 
-makePlot(tss[indx,], "H3K27me3", name="H3K27me3")
-makePlot(tss[indx_hg19_gain,], "H3K27me3", name="H3K27me3 gain")
-makePlot(tss[indx_hg19_loss,], "H3K27me3", name="H3K27me3 loss")
-makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K27me3", name="H3K27me3 complete loss")
+a <- makePlot(tss[indx,], "H3K27me3", name="H3K27me3")
+b <- makePlot(tss[indx_hg19_gain,], "H3K27me3", name="H3K27me3 gain")
+c <- makePlot(tss[indx_hg19_loss,], "H3K27me3", name="H3K27me3 loss")
+d <- makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K27me3", name="H3K27me3 complete loss")
+boxplot(list(conserved= a, gain= b, loss= c, complete.loss= d), ylab="Reads per kilobase", main="H3K27me3", outline=FALSE)
 
-makePlot(tss[indx,], "H3K4me3", name="H3K4me3")
-makePlot(tss[indx_hg19_gain,], "H3K4me3", name="H3K4me3 gain")
-makePlot(tss[indx_hg19_loss,], "H3K4me3", name="H3K4me3 loss")
-makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K4me3", name="H3K4me3 complete loss")
+a <- makePlot(tss[indx,], "H3K4me3", name="H3K4me3")
+b <- makePlot(tss[indx_hg19_gain,], "H3K4me3", name="H3K4me3 gain")
+c <- makePlot(tss[indx_hg19_loss,], "H3K4me3", name="H3K4me3 loss")
+d <- makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K4me3", name="H3K4me3 complete loss")
+boxplot(list(conserved= a, gain= b, loss= c, complete.loss= d), ylab="Reads per kilobase", main="H3K4me3", outline=FALSE)
 
-makePlot(tss[indx,], "H3K4me1", name="H3K4me1")
-makePlot(tss[indx_hg19_gain,], "H3K4me1", name="H3K4me1 gain")
-makePlot(tss[indx_hg19_loss,], "H3K4me1", name="H3K4me1 loss")
-makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K4me1", name="H3K4me1 complete loss")
+a <- makePlot(tss[indx,], "H3K4me1", name="H3K4me1")
+b <- makePlot(tss[indx_hg19_gain,], "H3K4me1", name="H3K4me1 gain")
+c <- makePlot(tss[indx_hg19_loss,], "H3K4me1", name="H3K4me1 loss")
+d <- makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K4me1", name="H3K4me1 complete loss")
+boxplot(list(conserved= a, gain= b, loss= c, complete.loss= d), ylab="Reads per kilobase", main="H3K4me1", outline=FALSE)
 
-makePlot(tss[indx,], "MeDIP-Seq", name="MeDIP-Seq")
-makePlot(tss[indx_hg19_gain,], "MeDIP-Seq", name="MeDIP-Seq gain")
-makePlot(tss[indx_hg19_loss,], "MeDIP-Seq", name="MeDIP-Seq loss")
-makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "MeDIP-Seq", name="MeDIP-Seq complete loss")
+a <- makePlot(tss[indx,], "MeDIP-Seq", name="MeDIP-Seq")
+b <- makePlot(tss[indx_hg19_gain,], "MeDIP-Seq", name="MeDIP-Seq gain")
+c <- makePlot(tss[indx_hg19_loss,], "MeDIP-Seq", name="MeDIP-Seq loss")
+d <- makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "MeDIP-Seq", name="MeDIP-Seq complete loss")
+boxplot(list(conserved= a, gain= b, loss= c, complete.loss= d), ylab="Reads per kilobase", main="MeDIP-seq", outline=FALSE)
 
 dev.off()
 
