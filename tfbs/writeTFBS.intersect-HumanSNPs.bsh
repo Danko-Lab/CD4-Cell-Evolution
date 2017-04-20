@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+bedmap --echo --indicator tf.u.hg19.bed.starch ../dna_sequence/hg19.diff.bed.starch | grep "|1" | sed "s/|1//g" | gzip > TF.binding.intersect.human.snp.bed.gz
+
+zcat TF.binding.intersect.human.snp.bed.gz | awk '{printf "%s\t%s\t%s\t%s\t%3.0f\t%s\n", $1, $2, $3, $7"_"$4, $5, $6}' > TF.binding.intersect.bed
+
+bedToBigBed TF.binding.intersect.bed /local/storage/data/hg19/hg19.chromInfo TF.binding.human_SNPs.bb

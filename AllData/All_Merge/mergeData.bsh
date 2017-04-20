@@ -4,18 +4,19 @@ PREP1=/local/storage/projects/NHP/Alignments_1stPrep
 PREP2=/local/storage/projects/NHP/Alignments_2ndPrep
 PREP3=/local/storage/projects/NHP/Alignments_3rdPrep
 PREP4=/local/storage/projects/NHP/Alignments_4thPrep
+PREP5=/local/storage/projects/NHP/Alignments_5thPrep
 
 ## Merge Human
-zcat $CD4/H1-U.bed.gz $PREP1/H3-U.bed.gz $PREP3/H2.2-U.bed.gz | sort-bed - | gzip > H-U.bed.gz ## Eliminate H2-U
-zcat $CD4/H1-PI.bed.gz $PREP1/H3-PI.bed.gz $PREP2/H2-PI.bed.gz $PREP3/H2.2-PI.bed.gz | sort-bed - | gzip > H-PI.bed.gz
+zcat $CD4/H1-U.bed.gz  $PREP3/H2.2-U.bed.gz $PREP5/H4-U.bed.gz | sort-bed - | gzip > H-U.bed.gz ## Eliminate H2-U, H3-U
+zcat $CD4/H1-PI.bed.gz $PREP2/H2-PI.bed.gz  $PREP3/H2.2-PI.bed.gz $PREP5/H4-PI.bed.gz | sort-bed - | gzip > H-PI.bed.gz ## Eliminate H3-PI
 
 ## Merge Chimp
 zcat $PREP2/C3-U.bed.gz $PREP3/C4-U.bed.gz $PREP4/C5-U.bed.gz | sort-bed - | gzip > C-U.bed.gz ## Eliminate C2-U
 zcat $PREP2/C3-PI.bed.gz $PREP3/C4-PI.bed.gz $PREP4/C5-PI.bed.gz | sort-bed - | gzip > C-PI.bed.gz ## Eliminate C2-PI
 
 ## Merge Rhesus
-zcat $PREP1/M1-U.bed.gz  $PREP2/M2-U.bed.gz $PREP3/M3-U.bed.gz | sort-bed - | gzip > M-U.bed.gz 
-zcat $PREP2/M2-PI.bed.gz $PREP3/M3-PI.bed.gz | sort-bed - | gzip > M-PI.bed.gz ##Eliminate M1-PI
+zcat $PREP2/M2-U.bed.gz $PREP3/M3-U.bed.gz $PREP5/M4-U.bed.gz | sort-bed - | gzip > M-U.bed.gz ## Eliminate M1-U
+zcat $PREP2/M2-PI.bed.gz $PREP3/M3-PI.bed.gz $PREP5/M4-PI.bed.gz | sort-bed - | gzip > M-PI.bed.gz ##Eliminate M1-PI
 
 ## Count reads.
 for i in *.bed.gz

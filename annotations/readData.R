@@ -37,8 +37,8 @@ ca <- rbind(ca, ts)  ## Don't use pause sites here!! Analyze these separately.
 
 ## Rename.
 names(ca) <- c("chrom", "chromStart", "chromEnd", "name", "score", "strand", "type", "mgi", "mapSize", "annot_type",
-                        "Jurkat", "Human 1", "Human 2", "Human 3", "Chimp 3", "Chimp 4", "Chimp 5", "R. Macaque 1", "R. Macaque 2", "R. Macaque 3",
-                        "PI Jurkat ", "PI Human 1", "PI Human 2", "PI Human 3", "PI Chimp 3", "PI Chimp 4", "PI Chimp 5", "PI R. Macaque 1", "PI R. Macaque 2", "PI R. Macaque 3",
+                        "Jurkat", "Human 1", "Human 2", "Human 4", "Chimp 3", "Chimp 4", "Chimp 5", "R. Macaque 2", "R. Macaque 3", "R. Macaque 4",
+                        "PI Jurkat ", "PI Human 1", "PI Human 2", "PI Human 4", "PI Chimp 3", "PI Chimp 4", "PI Chimp 5", "PI R. Macaque 2", "PI R. Macaque 3", "PI R. Macaque 4",
                         "K562", "GM12878", "IMR90", "Mouse", "Rat")
 Condition <- as.factor(c("NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "NA", 
                                                 "U", "U", "U", "U", "U", "U", "U", "U", "U", "U",
@@ -68,7 +68,7 @@ ca <- ca[grep("random", ca$chrom, invert=TRUE),]
 ## Used for getting useful subsets of the data.
 indx.all <- c(11:35)## ALL
 indx.unt <- c(11:20,31:35)## ONLY UNTREATED.
-indx.good <- c(11:27,29:35) ## "Good?!"  Remove M1-PI
+indx.good <- c(11:35) ## "Good?!"  Remove M1-PI
 
 # Get RPKM
 rpkm_df <- as.matrix(ca[,indx.good]) ## "Good?!"  Remove H2-U, H3-PI, C2-U+PI, M1-PI

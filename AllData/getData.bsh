@@ -7,6 +7,7 @@ ALIGN1=../Alignments_1stPrep
 ALIGN2=../Alignments_2ndPrep
 ALIGN3=../Alignments_3rdPrep
 ALIGN4=../Alignments_4thPrep
+ALIGN5=../Alignments_5thPrep
 
 #twoBitInfo /gbdb/hg19/hg19.2bit chromInfo.hg19
 function makeBigWig {
@@ -48,6 +49,9 @@ rm *.bed.gz *.wig.gz ## CLEANUP
 ## H3
 cp $ALIGN1/H3*.bw .
 
+## H4
+cp $ALIGN5/H4*.bw .
+
 ## C2
 cp $ALIGN1/C2*.hg19.bw .
 
@@ -69,3 +73,5 @@ cp $ALIGN2/M2*.hg19.bw .
 ## M3
 cp $ALIGN3/M3*.hg19.bw .
 
+## H4
+cp $ALIGN5/M4*.hg19.bw .
