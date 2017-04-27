@@ -1,16 +1,17 @@
 ## MA Plot
 require(bigWig)
 
-refGene <- read.table("refGene.bed.gz")
-refGene <- refGene[grep("random|Un|hap", refGene$V1, invert=TRUE),]
-refGene <- refGene[(refGene$V3-refGene$V2)>1000,]
+refGene <- read.table("tuSelecter/final_tus.txt", header=TRUE)  #refGene.bed.gz")
+
+refGene <- refGene[grep("random|Un|hap", refGene$TXCHROM, invert=TRUE),]
+refGene <- refGene[(refGene$TXEND-refGene$TXSTART)>1000,]
 
 bodies <- refGene
-bodies$V2[bodies$V6 == "+"] <-bodies$V2[bodies$V6 == "+"]+500
-bodies$V3[bodies$V6 == "-"] <- bodies$V3[bodies$V6 == "-"]-500
+bodies$TXSTART[bodies$TXSTRAND == "+"] <-bodies$TXSTART[bodies$TXSTRAND == "+"]+500
+bodies$TXEND[bodies$TXSTRAND == "-"] <- bodies$TXEND[bodies$TXSTRAND == "-"]-500
 
-bodies$V3[(bodies$V3 - bodies$V2) > 60000 & bodies$V6 == "+"] <- bodies$V2[(bodies$V3 - bodies$V2) > 60000 & bodies$V6 == "+"]+60000
-bodies$V2[(bodies$V3 - bodies$V2) > 60000 & bodies$V6 == "-"] <- bodies$V3[(bodies$V3 - bodies$V2) > 60000 & bodies$V6 == "-"]-60000
+bodies$TXEND[(bodies$TXEND - bodies$TXSTART) > 60000 & bodies$TXSTRAND == "+"] <- bodies$TXSTART[(bodies$TXEND - bodies$TXSTART) > 60000 & bodies$TXSTRAND == "+"]+60000
+bodies$TXSTART[(bodies$TXEND - bodies$TXSTART) > 60000 & bodies$TXSTRAND == "-"] <- bodies$TXEND[(bodies$TXEND - bodies$TXSTART) > 60000 & bodies$TXSTRAND == "-"]-60000
 
 getCounts <- function(plus, minus, path, intervals= bodies) {
   pl <- load.bigWig(paste(path, plus, sep=""))
@@ -22,10 +23,10 @@ getCounts <- function(plus, minus, path, intervals= bodies) {
 raw_counts <- cbind(
 human_1_U= getCounts("H1-U_plus.bw", "H1-U_minus.bw", "../AllData/"),
 human_2_U= getCounts("H2-U_plus.bw", "H2-U_minus.bw", "../AllData/"),
-human_3_U= getCounts("H3-U.bed.gz_plus.bw", "H3-U.bed.gz_minus.bw", "../AllData/"),
+human_3_U= getCounts("H4-U_plus.bw", "H4-U_minus.bw", "../AllData/"),
 human_1_PI= getCounts("H1-PI_plus.bw", "H1-PI_minus.bw", "../AllData/"),
 human_2_PI= getCounts("H2-PI_plus.bw", "H2-PI_minus.bw", "../AllData/"),
-human_3_PI= getCounts("H3-PI.bed.gz_plus.bw", "H3-PI.bed.gz_minus.bw", "../AllData/")
+human_3_PI= getCounts("H4-PI_plus.bw", "H4-PI_minus.bw", "../AllData/")
 )
 print(cor(raw_counts, method="spearman"))
 
@@ -40,7 +41,7 @@ dds <- DESeq(dds)
 res <- results(dds)
 
 print(paste("Number of changes: ", sum(res$padj < 0.01, na.rm=TRUE))) ## Number of transcripts.
-print(paste("Number of unique genes: ", NROW(unique(refGene$V7[res$padj < 0.01])))) ## Number of genes.
+print(paste("Number of unique genes: ", NROW(unique(refGene$GENENAME[res$padj < 0.01])))) ## Number of genes.
 
 ## Add specific genes to the plot.
 addlab <- function(gene_ID, deRes, genes, ...) {

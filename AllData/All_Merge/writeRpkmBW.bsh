@@ -10,11 +10,11 @@ function normBw {
 	rm tmp.bedGraph tmp.rpkm.bedGraph
 }
 
-normBw H-U_plus 95359834
-normBw H-U_minus 95359834
+normBw H-U_plus 106298522
+normBw H-U_minus 106298522
 
-normBw H-PI_plus 114089069
-normBw H-PI_minus 114089069
+normBw H-PI_plus 139049642
+normBw H-PI_minus 139049642
 
 normBw C-U_plus.hg19 128889582
 normBw C-U_minus.hg19 128889582
@@ -22,9 +22,9 @@ normBw C-U_minus.hg19 128889582
 normBw C-PI_plus.hg19 127253302
 normBw C-PI_minus.hg19 127253302
 
-normBw M-U_plus.hg19 114547647
-normBw M-U_minus.hg19 114547647
+normBw M-U_plus.hg19 131570208
+normBw M-U_minus.hg19 131570208
 
-normBw M-PI_plus.hg19 93520070
-normBw M-PI_minus.hg19 93520070
+normBw M-PI_plus.hg19 117440562
+normBw M-PI_minus.hg19 117440562
 

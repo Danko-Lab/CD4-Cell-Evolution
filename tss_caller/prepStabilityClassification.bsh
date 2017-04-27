@@ -1,14 +1,15 @@
 #!/usr/bin/bash
-hgsql hg19 -N -e "select chrom,txStart,txEnd,name,exonCount,strand from refGene" | sort-bed - | gzip > refGene.hg19.bed.gz
+#hgsql hg19 -N -e "select chrom,txStart,txEnd,name,exonCount,strand from refGene" | sort-bed - | gzip > refGene.hg19.bed.gz
+grep "protein_coding" /local/storage/data/hg19/all/gencode/gencode.V19.annotation.txtable.out | sort-bed - | gzip > gencode19.hg19.bed.gz
 
 cat HCM-U-PI.dREG-tss-clusters.tsv | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' > tmp.dREG.bed
-zcat refGene.hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$6=="+"?$2:$3-1,$6=="+"?$2+1:$3,$4,$5,$6}' | sort-bed - | bedtools closest -d -t "first" -b stdin -a tmp.dREG.bed | awk 'BEGIN{OFS="\t"} {print $10}' > proximity
+zcat gencode19.hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$6=="+"?$2:$3-1,$6=="+"?$2+1:$3,$4,$5,$6}' | sort-bed - | bedtools closest -d -t "first" -b stdin -a tmp.dREG.bed | awk 'BEGIN{OFS="\t"} {print $10}' > proximity
 paste HCM-U-PI.dREG-tss-clusters.tsv proximity > HCM-U-PI.dREG-tss-clusters.dist.tsv
 
 rm proximity tmp.dREG.bed
 
 cat HCMmr-U-PI.dREG-tss-clusters.tsv | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' > tmp.dREG.bed
-zcat refGene.hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$6=="+"?$2:$3-1,$6=="+"?$2+1:$3,$4,$5,$6}' | sort-bed - | bedtools closest -d -t "first" -b stdin -a tmp.dREG.bed | awk 'BEGIN{OFS="\t"} {print $10}' > proximity
+zcat gencode19.hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$6=="+"?$2:$3-1,$6=="+"?$2+1:$3,$4,$5,$6}' | sort-bed - | bedtools closest -d -t "first" -b stdin -a tmp.dREG.bed | awk 'BEGIN{OFS="\t"} {print $10}' > proximity
 paste HCMmr-U-PI.dREG-tss-clusters.tsv proximity > HCMmr-U-PI.dREG-tss-clusters.dist.tsv
 
 rm proximity tmp.dREG.bed

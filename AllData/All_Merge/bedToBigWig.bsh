@@ -43,7 +43,7 @@ function liftToHg19 {
    cat $f.tmp.bedGraph | sort-bed - | gzip > $f.bedGraph.gz
 
    ## Use liftOver.  Other options: -tab -minMatch=0.1
-   CrossMap.py bed $MAPCHAIN $f.bedGraph.gz $f.hg19.bedGraph
+   python /home/cgd24/python/CrossMap/usr/bin/CrossMap.py bed $MAPCHAIN $f.bedGraph.gz $f.hg19.bedGraph
    #liftOver $f.bedGraph $MAPCHAIN $f.hg19.bedGraph unmap
    #rm $f.tmp.bedGraph.gz $f.bedGraph.gz
    gzip $f.hg19.bedGraph

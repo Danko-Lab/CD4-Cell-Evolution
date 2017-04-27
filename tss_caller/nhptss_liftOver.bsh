@@ -8,7 +8,8 @@ function liftToHg19 {
 
    ## Use liftOver.  Other options: -tab -minMatch=0.1
    gunzip $f
-   CrossMap.py bed $MAPCHAIN $ngz $j\_hg19.bedGraph
+
+   python /home/cgd24/python/CrossMap/usr/bin/CrossMap.py bed $MAPCHAIN $ngz $j\_hg19.bedGraph
    #liftOver $ngz $MAPCHAIN $j\_hg19.bedGraph $j\_unmap.bedGraph
    gzip $ngz $j\_hg19.bedGraph $j\_unmap.bedGraph
  done

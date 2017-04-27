@@ -22,7 +22,7 @@ bedops --element-of 1 $h3k27ac $dnase | bedops --element-of 1 - $chromhmm | awk 
 ################################################################
 ## Test sensitivity ...
 
-for th in 0.7 # 0.95 0.97 0.98 0.99 
+for th in 0.25 # 0.7 0.3 0.25 0.2 0.1
 do
  echo $th
 
@@ -45,12 +45,14 @@ do
  SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - k27ac.dnase | grep "" -c` ## Specificity
  echo $[($SPECnum*100)/$SPECden]
 
- SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map k27ac.dnase - | grep "|0|" -c -v` ## Specificity
- SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map k27ac.dnase - | grep "" -c` ## Specificity
+ SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map k27ac.dnase - | grep "|0|" -c -v` ## Sensitivity
+ SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map k27ac.dnase - | grep "" -c` ## Sensitivity
  echo $[($SPECnum*100)/$SPECden]
 
  ## Fractions of the genome covered by each.
  featureBits hg19 tmp.mergepred.bed
+
+ echo ""
 done
 
 cat ../dREG_HD/H-U_dREG_HD.bed ../dREG_HD/H-PI_dREG_HD.bed | awk 'BEGIN{OFS="\t"} {print $1,$2,($3+1)}' | sort-bed - | bedops --merge - | grep "" -c

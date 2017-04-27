@@ -40,13 +40,13 @@ fitModel <- function(species, cnts) {
 
 ## Treating alternatie primates as a single 'group'.
 species <- c("SS", "SS", "SS", "SO", "SO", "SO", "SO", "SO", "SO")
-hs <- fitModel(species, counts, Design)
-hs_pi <- fitModel(species, countsPI, Design)
+hs <- fitModel(species, counts)
+hs_pi <- fitModel(species, countsPI)
 head(hs[order(hs$padj), ])
 
 species <- c("SO", "SO", "SO", "SS", "SS", "SS", "SO", "SO", "SO")
-cs <- fitModel(species, counts, Design)
-cs_pi <- fitModel(species, countsPI, Design)
+cs <- fitModel(species, counts)
+cs_pi <- fitModel(species, countsPI)
 head(cs[order(cs$padj), ])
 
 species <- c("SO", "SO", "SO", "SO", "SO", "SO", "SS", "SS", "SS")
@@ -127,11 +127,11 @@ NROW(unique(ca[fdr_t[,2] < PVAL & ca[,"annot_type"] == "gc18","mgi"])) # CHIMP
 NROW(unique(ca[fdr_t[,3] < PVAL & ca[,"annot_type"] == "gc18","mgi"])) # RHESUS
 
 ## Write a MA-plot for GC18.
-png("img/hs.MA.png")
- plot(hs$baseMean, hs$log2FoldChange, pch=19, log="x")
- points(hs$baseMean[hs$padj<PVAL], hs$log2FoldChange[hs$padj<PVAL], col="red", pch=19)
-# points(hs$baseMean[hs$padj<PVAL & abs(hs$log2FoldChange) > FOLD], hs$log2FoldChange[hs$padj<PVAL & abs(hs$log2FoldChange) > FOLD], col="red", pch=19)
-dev.off()
+#png("img/hs.MA.png")
+# plot(hs$baseMean, hs$log2FoldChange, pch=19, log="x")
+# points(hs$baseMean[hs$padj<PVAL], hs$log2FoldChange[hs$padj<PVAL], col="red", pch=19)
+## points(hs$baseMean[hs$padj<PVAL & abs(hs$log2FoldChange) > FOLD], hs$log2FoldChange[hs$padj<PVAL & abs(hs$log2FoldChange) > FOLD], col="red", pch=19)
+#dev.off()
 
 ## Write table of genes to use in GO.
 writeExprChange <- function(ss, name, indx, indx_pi) {

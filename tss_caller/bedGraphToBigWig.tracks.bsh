@@ -12,13 +12,13 @@ function convert {
 }
 ## And also convert panTro4 and rheMac3
 
-for file in "Mouse-U.TSS_hg19.bedGraph.gz" "Rat-U.TSS_hg19.bedGraph.gz"
-do
- convert $file ../hg19.chromInfo
-done
+#for file in "Mouse-U.TSS_hg19.bedGraph.gz" "Rat-U.TSS_hg19.bedGraph.gz"
+#do
+# convert $file ../hg19.chromInfo
+#done
 
-convert Mouse-U.TSS.bedGraph.gz /local/storage/data/rn6/rn6.chromInfo
-convert Rat-U.TSS.bedGraph.gz /local/storage/data/rn6/rn6.chromInfo
+#convert Mouse-U.TSS.bedGraph.gz /local/storage/data/rn6/rn6.chromInfo
+#convert Rat-U.TSS.bedGraph.gz /local/storage/data/rn6/rn6.chromInfo
 
 for file in "H-U.TSS.bedGraph.gz" "C-U.TSS_hg19.bedGraph.gz" "M-U.TSS_hg19.bedGraph.gz" "H-PI.TSS.bedGraph.gz" "C-PI.TSS_hg19.bedGraph.gz" "M-PI.TSS_hg19.bedGraph.gz"
 do

@@ -22,28 +22,28 @@ function writeBed {
 HS=VeryHighScore
 rm -Rf $HS
 mkdir $HS
-TH=0.9
+TH=0.6
 writeBed
 mv *.bed.gz $HS
 
 MHS=HighScore
 rm -Rf $MHS
 mkdir $MHS
-TH=0.8
+TH=0.5
 #writeBed
 mv *.bed.gz $MHS
 
 MS=MedScore
 rm -Rf $MS
 mkdir $MS
-TH=0.7
+TH=0.25
 #writeBed
 mv *.bed.gz $MS
 
 LS=LowScore
 rm -Rf $LS
 mkdir $LS
-TH=0.3
+TH=0.15
 #writeBed
 mv *.bed.gz $LS
 
@@ -56,7 +56,7 @@ rm -Rf $MERGE
 mkdir $MERGE
 cp $HS/*.bed.gz $MERGE
 
-for TH in 0.8 0.7 # 0.6 0.5
+for TH in 0.3 0.25
 do
   echo $TH
   writeBed
