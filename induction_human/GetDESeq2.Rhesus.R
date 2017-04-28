@@ -31,7 +31,7 @@ macaque_1_PI= getCounts("M4-PI_plus.hg19.bw", "M4-PI_minus.hg19.bw", "../AllData
 print(cor(raw_counts, method="spearman"))
 
 library("DESeq2")
-colData <- data.frame(Condition= c(rep("U",3), rep("PI",2)), row.names=colnames(raw_counts))
+colData <- data.frame(Condition= c(rep("U",3), rep("PI",3)), row.names=colnames(raw_counts))
 
 ## Create DESeq2 object.
 dds <- DESeqDataSetFromMatrix(countData= raw_counts, colData= colData, design= ~ Condition)

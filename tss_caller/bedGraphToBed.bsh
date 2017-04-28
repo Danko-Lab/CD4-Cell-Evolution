@@ -29,23 +29,23 @@ mv *.bed.gz $HS
 MHS=HighScore
 rm -Rf $MHS
 mkdir $MHS
-TH=0.5
-#writeBed
+TH=0.3
+writeBed
 mv *.bed.gz $MHS
 
 MS=MedScore
 rm -Rf $MS
 mkdir $MS
 TH=0.25
-#writeBed
+writeBed
 mv *.bed.gz $MS
 
-LS=LowScore
-rm -Rf $LS
-mkdir $LS
-TH=0.15
+#LS=LowScore
+#rm -Rf $LS
+#mkdir $LS
+#TH=0.15
 #writeBed
-mv *.bed.gz $LS
+#mv *.bed.gz $LS
 
 
 ## Combine high and medium scores.  
@@ -54,23 +54,24 @@ mv *.bed.gz $LS
 MERGE=Merge
 rm -Rf $MERGE
 mkdir $MERGE
-cp $HS/*.bed.gz $MERGE
+cp $MS/*.bed.gz $MERGE ## Take the 0.25 files...
 
-for TH in 0.3 0.25
-do
-  echo $TH
-  writeBed
-  for f in `ls *.bed.gz`
-  do
-    zcat $f | sort-bed - > $f.ms.tmp
-    zcat $MERGE/$f | sort-bed - > $f.hs.tmp
-
-    bedmap --echo --indicator $f.ms.tmp $f.hs.tmp | grep "|0" | sed "s/|0//g" > tmp.bed.tmp
-    cat tmp.bed.tmp $f.hs.tmp | sort-bed - | gzip > $MERGE/$f
-    rm *.tmp 
-  done
-  rm *.bed.gz
-done
+# Stopped this behavior after ading the new dREG model.
+#for TH in 0.3 0.25
+#do
+#  echo $TH
+#  writeBed
+#  for f in `ls *.bed.gz`
+#  do
+#    zcat $f | sort-bed - > $f.ms.tmp
+#    zcat $MERGE/$f | sort-bed - > $f.hs.tmp
+#
+#    bedmap --echo --indicator $f.ms.tmp $f.hs.tmp | grep "|0" | sed "s/|0//g" > tmp.bed.tmp
+#    cat tmp.bed.tmp $f.hs.tmp | sort-bed - | gzip > $MERGE/$f
+#    rm *.tmp 
+#  done
+#  rm *.bed.gz
+#done
 
 
 ####

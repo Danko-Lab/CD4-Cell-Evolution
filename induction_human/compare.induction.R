@@ -11,38 +11,38 @@ pt <- pt[match(hs$V4, pt$V4),]
 rm <- rm[match(hs$V4, rm$V4),]
 
 ## Remove NAs.
-skip <-is.na(hs$V9) | is.na(pt$V9) | is.na(rm$V9)
+skip <-is.na(hs$V15) | is.na(pt$V15) | is.na(rm$V15)
 sum(skip); sum(!skip)
 
 hs<- hs[!skip,]; pt<- pt[!skip,]; rm<- rm[!skip,]
 
 ## Get correlations.
-cc<- cor(cbind(hs$V9, pt$V9, rm$V9))
+cc<- cor(cbind(hs$V15, pt$V15, rm$V15))
 cc
-pairs(cbind(hs$V9, pt$V9, rm$V9))
+pairs(cbind(hs$V15, pt$V15, rm$V15))
 
 plot(c(0, 6, 25+25-6), cc[,1])
 
 ## Get number of genes.
 PVAL <- 0.01
-cngOne <- hs$V13 < PVAL | pt$V13 < PVAL | rm$V13 < PVAL; cngOne <- cngOne & !is.na(cngOne)
-cngAll <- hs$V13 < PVAL & pt$V13 < PVAL & rm$V13 < PVAL; cngAll <- cngAll & !is.na(cngAll)
+cngOne <- hs$V19 < PVAL | pt$V19 < PVAL | rm$V19 < PVAL; cngOne <- cngOne & !is.na(cngOne)
+cngAll <- hs$V19 < PVAL & pt$V19 < PVAL & rm$V19 < PVAL; cngAll <- cngAll & !is.na(cngAll)
 
 sum(cngOne); sum(cngAll)
 
 NROW(unique(hs$V7[cngAll])) ## Yep. 2,953.  A few that change directions.  Not many.
 
-cor(cbind(hs$V9[cngAll], pt$V9[cngAll], rm$V9[cngAll]))
-pairs(cbind(hs$V9[cngAll], pt$V9[cngAll], rm$V9[cngAll]))
+cor(cbind(hs$V15[cngAll], pt$V15[cngAll], rm$V15[cngAll]))
+pairs(cbind(hs$V15[cngAll], pt$V15[cngAll], rm$V15[cngAll]))
 
 pdf("CompareFoldChanges.pdf")
  source("../lib/densScatterplot.R")
- densScatterplot(hs$V9[cngAll], pt$V9[cngAll], xlab="Log2 fold-change Human", ylab="Log2 fold-change Chimp")
- densScatterplot(hs$V9[cngAll], rm$V9[cngAll], xlab="Log2 fold-change Human", ylab="Log2 fold-change Rhesus")
- densScatterplot(pt$V9[cngAll], rm$V9[cngAll], xlab="Log2 fold-change Chimp", ylab="Log2 fold-change Rhesus")
+ densScatterplot(hs$V15[cngAll], pt$V15[cngAll], xlab="Log2 fold-change Human", ylab="Log2 fold-change Chimp")
+ densScatterplot(hs$V15[cngAll], rm$V15[cngAll], xlab="Log2 fold-change Human", ylab="Log2 fold-change Rhesus")
+ densScatterplot(pt$V15[cngAll], rm$V15[cngAll], xlab="Log2 fold-change Chimp", ylab="Log2 fold-change Rhesus")
 dev.off() 
 
-cor(cbind(hs$V9[cngOne], pt$V9[cngOne], rm$V9[cngOne]))
-pairs(cbind(hs$V9[cngOne], pt$V9[cngOne], rm$V9[cngOne]))
+cor(cbind(hs$V15[cngOne], pt$V15[cngOne], rm$V15[cngOne]))
+pairs(cbind(hs$V15[cngOne], pt$V15[cngOne], rm$V15[cngOne]))
 
 

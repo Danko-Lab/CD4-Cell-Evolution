@@ -33,7 +33,7 @@ istss <- fdr_df$annot_type=="dREG_ENH" | fdr_df$annot_type=="dREG_INGENE" | fdr_
 
 ## Take anything that's changed in human, not in rhesus or chimp.
 MAXNEG <- 0.25#5
-FCNEG  <- 0.25#0.75
+FCNEG  <- 0.75
 ishumspec <- fdr_df$U2PIFDR_H < PVAL & (fdr_df$U2PIFDR_C > MAXNEG & fdr_df$U2PIFDR_M > MAXNEG) & abs(fdr_df$U2PIFC_H) > 1 & abs(fdr_df$U2PIFC_C) < FCNEG & abs(fdr_df$U2PIFC_M) < FCNEG
 ishumloss <- fdr_df$U2PIFDR_H > MAXNEG & (fdr_df$U2PIFDR_C < PVAL & fdr_df$U2PIFDR_M < PVAL) & ((fdr_df$U2PIFC_M>1 & fdr_df$U2PIFC_C>1)|(fdr_df$U2PIFC_M< -1 & fdr_df$U2PIFC_C< -1)) & abs(fdr_df$U2PIFC_H) < FCNEG
 summary(ishumspec & istss)

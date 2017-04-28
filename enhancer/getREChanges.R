@@ -3,6 +3,9 @@
 load("../annotations/fdr.RData")
 source("../lib/normalizeSubsample.R")
 
+highth <- 0.4
+lowth  <- 0.05
+
 require(boot)
 
 tss_aln <- fdr_df[grepl("dREG", ca$annot_type),]
@@ -26,8 +29,8 @@ for(i in 7:12) { tss[is.na(tss[,i]),i] <- 0 }
 
 ## Change in basal T-cells.
               ##  1:1 ortholog,  mappable,             complete gain/ loss,                            gain/ loss in magnitude.
-indx_hg19_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V7 > 0.7 & tss$V8 < 0.1 & tss$V9 < 0.1) | (tss$HumanFDR < 0.05 & tss$HumanFC > 0))
-indx_hg19_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V7 < 0.1 & tss$V8 > 0.7 & tss$V9 > 0.7) | (tss$HumanFDR < 0.05 & tss$HumanFC < 0))
+indx_hg19_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V7 > highth & tss$V8 < lowth & tss$V9 < lowth) | (tss$HumanFDR < PVAL & tss$HumanFC > 0))
+indx_hg19_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V7 < lowth & tss$V8 > highth & tss$V9 > highth) | (tss$HumanFDR < PVAL & tss$HumanFC < 0))
 
 write.table(tss[indx_hg19_gain | indx_hg19_loss,], "hg19.gain.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 write.table(tss[indx_hg19_gain,], "hg19.gain.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
@@ -38,23 +41,23 @@ write.table(tss[(indx_hg19_gain | indx_hg19_loss) & tss$HumanFDR < 0.01 & tss$Hu
 
 
               ##     1:1 ortholog,  mappable,             complete gain/ loss,                            gain/ loss in magnitude.
-indx_rheMac3_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V9 > 0.7 & tss$V8 < 0.1 & tss$V7 < 0.1) | (tss$MacaqueFDR < 0.05 & tss$MacaqueFC > 0))
-indx_rheMac3_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V9 < 0.1 & tss$V8 > 0.7 & tss$V7 > 0.7) | (tss$MacaqueFDR < 0.05 & tss$MacaqueFC < 0))
+indx_rheMac3_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V9 > highth & tss$V8 < lowth & tss$V7 < lowth) | (tss$MacaqueFDR < PVAL & tss$MacaqueFC > 0))
+indx_rheMac3_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V9 < lowth & tss$V8 > highth & tss$V7 > highth) | (tss$MacaqueFDR < PVAL & tss$MacaqueFC < 0))
 
 write.table(tss[indx_rheMac3_gain | indx_rheMac3_loss,], "rheMac3.gain.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 write.table(tss[indx_rheMac3_gain,], "rheMac3.gain.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 write.table(tss[indx_rheMac3_loss,], "rheMac3.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
               ##     1:1 ortholog,  mappable,             complete gain/ loss,                            gain/ loss in magnitude.
-indx_panTro4_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V8 > 0.7 & tss$V9 < 0.1 & tss$V7 < 0.1) | (tss$ChimpFDR < 0.05 & tss$ChimpFC > 0))
-indx_panTro4_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V8 < 0.1 & tss$V9 > 0.7 & tss$V7 > 0.7) | (tss$ChimpFDR < 0.05 & tss$ChimpFC < 0))
+indx_panTro4_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V8 > highth & tss$V9 < lowth & tss$V7 < lowth) | (tss$ChimpFDR < PVAL & tss$ChimpFC > 0))
+indx_panTro4_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V8 < lowth & tss$V9 > highth & tss$V7 > highth) | (tss$ChimpFDR < PVAL & tss$ChimpFC < 0))
 
 write.table(tss[indx_panTro4_gain | indx_panTro4_loss,], "panTro4.gain.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 write.table(tss[indx_panTro4_gain,], "panTro4.gain.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 write.table(tss[indx_panTro4_loss,], "panTro4.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 ## Conserved in all species.
-indx <- tss$V20 == 0 & !is.na(tss$mapSize) & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7) & (tss$HumanFDR > 0.25 & tss$ChimpFDR > 0.25 & tss$MacaqueFDR > 0.25) & (tss$HumanFC < 0.5 & tss$ChimpFC < 0.5 & tss$MacaqueFC < 0.5)
+indx <- tss$V20 == 0 & !is.na(tss$mapSize) & (tss$V7 > highth & tss$V8 > highth & tss$V9 > highth) & (tss$HumanFDR > 0.25 & tss$ChimpFDR > 0.25 & tss$MacaqueFDR > 0.25) & (tss$HumanFC < 0.5 & tss$ChimpFC < 0.5 & tss$MacaqueFC < 0.5)
 sum(indx) 
 
 write.table(tss[indx,], "all.conserved.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
@@ -76,31 +79,31 @@ pdf("dREG-Changes.pdf")
 a <- makePlot(tss[indx,], "H3K27ac", name="H3K27ac")
 b <- makePlot(tss[indx_hg19_gain,], "H3K27ac", name="H3K27ac gain")
 c <- makePlot(tss[indx_hg19_loss,], "H3K27ac", name="H3K27ac loss") ## These include sites that are decreases.
-d <- makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K27ac", name="H3K27ac complete loss") ## Complete loss of dREG signal.
+d <- makePlot(tss[indx_hg19_loss & tss$V7 < lowth,], "H3K27ac", name="H3K27ac complete loss") ## Complete loss of dREG signal.
 boxplot(list(conserved= a, gain= b, loss= c, complete.loss= d), ylab="Reads per kilobase", main="H3K27ac", outline=FALSE)
 
 a <- makePlot(tss[indx,], "H3K27me3", name="H3K27me3")
 b <- makePlot(tss[indx_hg19_gain,], "H3K27me3", name="H3K27me3 gain")
 c <- makePlot(tss[indx_hg19_loss,], "H3K27me3", name="H3K27me3 loss")
-d <- makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K27me3", name="H3K27me3 complete loss")
+d <- makePlot(tss[indx_hg19_loss & tss$V7 < lowth,], "H3K27me3", name="H3K27me3 complete loss")
 boxplot(list(conserved= a, gain= b, loss= c, complete.loss= d), ylab="Reads per kilobase", main="H3K27me3", outline=FALSE)
 
 a <- makePlot(tss[indx,], "H3K4me3", name="H3K4me3")
 b <- makePlot(tss[indx_hg19_gain,], "H3K4me3", name="H3K4me3 gain")
 c <- makePlot(tss[indx_hg19_loss,], "H3K4me3", name="H3K4me3 loss")
-d <- makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K4me3", name="H3K4me3 complete loss")
+d <- makePlot(tss[indx_hg19_loss & tss$V7 < lowth,], "H3K4me3", name="H3K4me3 complete loss")
 boxplot(list(conserved= a, gain= b, loss= c, complete.loss= d), ylab="Reads per kilobase", main="H3K4me3", outline=FALSE)
 
 a <- makePlot(tss[indx,], "H3K4me1", name="H3K4me1")
 b <- makePlot(tss[indx_hg19_gain,], "H3K4me1", name="H3K4me1 gain")
 c <- makePlot(tss[indx_hg19_loss,], "H3K4me1", name="H3K4me1 loss")
-d <- makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "H3K4me1", name="H3K4me1 complete loss")
+d <- makePlot(tss[indx_hg19_loss & tss$V7 < lowth,], "H3K4me1", name="H3K4me1 complete loss")
 boxplot(list(conserved= a, gain= b, loss= c, complete.loss= d), ylab="Reads per kilobase", main="H3K4me1", outline=FALSE)
 
 a <- makePlot(tss[indx,], "MeDIP-Seq", name="MeDIP-Seq")
 b <- makePlot(tss[indx_hg19_gain,], "MeDIP-Seq", name="MeDIP-Seq gain")
 c <- makePlot(tss[indx_hg19_loss,], "MeDIP-Seq", name="MeDIP-Seq loss")
-d <- makePlot(tss[indx_hg19_loss & tss$V7 < 0.1,], "MeDIP-Seq", name="MeDIP-Seq complete loss")
+d <- makePlot(tss[indx_hg19_loss & tss$V7 < lowth,], "MeDIP-Seq", name="MeDIP-Seq complete loss")
 boxplot(list(conserved= a, gain= b, loss= c, complete.loss= d), ylab="Reads per kilobase", main="MeDIP-seq", outline=FALSE)
 
 dev.off()
@@ -114,8 +117,8 @@ hm_mat <- t(matrix(unlist(hm), NROW(hm[[1]])))
 #2# Data playtime!
 
 ## 
-indx_hg19_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V7 > 0.7 & tss$V8 < 0.1 & tss$V9 < 0.1))
-indx_hg19_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V7 < 0.1 & tss$V8 > 0.7 & tss$V9 > 0.5))
+indx_hg19_gain <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V7 > highth & tss$V8 < lowth & tss$V9 < lowth))
+indx_hg19_loss <- tss$V20 == 0 & !is.na(tss$mapSize) & ((tss$V7 < lowth & tss$V8 > highth & tss$V9 > 0.5))
 
 sum(indx_hg19_gain) ## Differences in gain/ loss rates.  I'd guess due to incomplete power in rm3 dREG sites?!
 sum(indx_hg19_loss)

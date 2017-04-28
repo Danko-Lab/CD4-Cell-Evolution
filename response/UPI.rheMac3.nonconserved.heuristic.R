@@ -12,7 +12,7 @@ summary(isresp)
 
 ## Take anything that's changed in human, not in rhesus or chimp.
 MAXNEG <- 0.25
-MAXFC  <- 0.25 #0.5
+MAXFC  <- 0.75 #0.5
 isrhespec <- fdr_df$U2PIFDR_M < PVAL & (fdr_df$U2PIFDR_C > MAXNEG & fdr_df$U2PIFDR_H > MAXNEG) & abs(fdr_df$U2PIFC_M) > 1 & abs(fdr_df$U2PIFC_C) < MAXFC & abs(fdr_df$U2PIFC_H) < MAXFC
 isrheloss <- fdr_df$U2PIFDR_M > MAXNEG & (fdr_df$U2PIFDR_C < PVAL & fdr_df$U2PIFDR_H < PVAL) & ((fdr_df$U2PIFC_H>1 & fdr_df$U2PIFC_C>1)|(fdr_df$U2PIFC_H< -1 & fdr_df$U2PIFC_C< -1)) & abs(fdr_df$U2PIFC_M) < MAXFC
 summary(isrhespec)

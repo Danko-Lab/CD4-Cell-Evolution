@@ -21,11 +21,11 @@ getCounts <- function(plus, minus, path, intervals= bodies) {
 }
 
 raw_counts <- cbind(
-chimp_1_U= getCounts("C3-U.bed.gz_plus.hg19.bw", "C3-U.bed.gz_minus.hg19.bw", "../AllData/"),
-chimp_2_U= getCounts("C4-U.bed.gz_plus.hg19.bw", "C4-U.bed.gz_minus.hg19.bw", "../AllData/"),
+chimp_1_U= getCounts("C3-U_plus.hg19.bw", "C3-U_minus.hg19.bw", "../AllData/"),
+chimp_2_U= getCounts("C4-U_plus.hg19.bw", "C4-U_minus.hg19.bw", "../AllData/"),
 chimp_3_U= getCounts("C5-U_plus.hg19.bw", "C5-U_minus.hg19.bw", "../AllData/"),
-chimp_1_PI= getCounts("C3-PI.bed.gz_plus.hg19.bw", "C3-PI.bed.gz_minus.hg19.bw", "../AllData/"),
-chimp_2_PI= getCounts("C4-PI.bed.gz_plus.hg19.bw", "C4-PI.bed.gz_minus.hg19.bw", "../AllData/"),
+chimp_1_PI= getCounts("C3-PI_plus.hg19.bw", "C3-PI_minus.hg19.bw", "../AllData/"),
+chimp_2_PI= getCounts("C4-PI_plus.hg19.bw", "C4-PI_minus.hg19.bw", "../AllData/"),
 chimp_3_PI= getCounts("C5-PI_plus.hg19.bw", "C5-PI_minus.hg19.bw", "../AllData/")
 )
 print(cor(raw_counts, method="spearman"))

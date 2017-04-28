@@ -4,6 +4,9 @@ source("../lib/normalizeSubsample.R")
 
 require(boot)
 
+lnTH= 0.05
+hcTH= 0.40
+
 tss_aln <- fdr_df[grepl("dREG", ca$annot_type),]
 tss <- read.table("tss.tsv")
 tss <- data.frame(tss, tss_aln[match(tss$V4, tss_aln$name),c(9,33:50)])
@@ -46,8 +49,8 @@ dev.off()
 for(i in 7:12) { tss[is.na(tss[,i]),i] <- 0 }
 
 ## H-C
-lccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V8 < 0.1) & tss$V20 == 0 & !is.na(tss$mapSize)])) # 'Low-confidence'
-chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 & tss$V8 > 0.7 & tss$V9 > 0.7)])) # 'High-confidence'
+lccng <- summary(as.factor(tss$V5[(tss$V7 < lnTH | tss$V8 < lnTH) & tss$V20 == 0 & !is.na(tss$mapSize)])) # 'Low-confidence'
+chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < PVAL & (tss$V7 > hcTH & tss$V8 > hcTH & tss$V9 > hcTH)])) # 'High-confidence'
 
 
 
@@ -57,13 +60,13 @@ chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_m
 total <- summary(as.factor(tss$V5))
 one2m <- summary(as.factor(tss$V5[tss$V20 > 0])) ## Possible 1:many orthology
 unmap <- summary(as.factor(tss$V5[tss$V20 == 0 & is.na(tss$mapSize)])) ## INDEL
-lccng <- summary(as.factor(tss$V5[(tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss$V20 == 0 & !is.na(tss$mapSize)])) # 'Low-confidence'
-chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & (tss$V7 > 0.1 & tss$V8 > 0.1 & tss$V9 > 0.1)])) # 'High-confidence'
-hctot <- summary(as.factor(tss$V5[tss$V20 == 0 & tss$fdr_min < 0.05  & !is.na(tss$mapSize)])) # 'HC all'
+lccng <- summary(as.factor(tss$V5[(tss$V7 < lnTH | tss$V8 < lnTH | tss$V9 < lnTH) & (tss$V7 > hcTH | tss$V8 > hcTH | tss$V9 > hcTH) & tss$V20 == 0 & !is.na(tss$mapSize)])) # 'Low-confidence'
+chang <- summary(as.factor(tss$V5[tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < PVAL & (tss$V7 > hcTH | tss$V8 > hcTH | tss$V9 > hcTH) & (tss$V7 > lnTH & tss$V8 > lnTH & tss$V9 > lnTH)])) # 'High-confidence'
+hctot <- summary(as.factor(tss$V5[tss$V20 == 0 & tss$fdr_min < PVAL & !is.na(tss$mapSize)])) # 'HC all'
 
-lccng_U2PI <- summary(as.factor(tss$V5[((tss$V7 < 0.1 & tss$V10 > 0.7) | (tss$V7 > 0.7 & tss$V10 < 0.1)) & !is.na(tss$mapSize)]))
-hccng_U2PI <- summary(as.factor(tss$V5[(tss$U2PIFDR_H < 0.05) & !((tss$V7 < 0.1 & tss$V10 > 0.7) | (tss$V7 > 0.7 & tss$V10 < 0.1)) & !is.na(tss$mapSize)]))
-ALLchang_U2PI <- summary(as.factor(tss$V5[tss$U2PIFDR_H < 0.05 & !is.na(tss$mapSize)]))
+lccng_U2PI <- summary(as.factor(tss$V5[((tss$V7 < lnTH & tss$V10 > hcTH) | (tss$V7 > hcTH & tss$V10 < lnTH)) & !is.na(tss$mapSize)]))
+hccng_U2PI <- summary(as.factor(tss$V5[(tss$U2PIFDR_H < PVAL) & !((tss$V7 < lnTH & tss$V10 > hcTH) | (tss$V7 > hcTH & tss$V10 < lnTH)) & !is.na(tss$mapSize)]))
+ALLchang_U2PI <- summary(as.factor(tss$V5[tss$U2PIFDR_H < PVAL & !is.na(tss$mapSize)]))
 
 ## Create a barplot.
 require(ggplot2)
@@ -127,9 +130,9 @@ cmpFracConserved <- function(tss1, tss2, i=2, i2=i) { ## defaults to enhancer (i
  total1 <- summary(as.factor(tss1$V5))
  one2m1 <- summary(as.factor(tss1$V5[tss1$V20 > 0])) ## Possible 1:many orthology
  unmap1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & is.na(tss1$mapSize)])) ## INDEL
- lccng1 <- summary(as.factor(tss1$V5[(tss1$V7 < 0.1 | tss1$V8 < 0.1 | tss1$V9 < 0.1) & (tss1$V7 > 0.7 | tss1$V8 > 0.7 | tss1$V9 > 0.7) & tss1$V20 == 0 & !is.na(tss1$mapSize)])) # 'Low-confidence'
- chang1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < 0.05 & (tss1$V7 > 0.7 | tss1$V8 > 0.7 | tss1$V9 > 0.7) & (tss1$V7 > 0.1 & tss1$V8 > 0.1 & tss1$V9 > 0.1)])) # 'High-confidence'
- allcng1<- summary(as.factor(tss1$V5[(tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < 0.05)]))
+ lccng1 <- summary(as.factor(tss1$V5[(tss1$V7 < lnTH | tss1$V8 < lnTH | tss1$V9 < lnTH) & (tss1$V7 > hcTH | tss1$V8 > hcTH | tss1$V9 > hcTH) & tss1$V20 == 0 & !is.na(tss1$mapSize)])) # 'Low-confidence'
+ chang1 <- summary(as.factor(tss1$V5[tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < PVAL & (tss1$V7 > hcTH | tss1$V8 > hcTH | tss1$V9 > hcTH) & (tss1$V7 > lnTH & tss1$V8 > lnTH & tss1$V9 > lnTH)])) # 'High-confidence'
+ allcng1<- summary(as.factor(tss1$V5[(tss1$V20 == 0 & !is.na(tss1$mapSize) & tss1$fdr_min < PVAL)]))
 
  tot1 <- total1[i]-one2m1[i]
  con1 <- total1[i]-one2m1[i]-unmap1[i]-chang1[i]-lccng1[i]
@@ -138,9 +141,9 @@ cmpFracConserved <- function(tss1, tss2, i=2, i2=i) { ## defaults to enhancer (i
  total2 <- summary(as.factor(tss2$V5))
  one2m2 <- summary(as.factor(tss2$V5[tss2$V20 > 0])) ## Possible 1:many orthology
  unmap2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & is.na(tss2$mapSize)])) ## INDEL
- lccng2 <- summary(as.factor(tss2$V5[(tss2$V7 < 0.1 | tss2$V8 < 0.1 | tss2$V9 < 0.1) & (tss2$V7 > 0.7 | tss2$V8 > 0.7 | tss2$V9 > 0.7) & tss2$V20 == 0 & !is.na(tss2$mapSize)])) # 'Low-confidence'
- chang2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < 0.05 & (tss2$V7 > 0.7 | tss2$V8 > 0.7 | tss2$V9 > 0.7) & (tss2$V7 > 0.1 & tss2$V8 > 0.1 & tss2$V9 > 0.1)])) # 'High-confidence'
- allcng2<- summary(as.factor(tss2$V5[(tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < 0.05)]))
+ lccng2 <- summary(as.factor(tss2$V5[(tss2$V7 < lnTH | tss2$V8 < lnTH | tss2$V9 < lnTH) & (tss2$V7 > hcTH | tss2$V8 > hcTH | tss2$V9 > hcTH) & tss2$V20 == 0 & !is.na(tss2$mapSize)])) # 'Low-confidence'
+ chang2 <- summary(as.factor(tss2$V5[tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < PVAL & (tss2$V7 > hcTH | tss2$V8 > hcTH | tss2$V9 > hcTH) & (tss2$V7 > lnTH & tss2$V8 > lnTH & tss2$V9 > lnTH)])) # 'High-confidence'
+ allcng2<- summary(as.factor(tss2$V5[(tss2$V20 == 0 & !is.na(tss2$mapSize) & tss2$fdr_min < PVAL)]))
 
  tot2 <- total2[i2]-one2m2[i2]
  con2 <- total2[i2]-one2m2[i2]-unmap2[i2]-chang2[i2]-lccng2[i2]
@@ -155,9 +158,9 @@ fracConserved <- function(tss, ret="C") { ## defaults to ...
  total <- NROW(tss)
  one2m <- sum(tss$V20 > 0) ## Possible 1:many orthology
  unmap <- sum(tss$V20 == 0 & is.na(tss$mapSize)) ## INDEL
- lccng <- sum((tss$V7 < 0.1 | tss$V8 < 0.1 | tss$V9 < 0.1) & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & tss$V20 == 0 & !is.na(tss$mapSize)) # 'Low-confidence'
- chang <- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05 & (tss$V7 > 0.7 | tss$V8 > 0.7 | tss$V9 > 0.7) & (tss$V7 > 0.1 & tss$V8 > 0.1 & tss$V9 > 0.1)) # 'High-confidence'
- allcng<- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < 0.05)
+ lccng <- sum((tss$V7 < lnTH | tss$V8 < lnTH | tss$V9 < lnTH) & (tss$V7 > hcTH | tss$V8 > hcTH | tss$V9 > hcTH) & tss$V20 == 0 & !is.na(tss$mapSize)) # 'Low-confidence'
+ chang <- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < PVAL & (tss$V7 > hcTH | tss$V8 > hcTH | tss$V9 > hcTH) & (tss$V7 > lnTH & tss$V8 > lnTH & tss$V9 > lnTH)) # 'High-confidence'
+ allcng<- sum(tss$V20 == 0 & !is.na(tss$mapSize) & tss$fdr_min < PVAL)
 
  if(ret=="C") {
   tot <- total-one2m
