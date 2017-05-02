@@ -8,6 +8,7 @@ export MOUSE_NET=mm10_net_rbest
 export RAT_NET=rn6_net_rbest
 
 export PROM=250 ## 1000
+export TRELEN=500 ## How much to add on each side of a TRE to caputre pause peaks.
 export MAXLEN=60000 ## Max length in base pairs.
 export MINLEN=500
 
@@ -74,7 +75,7 @@ function makeIncrements {
 
  ## Get the strand(s) of the gene(s) associated with each interval.
  bedmap --echo --echo-map gene.woGap.tmp $1 | sed "s/|chr/\t/g" \
-							 | awk 'BEGIN{OFS="\t"} {p= match($0, "\t+\t")} {m= match($0, "\t-\t")} {b= match($0, "\t.\t")} 
+							 | awk 'BEGIN{OFS="\t"} {p= match($0, /\t\+\t/)} {m= match($0, /\t\-\t/)} {b= match($0, /\t\.\t/)} 
 								{if(p>0) print $1,$2,$3,"N","0","+"}
 								{if(m>0) print $1,$2,$3,"N","0","-"}
 								{if(b>0) print $1,$2,$3,"N","0","+\n" $1,$2,$3,"N","0","-"}' > $2
@@ -118,8 +119,8 @@ cat genespc.tmp | bedmap --echo --echo-map --indicator $INTSS - | grep "|1" | se
 #cat genespc.tmp | bedops --element-of -1 $INTSS - | bedops --not-element-of -1 - annottss.tsv | awk 'BEGIN{OFS="\t"} {print $0,"dREG_INGENE"}' | sort-bed - > ingene.tmp ## Also pull out those that are in gene annotations.
 bedops --not-element-of -1 $INTSS annottss.tsv | bedops --not-element-of -1 - genespc.tmp | awk 'BEGIN{OFS="\t"} {print $0,"dREG_ENH"}' | sort-bed - > enh.tmp ## Assume the remaining sites are intragenic enhancers.
 
-## As it writes, extend +/-250bp ($PROM) to ensure that we capture the pause peak.
-cat dreg.tss enh.tmp ingene.tmp | awk 'BEGIN{OFS="\t"} {print $1,$2-'"$PROM"',$3+'"$PROM"',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19}' | sort-bed - > $TSSSITES
+## As it writes, extend +/-500bp ($TRELEN) to ensure that we capture the pause peak.
+cat dreg.tss enh.tmp ingene.tmp | awk 'BEGIN{OFS="\t"} {print $1,$2-'"$TRELEN"',$3+'"$TRELEN"',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19}' | sort-bed - > $TSSSITES
 rm enh.tmp ingene.tmp genespc.tmp
 makeIncrements $TSSSITES $TSSINCR
 
