@@ -86,15 +86,15 @@ write.table(PX, "results/human-changed.genes.tsv", sep="\t", row.names=FALSE, co
 
 ######################
 ## Now get REs.
-dREG<- read.table("../tss_caller/Human-U.dREG.bed.gz")
+#dREG<- read.table("../tss_caller/Human-U.dREG.bed.gz")
 
 hdU <- read.table("../dREG_HD/H-U_dREG_HD.bed")
 hdPI<- read.table("../dREG_HD/H-PI_dREG_HD.bed")
 
 #hd <- rbind(hdU, hdPI)
 hd <- read.table("../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed")
-hd$V2 <- hd$V2-250; hd$V2[hd$V2 < 0] = 0
-hd$V3 <- hd$V3+250
+hd$V2 <- hd$V2-500; hd$V2[hd$V2 < 0] = 0
+hd$V3 <- hd$V3+500
 
 getCountsE <- function(plus, minus, path, intervals= hd) {
   pl <- load.bigWig(paste(path, plus, sep=""))
@@ -105,39 +105,39 @@ getCountsE <- function(plus, minus, path, intervals= hd) {
 
 ################################################################################
 ## First focus on dREG ... just to get number of changed sites for the paper.
-counts_dreg <- cbind(
-human_1_U= getCountsE("H1-U_plus.bw", "H1-U_minus.bw", "../AllData/", intervals= dREG),
-human_2_U= getCountsE("H2-U_plus.bw", "H2-U_minus.bw", "../AllData/", intervals= dREG),
-human_3_U= getCountsE("H3-U.bed.gz_plus.bw", "H3-U.bed.gz_minus.bw", "../AllData/", intervals= dREG),
-human_1_PI= getCountsE("H1-PI_plus.bw", "H1-PI_minus.bw", "../AllData/", intervals= dREG),
-human_2_PI= getCountsE("H2-PI_plus.bw", "H2-PI_minus.bw", "../AllData/", intervals= dREG),
-human_3_PI= getCountsE("H3-PI.bed.gz_plus.bw", "H3-PI.bed.gz_minus.bw", "../AllData/", intervals= dREG)
-)
-
-
-print(cor(counts_dreg, method="spearman"))
-
+#counts_dreg <- cbind(
+#human_1_U= getCountsE("H1-U_plus.bw", "H1-U_minus.bw", "../AllData/", intervals= dREG),
+#human_2_U= getCountsE("H2-U_plus.bw", "H2-U_minus.bw", "../AllData/", intervals= dREG),
+#human_3_U= getCountsE("H3-U.bed.gz_plus.bw", "H3-U.bed.gz_minus.bw", "../AllData/", intervals= dREG),
+#human_1_PI= getCountsE("H1-PI_plus.bw", "H1-PI_minus.bw", "../AllData/", intervals= dREG),
+#human_2_PI= getCountsE("H2-PI_plus.bw", "H2-PI_minus.bw", "../AllData/", intervals= dREG),
+#human_3_PI= getCountsE("H3-PI.bed.gz_plus.bw", "H3-PI.bed.gz_minus.bw", "../AllData/", intervals= dREG)
+#)
+#
+#
+#print(cor(counts_dreg, method="spearman"))
+#
 library("DESeq2")
-colData <- data.frame(Condition= c(rep("U",3), rep("PI",3)), row.names=colnames(counts_dreg))
-
-## Number of dREG sites that change.
-dds <- DESeqDataSetFromMatrix(countData= counts_dreg, colData= colData, design= ~ Condition)
-dds$Condition <- relevel(dds$Condition, ref="U") ## Set the reference condition as the primary tumor.
-
-dds <- DESeq(dds)
-res <- results(dds)
-
-print(paste("Number of changes: ", sum(res$padj < 0.01, na.rm=TRUE))) ## Number of transcripts.
+#colData <- data.frame(Condition= c(rep("U",3), rep("PI",3)), row.names=colnames(counts_dreg))
+#
+### Number of dREG sites that change.
+#dds <- DESeqDataSetFromMatrix(countData= counts_dreg, colData= colData, design= ~ Condition)
+#dds$Condition <- relevel(dds$Condition, ref="U") ## Set the reference condition as the primary tumor.
+#
+#dds <- DESeq(dds)
+#res <- results(dds)
+#
+#print(paste("Number of changes: ", sum(res$padj < 0.01, na.rm=TRUE))) ## Number of transcripts.
 
 ###################################################################################
 ### NOW FOCUS ON dREG-HD
 raw_counts <- cbind(
 human_1_U= getCountsE("H1-U_plus.bw", "H1-U_minus.bw", "../AllData/"),
 human_2_U= getCountsE("H2-U_plus.bw", "H2-U_minus.bw", "../AllData/"),
-human_3_U= getCountsE("H3-U.bed.gz_plus.bw", "H3-U.bed.gz_minus.bw", "../AllData/"),
+human_3_U= getCountsE("H4-U_plus.bw", "H4-U_minus.bw", "../AllData/"),
 human_1_PI= getCountsE("H1-PI_plus.bw", "H1-PI_minus.bw", "../AllData/"),
 human_2_PI= getCountsE("H2-PI_plus.bw", "H2-PI_minus.bw", "../AllData/"),
-human_3_PI= getCountsE("H3-PI.bed.gz_plus.bw", "H3-PI.bed.gz_minus.bw", "../AllData/")
+human_3_PI= getCountsE("H4-PI_plus.bw", "H4-PI_minus.bw", "../AllData/")
 )
 
 print(cor(raw_counts, method="spearman"))

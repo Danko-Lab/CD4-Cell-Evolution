@@ -32,7 +32,7 @@ fitModel <- function(species, cnts) {
   dds <- DESeq(dds, betaPrior=FALSE)
   dds <- replaceOutliersWithTrimmedMean(dds) ## NAs otherwise.
   resultsNames(dds)
-  res <- results(dds, name="species_SS_vs_SO")
+  res <- results(dds, name="species_SS_vs_SO", independentFiltering = FALSE)
   ss <- data.frame(genes, res)
 
   return(ss)

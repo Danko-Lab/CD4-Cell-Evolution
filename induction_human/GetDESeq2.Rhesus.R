@@ -79,14 +79,15 @@ PX <- cbind(bodies, res)
 PX <- PX[order(PX$padj),]
 write.table(PX, "results/rhesus-changed.genes.tsv", sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 
-q("no")
+###################################################################################
+### NOW FOCUS ON dREG-HD in the Rhesus genome.
 
 hdU <- read.table("../dREG_HD/M-U_dREG_HD.bed")
 hdPI<- read.table("../dREG_HD/M-PI_dREG_HD.bed")
 
 hd <- read.table("../dREG_HD/dREG_HD.merge.HCM.UPI.rhesus.bed") #rbind(hdU, hdPI)
-hd$V2 <- hd$V2-250; hd$V2[hd$V2 < 0] = 0
-hd$V3 <- hd$V3+250
+hd$V2 <- hd$V2-500; hd$V2[hd$V2 < 0] = 0
+hd$V3 <- hd$V3+500
 
 hd <- hd[grep("random|Un", hd$V1, invert=TRUE),]
 
@@ -97,19 +98,18 @@ getCountsE <- function(plus, minus, path, intervals= hd) {
   counts #* (1000/(bodies$V3-bodies$V2)) * (1e6/ (pl$mean*pl$basesCovered+mn$mean*mn$basesCovered)) ## Normalize to RPKM
 }
 
-###################################################################################
-### NOW FOCUS ON dREG-HD
 raw_counts <- cbind(
-rhesus_1_U= getCountsE("M1-U.bed.gz_plus.bw", "M1-U.bed.gz_minus.bw", "../Alignments_1stPrep/"),
 rhesus_2_U= getCountsE("M2-U_plus.bw", "M2-U_minus.bw", "../Alignments_2ndPrep/"),
 rhesus_3_U= getCountsE("M3-U_plus.bw", "M3-U_minus.bw", "../Alignments_3rdPrep/"),
+rhesus_4_U= getCountsE("M4-U_plus.bw", "M4-U_minus.bw", "../Alignments_5thPrep/"),
 rhesus_2_PI= getCountsE("M2-PI_plus.bw", "M2-PI_minus.bw", "../Alignments_2ndPrep/"),
-rhesus_3_PI= getCountsE("M3-PI_plus.bw", "M3-PI_minus.bw", "../Alignments_3rdPrep/")
+rhesus_3_PI= getCountsE("M3-PI_plus.bw", "M3-PI_minus.bw", "../Alignments_3rdPrep/"),
+rhesus_4_PI= getCountsE("M4-PI_plus.bw", "M4-PI_minus.bw", "../Alignments_5thPrep/")
 )
 
 print(cor(raw_counts, method="spearman"))
 
-colData <- data.frame(Condition= c(rep("U",3), rep("PI",2)), row.names=colnames(raw_counts))
+colData <- data.frame(Condition= c(rep("U",3), rep("PI",3)), row.names=colnames(raw_counts))
 
 ## Create DESeq2 object.
 library("DESeq2")

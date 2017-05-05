@@ -11,13 +11,20 @@ cat first |  bedmap --echo --indicator --echo-map - tss.tmp | grep "|1|" | sed "
 zcat /local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$3-'"$loopsize"',$3,$4}' | sort-bed - > second
 cat second | bedmap --echo --indicator --echo-map - tss.tmp | grep "|1|" | sed "s/|1|/\t/g" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,$8}' > second.tss
 
+## Capture Hi-C
+zcat /local/storage/data/hg19/cd4/capture_hic/tCD4.PCHiC_peak_matrix_cutoff5.tsv.gz | grep "chr" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$22}' | sort-bed - > first.capturehic
+
+zcat /local/storage/data/hg19/cd4/capture_hic/tCD4.PCHiC_peak_matrix_cutoff5.tsv.gz | grep "chr" | awk 'BEGIN{OFS="\t"} {print $6,$7,$8,$22}' | sort-bed - > second.capturehic
+
 ## Get info on whether enhancers for a loop ...
 cat tss.tsv | sort-bed - | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4}' > tss.tsv.reduced
 cat tss.tsv.reduced | bedmap --count - first  > tss.tsv.first
 cat tss.tsv.reduced | bedmap --count - second > tss.tsv.second
-paste tss.tsv.reduced tss.tsv.first tss.tsv.second > tss.tsv.loop
+cat tss.tsv.reduced | bedmap --count - first.capturehic > tss.tsv.capturehic.first
+cat tss.tsv.reduced | bedmap --count - second.capturehic> tss.tsv.capturehic.second
+paste tss.tsv.reduced tss.tsv.first tss.tsv.second tss.tsv.capturehic.first tss.tsv.capturehic.second > tss.tsv.loop
 
 ## ... and whether that is to a TSS.
 
 
-rm tss.tsv.reduced tss.tsv.first tss.tsv.second first first.tss second second.tss
+rm tss.tsv.reduced tss.tsv.first tss.tsv.second first first.tss second second.tss first.capturehic second.capturehic tss.tsv.capturehic.first tss.tsv.capturehic.second

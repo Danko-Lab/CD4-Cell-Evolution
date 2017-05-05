@@ -17,8 +17,8 @@ load("APCluster.rdata")
 
 ## Now get enriched motifs...
 PVAL <- 0.01
-FOLD <- 3 #1 #3
-mTH  <- 7.5
+FOLD <- 1 #1 #3
+mTH  <- 8 # 7
 min.size <- 2500
 
 ## Do human
@@ -38,26 +38,28 @@ print(paste("Human: ", NROW(enh.up), NROW(enh.dn), NROW(enh.unc)))
 
 tf_up <- tfbs.enrichmentTest(
         tfbs= tfs,
-        file.twoBit= file.twoBit_path,
+        file.genome= file.twoBit_path,
         positive.bed= enh.up,
         negative.bed= enh.unc,
         gc.correction=TRUE,
 	gc.min.sample= min.size,
         use.cluster=TRUE,
         threshold = mTH,
+	pv.adj = "bonferroni",
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_up, file.pdf="Human.TF-up.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
 tfbs.plotEnrichment(tfs, tf_up, file.pdf=paste("Human.TF-up.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options)
 
 tf_dn <- tfbs.enrichmentTest(
         tfbs= tfs,
-        file.twoBit= file.twoBit_path,
+        file.genome= file.twoBit_path,
         positive.bed= enh.dn,
         negative.bed= enh.unc,
         gc.correction=TRUE,
         gc.min.sample= min.size,
         use.cluster=TRUE,
         threshold = mTH,
+        pv.adj = "bonferroni",
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_dn, file.pdf="Human.TF-dn.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
 tfbs.plotEnrichment(tfs, tf_dn, file.pdf=paste("Human.TF-dn.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options)
@@ -76,26 +78,28 @@ print(paste("Chimp: ", NROW(enh.up), NROW(enh.dn), NROW(enh.unc)))
 
 tf_up <- tfbs.enrichmentTest(
         tfbs= tfs,
-        file.twoBit= chimp.twoBit_path,
+        file.genome= chimp.twoBit_path,
         positive.bed= enh.up,
         negative.bed= enh.unc,
         gc.correction=TRUE,
         gc.min.sample= min.size,
         use.cluster=TRUE,
         threshold = mTH,
+        pv.adj = "bonferroni",
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_up, file.pdf="Chimp.TF-up.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
 tfbs.plotEnrichment(tfs, tf_up, file.pdf=paste("Chimp.TF-up.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options)
 
 tf_dn <- tfbs.enrichmentTest(
         tfbs= tfs,
-        file.twoBit= chimp.twoBit_path,
+        file.genome= chimp.twoBit_path,
         positive.bed= enh.dn,
         negative.bed= enh.unc,
         gc.correction=TRUE,
         gc.min.sample= min.size,
         use.cluster=TRUE,
         threshold = mTH,
+        pv.adj = "bonferroni",
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_dn, file.pdf="Chimp.TF-dn.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
 tfbs.plotEnrichment(tfs, tf_dn, file.pdf=paste("Chimp.TF-dn.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options)
@@ -111,26 +115,28 @@ print(paste("Rhesus: ", NROW(enh.up), NROW(enh.dn), NROW(enh.unc)))
 
 tf_up <- tfbs.enrichmentTest(
         tfbs= tfs,
-        file.twoBit= rhesus.twoBit_path,
+        file.genome= rhesus.twoBit_path,
         positive.bed= enh.up,
         negative.bed= enh.unc,
         gc.correction=TRUE,
         gc.min.sample= min.size,
         use.cluster=TRUE,
         threshold = mTH,
+        pv.adj = "bonferroni",
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_up, file.pdf="Rhesus.TF-up.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
 tfbs.plotEnrichment(tfs, tf_up, file.pdf=paste("Rhesus.TF-up.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options)
 
 tf_dn <- tfbs.enrichmentTest(
         tfbs= tfs,
-        file.twoBit= rhesus.twoBit_path,
+        file.genome= rhesus.twoBit_path,
         positive.bed= enh.dn,
         negative.bed= enh.unc,
         gc.correction=TRUE,
         gc.min.sample= min.size,
         use.cluster=TRUE,
         threshold = mTH,
+        pv.adj = "bonferroni",
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_dn, file.pdf="Rhesus.TF-dn.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
 options$y.max <- 6

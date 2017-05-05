@@ -49,12 +49,20 @@ norm.subsample <- function(a, b, nBins=100, nsamp=10000, boot.replace=TRUE, plot
 ## l is a list of vectors.  Each represents a distinct class.
 ## dist is a target distribution; if specified it will use that distribution.
 
+## NOTES: There are two ways to control the number of samples returned.
+## nsamp: Fixes the number of samples made for each class.
+## alpha: Samples a fraction of the total number of samples.  Useful for highly unbalanced groups.
+## 
+## passthrough: If TRUE, returns the input data untouched.
+
 ## Test: 
 #    l <- list(x= rnorm(1000, mean=1.5), y= rnorm(1000, mean=2), z= rnorm(1000, mean=2.5))
 #    norm.subsample.n(l, plot.cdf=TRUE)
 ## Seems to work correctly...
 
-norm.subsample.n <- function(l, dist= NA, nBins=100, nsamp=1000, boot.replace=TRUE, plot.cdf=FALSE) {
+norm.subsample.n <- function(l, dist= NA, nBins=100, nsamp=1000, alpha=NULL, boot.replace=TRUE, plot.cdf=FALSE, passthrough=FALSE) {
+ ## Error check ...
+ stopifnot(is.null(alpha) || (alpha < 1 && alpha > 0)) ## Error check alpha.
 
  ## Descritise DS.
  rs <- range(unlist(l))
@@ -83,7 +91,17 @@ norm.subsample.n <- function(l, dist= NA, nBins=100, nsamp=1000, boot.replace=TR
  ## Subsample with a probability proposrtional to the combination of all elements of l.
  sIndx <- list()
  for(j in 1:NROW(l)) {
-  sIndx[[j]] <- sample(c(1:NROW(l[[j]])), nsamp, prob=sweight[[j]], replace=boot.replace)
+
+  if(!is.null(alpha)) {
+    nsamp <- alpha * NROW(l[[j]])
+  }
+
+
+  if(passthrough) {
+    sIndx[[j]] <- 1:NROW(l[[j]])
+  } else {
+    sIndx[[j]] <- sample(c(1:NROW(l[[j]])), nsamp, prob=sweight[[j]], replace=(boot.replace || (nsamp>NROW(l[[j]]))) )
+  }
  }
 
  ## Sanity check that subsampling worked ...

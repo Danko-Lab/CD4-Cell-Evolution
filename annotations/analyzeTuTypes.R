@@ -1,8 +1,21 @@
 ##
 ##
 load("fdr.RData")
-PVAL <- 0.005
-EXPR <- 0
+
+## Compute an expression threshold.
+## Necessary because our power is limited.
+EXPR <- 5e-4
+isExpr <- rowMax(rpkm_df[,2:9]) > EXPR
+sum(isExpr)/NROW(isExpr)
+isExprPI <- rowMax(rpkm_df[,11:18]) > EXPR
+sum(isExprPI)/NROW(isExprPI)
+
+pdf("analyzeTuTypes.ValidateExpressionThreshold.pdf")
+## Make sure this expression threshold looks resonable
+source("../lib/densScatterplot.R")
+densScatterplot(fdr_df$fdr_min, log(rowMax(rpkm_df[,2:9])), xlab="Minimum FDR", ylab="Maximum expression level")
+abline(h=log(EXPR))
+dev.off()
 
 toLogical <- function(indx, expLength) {
   var <- rep(FALSE, expLength)
@@ -22,27 +35,30 @@ toLogical <- function(indx, expLength) {
 
   ## Adjust data to normalize for expression levels ...
   source("../lib/normalizeSubsample.R")
-  indx.good.df <- c(12:20,22:29)
+  indx.good.df <- c(12:20,22:30)
   #head(fdr_df[,indx.good.df])
   data_sums <- log(rowSums(fdr_df[,indx.good.df])+1)
-#  lnorm <- list(indx.eRNA= data_sums[indx.eRNA], 
-#		indx.lincRNA= data_sums[indx.lincRNA], 
-#		indx.unannot= data_sums[indx.unannot], 
+  lnorm <- list(indx.eRNA= data_sums[indx.eRNA], 
+		indx.lincRNA= data_sums[indx.lincRNA], 
+		indx.unannot= data_sums[indx.unannot], 
 #		indx.pseudogene.rep= data_sums[indx.pseudogene.rep], 
-#		indx.protein_coding= data_sums[indx.protein_coding],
-#		indx.antisense= data_sums[indx.antisense],
-#		indx.uas= data_sums[indx.uas],
-#		indx.srna= data_sums[indx.srna])
-#  ns <- norm.subsample.n(lnorm, plot.cdf=TRUE)#, dist=data_sums[indx.eRNA])
+		indx.protein_coding= data_sums[indx.protein_coding],
+		indx.antisense= data_sums[indx.antisense],
+		indx.uas= data_sums[indx.uas],
+		indx.srna= data_sums[indx.srna])
 
-  indx.eRNA <- toLogical(which(indx.eRNA), NROW(fdr_df)) # toLogical(ns[[1]], NROW(fdr_df)) 
-  indx.lincRNA <- toLogical(which(indx.lincRNA), NROW(fdr_df)) #toLogical(ns[[2]], NROW(fdr_df)) 
-  indx.unannot <- toLogical(which(indx.unannot), NROW(fdr_df)) # toLogical(ns[[3]], NROW(fdr_df))
-  indx.pseudogene.rep <- toLogical(which(indx.pseudogene.rep), NROW(fdr_df)) # toLogical(ns[[4]], NROW(fdr_df)) 
-  indx.protein_coding <- toLogical(which(indx.protein_coding), NROW(fdr_df)) # toLogical(ns[[5]], NROW(fdr_df)) 
-  indx.antisense <- toLogical(which(indx.antisense), NROW(fdr_df)) # toLogical(ns[[6]], NROW(fdr_df)) 
-  indx.uas <- toLogical(which(indx.uas), NROW(fdr_df)) # toLogical(ns[[7]], NROW(fdr_df)) 
-  indx.srna <- toLogical(which(indx.srna), NROW(fdr_df)) # toLogical(ns[[8]], NROW(fdr_df))
+  pdf("analyzeTuTypes.DataCorrection.pdf")
+    ns <- norm.subsample.n(lnorm, alpha= 0.1, plot.cdf=TRUE, boot.replace=FALSE, passthrough=TRUE)
+  dev.off()
+
+  indx.eRNA <- 		toLogical(which(indx.eRNA)[ns[[1]]], NROW(fdr_df)) #toLogical(which(indx.eRNA), NROW(fdr_df)) # toLogical(ns[[1]], NROW(fdr_df)) 
+  indx.lincRNA <- 	toLogical(which(indx.lincRNA)[ns[[2]]], NROW(fdr_df))  #toLogical(which(indx.lincRNA), NROW(fdr_df)) #toLogical(ns[[2]], NROW(fdr_df)) 
+  indx.unannot <- 	toLogical(which(indx.unannot)[ns[[3]]], NROW(fdr_df)) #toLogical(which(indx.unannot), NROW(fdr_df)) # toLogical(ns[[3]], NROW(fdr_df))
+#  indx.pseudogene.rep <-toLogical(which(indx.pseudogene.rep)[ns[[4]]], NROW(fdr_df)) #toLogical(which(indx.pseudogene.rep), NROW(fdr_df)) # toLogical(ns[[4]], NROW(fdr_df)) 
+  indx.protein_coding <-toLogical(which(indx.protein_coding)[ns[[4]]], NROW(fdr_df)) #toLogical(which(indx.protein_coding), NROW(fdr_df)) # toLogical(ns[[5]], NROW(fdr_df)) 
+  indx.antisense <- 	toLogical(which(indx.antisense)[ns[[5]]], NROW(fdr_df)) #toLogical(which(indx.antisense), NROW(fdr_df)) # toLogical(ns[[6]], NROW(fdr_df)) 
+  indx.uas <- 		toLogical(which(indx.uas)[ns[[6]]], NROW(fdr_df)) #toLogical(which(indx.uas), NROW(fdr_df)) # toLogical(ns[[7]], NROW(fdr_df)) 
+  indx.srna <- 		toLogical(which(indx.srna)[ns[[7]]], NROW(fdr_df)) #toLogical(which(indx.srna), NROW(fdr_df)) # toLogical(ns[[8]], NROW(fdr_df))
 
 ## UNDO THIS ONE!
 #  indx.pseudogene.rep <- grepl("pseudogene|GERST_PG|PSEUDOGENE+REP", fdr_df$type)
@@ -60,7 +76,7 @@ getDifferences <- function(changeExpr, isExpr) {
     "Protein Coding"=  NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr]))/NROW(unique(fdr_df$name[indx.protein_coding & isExpr])),
     "Antisense"=  NROW(unique(fdr_df$name[changeExpr & indx.antisense & isExpr]))/NROW(unique(fdr_df$name[indx.antisense & isExpr])),
     "ups_Antis"= NROW(unique(fdr_df$name[changeExpr & indx.uas & isExpr]))/NROW(unique(fdr_df$name[indx.uas & isExpr])),
-    "Pseudogene"=  NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr]))/NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr])),
+ #   "Pseudogene"=  NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr]))/NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr])),
     "All Expressed"= NROW(unique(fdr_df$name[changeExpr & isExpr]))/NROW(unique(fdr_df$name[isExpr]))
   )
 
@@ -86,45 +102,16 @@ getDifferences <- function(changeExpr, isExpr) {
     "ups_Antis"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.uas & isExpr])), NROW(unique(fdr_df$name[indx.uas & isExpr]))), 
       c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr])))))$p.value,
 
-    "Pseudogene"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))), 
-      c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr])))))$p.value,
+ #   "Pseudogene"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))), 
+ #     c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr])))))$p.value,
 
     "All Expressed"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr]))),
       c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr])))))$p.value
   )
 
-  pval.pg <- list(
-    "eRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.eRNA & isExpr])), NROW(unique(fdr_df$name[indx.eRNA & isExpr]))),
-      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,
-
-    "LincRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.lincRNA & isExpr])), NROW(unique(fdr_df$name[indx.lincRNA & isExpr]))),
-      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,
-
-    "Unannot"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.unannot & isExpr])), NROW(unique(fdr_df$name[indx.unannot & isExpr]))),       
-      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,  
-
-    "sRNA"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.srna & isExpr])), NROW(unique(fdr_df$name[indx.srna & isExpr]))),
-      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,  
-
-    "Protein Coding"=   fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.protein_coding & isExpr])), NROW(unique(fdr_df$name[indx.protein_coding & isExpr]))),
-      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,
-
-    "Antisense"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.antisense & isExpr])), NROW(unique(fdr_df$name[indx.antisense & isExpr]))),
-      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,
-
-    "ups_Antis"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.uas & isExpr])), NROW(unique(fdr_df$name[indx.uas & isExpr]))),                
-      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,   
-
-    "Pseudogene"=  fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))),
-      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value,
-
-    "All Expressed"= fisher.test(data.frame(c(NROW(unique(fdr_df$name[changeExpr & isExpr])), NROW(unique(fdr_df$name[isExpr]))),
-      c(NROW(unique(fdr_df$name[changeExpr & indx.pseudogene.rep & isExpr])), NROW(unique(fdr_df$name[indx.pseudogene.rep & isExpr]))) ))$p.value
-  )
-
   require(ggplot2)
   library(reshape2)
-  data_df <- data.frame(Type= names(fractionChanged), Changed= as.double(unlist(fractionChanged)), Pval= as.double(unlist(pval)), Pval.pg= as.double(unlist(pval.pg)))
+  data_df <- data.frame(Type= names(fractionChanged), Changed= as.double(unlist(fractionChanged)), Pval= as.double(unlist(pval)))#, Pval.pg= as.double(unlist(pval.pg)))
 #  data_df$Type <- factor(data_df$Type, levels= data_df$Type[c(1,2,4,5,3,6)])
 
   # http://learnr.wordpress.com/2009/03/17/ggplot2-barplots/
@@ -136,18 +123,18 @@ getDifferences <- function(changeExpr, isExpr) {
   return(data_df)
 }
 
+## Compute an expression threshold.
+## Necessary because our power is limited at lower thresholds...
+isExpr <- rowMax(rpkm_df[,2:9]) > EXPR
+sum(isExpr)/NROW(isExpr)
+isExprPI <- rowMax(rpkm_df[,11:18]) > EXPR
+sum(isExprPI)/NROW(isExprPI)
+
 ##############################################################################
 ## Compare frequency of changes in expression for genes, and non-coding RNAs.
 
 summary(fdr_df$fdr_min < PVAL) ## ~12k transcripts that change expression.
 changeExpr <- fdr_df$fdr_min < PVAL & !is.na(fdr_df$fdr_min) & abs(fdr_df$fc_min) > FOLD #1
-
-## Comput RPKM
-isExpr <- rowMax(rpkm_df[,2:9]) > EXPR
-sum(isExpr)/NROW(isExpr)
-
-isExprPI<-rowMax(rpkm_df[,11:17]) > EXPR
-sum(isExprPI)/NROW(isExprPI)
 
 diff_all <- getDifferences(changeExpr, isExpr); diff_all
 
@@ -185,10 +172,17 @@ font_size <- 16
     geom_bar(aes(fill=Type), stat="identity") +
     scale_fill_brewer(palette = "Set1")
 
-  b <- ggplot(hu, aes(Type, Changed)) + xlab("") + ylab("Fraction of Transcripts Changed") +
+  b <- ggplot(hp, aes(Type, Changed)) + xlab("") + ylab("Fraction of Transcripts Changed (human PI)") +
     geom_bar(aes(fill=Type), stat="identity") +
     scale_fill_brewer(palette = "Set1")
 
+  bc <- ggplot(cp, aes(Type, Changed)) + xlab("") + ylab("Fraction of Transcripts Changed (chimp PI)") +
+    geom_bar(aes(fill=Type), stat="identity") +
+    scale_fill_brewer(palette = "Set1")
+
+  bm <- ggplot(mp, aes(Type, Changed)) + xlab("") + ylab("Fraction of Transcripts Changed (rhesus PI)") +
+    geom_bar(aes(fill=Type), stat="identity") +
+    scale_fill_brewer(palette = "Set1")
 
 theme_update(axis.text.x = element_text(angle = 90, hjust = 1, size=font_size), 
      axis.text.y = element_text(size=font_size), 
@@ -205,6 +199,8 @@ a
 ac
 am
 b
+bc
+bm
 	 
 dev.off()
 

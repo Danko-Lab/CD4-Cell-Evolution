@@ -5,7 +5,7 @@ source("../lib/normalizeSubsample.R")
 require(boot)
 
 lnTH= 0.05
-hcTH= 0.40
+hcTH= 0.30
 
 tss_aln <- fdr_df[grepl("dREG", ca$annot_type),]
 tss <- read.table("tss.tsv")
@@ -282,6 +282,12 @@ fracConserved(tss[rowSums(loop[,5:6]) == 0 & tss$V5 == "Prox_Stab",])  ## Conser
 cmpFracConserved(tss[rowSums(loop[,5:6]) >  0,], tss[rowSums(loop[,5:6]) == 0,], i=2) ## Enhancers
 cmpFracConserved(tss[rowSums(loop[,5:6]) >  0,], tss[rowSums(loop[,5:6]) == 0,], i=3) ## Promoters
 
+## Reproducible with promoter capture Hi-C data?
+cmpFracConserved(tss[loop[,8] >  0,], tss[loop[,8] == 0,], i=2) ## Enhancers
+cmpFracConserved(tss[rowSums(loop[,7:8]) >  0,], tss[rowSums(loop[,7:8]) == 0,], i=2) ## Enhancers
+cmpFracConserved(tss[loop[,8] >  0,], tss[loop[,8] == 0,], i=3) ## Promoters
+cmpFracConserved(tss[rowSums(loop[,7:8]) >  0,], tss[rowSums(loop[,7:8]) == 0,], i=3) ## Promoters
+
 ## Compare looped enhancers to promoters.
 cmpFracConserved(tss[rowSums(loop[,5:6]) >  0,], tss, i=2, i2=3)
 b_du <- boot(data= tss[tss$V5=="Dist_UnSt",], R=1000, statistic= function(a, i) {fracConserved(a[i,])})
@@ -368,7 +374,7 @@ for(x in nloops) {
 
 use <- !is.na(loop_cons_df$t0)
 pdf("NumberOfLoops.Promoter.pdf")
-  plot(0:12, loop_cons, pch=19, cex=3*getCex(n_s), xlab= "Number of loops to promoter", ylab= "Fraction conserved", ylim=c(0.55,0.95), xlim=c(-1,12))
+  plot(0:12, loop_cons, pch=19, cex=3*getCex(n_s), xlab= "Number of loops to promoter", ylab= "Fraction conserved", ylim=c(0.5,1.0), xlim=c(-1,12))
   abline(fit_line)
   cd.barplot(loop_cons_df$t0[use], loop_cons_df$sd[use], as.character(nloops)[use], fill=TRUE, order=FALSE)
   plot(loop_swap)

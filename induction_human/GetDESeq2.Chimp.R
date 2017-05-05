@@ -79,16 +79,14 @@ PX <- cbind(bodies, res)
 PX <- PX[order(PX$padj),]
 write.table(PX, "results/chimp-changed.genes.tsv", sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 
-q("no")
-
 ######################
 ## Now get REs.
 hdU <- read.table("../dREG_HD/C-U_dREG_HD.bed")
 hdPI<- read.table("../dREG_HD/C-PI_dREG_HD.bed")
 
 hd <- read.table("../dREG_HD/dREG_HD.merge.HCM.UPI.chimp.bed") #rbind(hdU, hdPI)
-hd$V2 <- hd$V2-250; hd$V2[hd$V2 < 0] = 0
-hd$V3 <- hd$V3+250
+hd$V2 <- hd$V2-500; hd$V2[hd$V2 < 0] = 0
+hd$V3 <- hd$V3+500
 
 hd <- hd[grep("random|Un", hd$V1, invert=TRUE),]
 

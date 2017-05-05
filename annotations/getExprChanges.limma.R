@@ -1,6 +1,6 @@
 ################################################################################
-## ID changes in GE with Limma Voom
-PVAL <- 0.05
+## ID changes in GE with Limma 
+PVAL <- 0.01
 FOLD <- 0 #log(10,2)
 
 ## Read count data.
@@ -9,17 +9,17 @@ source("readData.R")
 ## Use only untreated, and get switch to RPKM
 ca <- ca[,c(1:10,indx.good)]
 
-counts <- ca[,c(12:20,22:29)] #rpkm_df[,c(2:9,11:17)] #ca[,c(12:19,21:27)]
+counts <- ca[,c(12:20,22:30)] #rpkm_df[,c(2:9,11:17)] #ca[,c(12:19,21:27)]
 genes  <- ca[,c(1:10)]
-species  <- c("H","H","H","C","C","C","M","M","M",    "H","H","H","C","C","C","M","M") ## CGDCG"H"
-treatment<- c(rep("U",9), rep("PI",8)) ## CGDCG 7
+species  <- c("H","H","H","C","C","C","M","M","M",    "H","H","H","C","C","C","M","M","M") 
+treatment<- c(rep("U",9), rep("PI",9)) ## CGDCG 7
 
 ## Indices for different combinations of data.
 dindx_u  <- c(1:9)
-dindx_pi <- c(10:17) # c(9:15)
+dindx_pi <- c(10:18) # c(9:15)
 dindx_h  <- c(1:3,10:12) # c(1:3,9:11)
 dindx_c  <- c(4:6,13:15) #c(4:5,12:13)
-dindx_m  <- c(7:9,16:17) #c(6:8,14:15)
+dindx_m  <- c(7:9,16:18) #c(6:8,14:15)
 
 ## Import function from lib.
 source("../lib/runLimmaQuantile.R")
@@ -130,12 +130,12 @@ writeExprChange <- function(ss, name, indx, indx_pi) {
  write.table(cbind(genes[,1:4], fc_t[,indx_pi],genes[,6:10], fdr_t, fc_t), paste("chage_expr/",name,".change-PI.all.tsv", sep=""), quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
 }
 
-writeExprChange(ss, "H", 1,4)
-writeExprChange(ss, "C", 2,5)
-writeExprChange(ss, "M", 3,6)
+#writeExprChange(ss, "H", 1,4)
+#writeExprChange(ss, "C", 2,5)
+#writeExprChange(ss, "M", 3,6)
 
 isExpr <- rowMax(rpkm_df[,2:9]) > 1e-4
-write.table(unique(ca[isExpr & ca[,"annot_type"] == "gc18","mgi"]), "chage_expr/exprbg.mgi.tsv", quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
+#write.table(unique(ca[isExpr & ca[,"annot_type"] == "gc18","mgi"]), "chage_expr/exprbg.mgi.tsv", quote=FALSE, row.names=FALSE, col.names=FALSE, sep="\t")
 
 ## Compute frequency of changes for 'expressed' genes in each class.
-save.image("fdr.RData")
+save.image("fdr.limma.RData")
