@@ -1,7 +1,7 @@
 run_1:
 	#bash nhptss_liftOver.bsh
 	#bash testSpec.bsh
-	bash bedGraphToBed.bsh
+	bash bedGraphToBed.dreghd.bsh
 	bash prepStabilityClassification.bsh
 	R --no-save < classifySites.R
 

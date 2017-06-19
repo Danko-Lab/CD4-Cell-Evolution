@@ -18,15 +18,18 @@ h3k27ac=/local/storage/data/hg19/cd4/epiRoadmap_histone/H3K27ac_peaks.narrowPeak
 ## Combined file.
 cat $dnase $h3k4me3 $h3k4me1 $h3k9ac $h4k16ac $h3k27ac $chromhmm | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' | sort-bed - > all
 bedops --element-of 1 $h3k27ac $dnase | bedops --element-of 1 - $chromhmm | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' | sort-bed - > k27ac.dnase
+bedops --element-of 1 $h4k16ac $dnase | bedops --element-of 1 - $chromhmm | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' | sort-bed - > k16ac.dnase
+bedops --element-of 1 $h3k9ac  $dnase | bedops --element-of 1 - $chromhmm | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' | sort-bed - > k9ac.dnase
+bedops --element-of 1 $h3k4me3 $dnase | bedops --element-of 1 - $chromhmm | awk 'BEGIN{OFS="\t"} {print $1,$2,$3}' | sort-bed - > k4me3.dnase
 
 ################################################################
 ## Test sensitivity ...
 
-for th in 0.7 0.5 0.4 0.3 0.25 0.2 0.1 0.05 0.01
+for th in 0.4 0.35 0.3 0.25 0.2 0.05
 do
  echo $th
 
- ## Use threshold 0.81 @ 10% FDR.
+ ## Use threshold 0.3 @ 10% FDR.
  zcat $infPos | awk 'BEGIN{OFS="\t"} ($4 > '"$th"') {print $1,$2-50,$3+51,$4}' | sort-bed - |  bedops --merge - | perl ~/perl/bed_merge.pl $dist > tmp.mergepred.bed
  #cat tmp.mergepred.bed | gzip > Human-U.dREG.bed.gz
 
@@ -39,14 +42,54 @@ do
  SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - all | grep "" -c` ## Specificity
  echo $[($SPECnum*100)/$SPECden]
 
- ## K27ac overlap.
- echo "Comparison with H3K27ac:"
+ ## K27ac/ DNase overlap.
+ echo "Comparison with H3K27ac/ DNase:"
  SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - k27ac.dnase | grep "|0|" -c -v` ## Specificity
  SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - k27ac.dnase | grep "" -c` ## Specificity
  echo $[($SPECnum*100)/$SPECden]
 
  SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map k27ac.dnase - | grep "|0|" -c -v` ## Sensitivity
  SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map k27ac.dnase - | grep "" -c` ## Sensitivity
+ echo $[($SPECnum*100)/$SPECden]
+
+ ## K27ac overlap.
+ echo "Comparison with H3K27ac alone:"
+ SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - $h3k27ac | grep "|0|" -c -v` ## Specificity
+ SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - $h3k27ac | grep "" -c` ## Specificity
+ echo $[($SPECnum*100)/$SPECden]
+
+ SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map $h3k27ac - | grep "|0|" -c -v` ## Sensitivity
+ SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map $h3k27ac - | grep "" -c` ## Sensitivity
+ echo $[($SPECnum*100)/$SPECden]
+
+ ## K27ac overlap.
+ echo "Comparison with H4K16ac/ DNase:"
+ SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - k16ac.dnase | grep "|0|" -c -v` ## Specificity
+ SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - k16ac.dnase | grep "" -c` ## Specificity
+ echo $[($SPECnum*100)/$SPECden]
+
+ SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map k16ac.dnase - | grep "|0|" -c -v` ## Sensitivity
+ SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map k16ac.dnase - | grep "" -c` ## Sensitivity
+ echo $[($SPECnum*100)/$SPECden]
+
+ ## K27ac overlap.
+ echo "Comparison with H3K9ac/ DNase:"
+ SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - k9ac.dnase | grep "|0|" -c -v` ## Specificity
+ SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - k9ac.dnase | grep "" -c` ## Specificity
+ echo $[($SPECnum*100)/$SPECden]
+
+ SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map k9ac.dnase - | grep "|0|" -c -v` ## Sensitivity
+ SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map k9ac.dnase - | grep "" -c` ## Sensitivity
+ echo $[($SPECnum*100)/$SPECden]
+
+ ## K4me3 overlap.
+ echo "Comparison with H3K4me3/ DNase:"
+ SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - k4me3.dnase | grep "|0|" -c -v` ## Specificity
+ SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map - k4me3.dnase | grep "" -c` ## Specificity
+ echo $[($SPECnum*100)/$SPECden]
+
+ SPECnum=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map k4me3.dnase - | grep "|0|" -c -v` ## Sensitivity
+ SPECden=`cat tmp.mergepred.bed | bedmap --echo --count --echo-map k4me3.dnase - | grep "" -c` ## Sensitivity
  echo $[($SPECnum*100)/$SPECden]
 
  ## Fractions of the genome covered by each.

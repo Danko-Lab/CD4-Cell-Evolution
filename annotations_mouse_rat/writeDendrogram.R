@@ -6,8 +6,8 @@ require(cluster)
 ## Using more efficient counting/ merging using bedops and bash scripts.						
 source("readData.R")
 #ca <- ca[grep("gc18", ca[,"annot_type"]),] ## Remove pause sites and TSS for this task...
-#ca <- ca[grep("protein_coding", ca[,"type"]),]
-ca <- ca[(ca[,3]-ca[,2]) > 10000,]
+ca <- ca[grep("protein_coding", ca[,"type"]),]
+ca <- ca[(ca[,3]-ca[,2]) > 1000,]
 
 yb.sig.pal <- function(n, scale=10) {
  ints<- c(0:(n-1))/(n-1)   ## Linear scale from 0:1 x N values.
@@ -44,16 +44,19 @@ drawCor <- function(indx) {
 	
 	## Print dendrogram and heatmap with latticeExtra.
 	 library(latticeExtra)
-	 #hc1 <- agnes(1-cc, diss=TRUE, method="ward")
+	# hc1 <- agnes(1-cc, diss=TRUE, method="ward")
 	# hc1 <- hclust(dist(t(rpkm_df), method = "canberra"))
-	 hc1 <- hclust(dist(cc, method = "euclidean"),  method="single")#method="single")
+	 hc1 <- hclust(dist(cc, method = "euclidean"),  method="single")
 	 hc1 <- as.dendrogram(hc1)
 	 ord.hc1 <- order.dendrogram(hc1)
 	 hc2 <- reorder(hc1, cond[ord.hc1])
 	 ord.hc2 <- order.dendrogram(hc2)
 	 #region.colors <- trellis.par.get("superpose.polygon")$col
 
-	 pl <- levelplot((cc)[ord.hc2, ord.hc2], col.regions= yb.sig.pal(100, scale=3), xlab="", ylab="", #rev(cm.colors(100)),  # #c("white", "yellow", "blue") # c("#E9F231", "#B1EC2C", "#5DBDEF")
+	cols <- yb.sig.pal(300, scale=3)
+	brks <- seq(0.3, max(cc), length.out=NROW(cols)+1)
+
+	 pl <- levelplot((cc)[ord.hc2, ord.hc2], at= brks, col.regions= cols, xlab="", ylab="", #rev(cm.colors(100)),  # #c("white", "yellow", "blue") # c("#E9F231", "#B1EC2C", "#5DBDEF")
 		 colorkey = list(space="left", labels=list(cex=1.5)), 
 		 scales = list(x= list(rot=90, cex=1.5, labels=labs[ord.hc2]), y=list(draw=FALSE)), #scales = list(x = list(rot = 90)), 
 		 legend = list(
@@ -74,46 +77,10 @@ drawCor <- function(indx) {
 pdf("Agg.Hier.pdf")
  drawCor(indx.unt)
  drawCor(indx.good)
- drawCor(indx.cd4)
+# drawCor(indx.all)
 dev.off()
 
-## Look at dissimilarity between samples.
-pdf("Correlation.Untreated.pdf")
- indx <- c(2:10,24:25)
- dist_MYR <- c(0,0,0, 12,12,12, 25,25,25, 75,75)
 
- rpkm_df <- as.matrix(ca[,indx.good])
- for(i in 1:NCOL(rpkm_df)) rpkm_df[,i] <- 1000*rpkm_df[,i]/sum(rpkm_df[,i]) *1000/(ca[,"mapSize"]) ## Normalization MUST be here.
- mean_human <- rowMeans(rpkm_df[,2:4])
- cc <- cor(mean_human, rpkm_df[,indx], method="spearman")
-
-
- lne <- lm(y~x, data= data.frame(y= as.double(cc), x= as.double(dist_MYR)))
- newx<- seq(0,100)
- prd <- predict(lne, newdata=data.frame(x=newx), interval=c("confidence"), level= 0.99, type="response")
-
- plot(dist_MYR, cc, xlab="Evolutionary distance [MYR]", ylab="Spearman's Correlation to human mean", pch=19, cex=1, ylim=c(0.4,1))
- abline(lne, col="red")
- lines(newx, prd[,2], col="red", lty=2)
- lines(newx, prd[,3], col="red", lty=2)
-dev.off()
-
-## PI
- indx <- c(12:20)
- dist_MYR <- c(0,0,0, 12,12,12, 25,25,25)
-
- mean_human <- rowMeans(rpkm_df[,12:14])
- cc <- cor(mean_human, rpkm_df[,indx], method="spearman")
-
- lne <- lm(y~x, data= data.frame(y= as.double(cc), x= as.double(dist_MYR)))
- newx<- seq(0,100)
- prd <- predict(lne, newdata=data.frame(x=newx), interval=c("confidence"), level= 0.99, type="response")
- 
- plot(dist_MYR, cc, xlab="Evolutionary distance [MYR]", ylab="Spearman's Correlation to human mean", pch=19, cex=3)
- abline(lne, col="red")
- lines(newx, prd[,2], col="red", lty=2)
- lines(newx, prd[,3], col="red", lty=2)
- 
 
 ## Print correlation matrix w/ hexbin.
 require(hexbin)

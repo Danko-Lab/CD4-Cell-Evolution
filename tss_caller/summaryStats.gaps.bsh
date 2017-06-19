@@ -4,11 +4,11 @@
 
 function count_tss_in_gaps {
  echo "In unmapped regions."
- zcat $1.TSS_unmap.bedGraph.gz | grep "#" -v | awk '($4 > 0.7){print $0}' | grep "" -c
+ zcat $1.TSS_unmap.bedGraph.gz | grep "#" -v | awk '($4 > 0.3){print $0}' | grep "" -c
  zcat $1.TSS_unmap.bedGraph.gz | grep "#" -v | grep "" -c 
 
  echo "Mapped to hg19."
- zcat $1.TSS_hg19.bedGraph.gz | awk '($4 > 0.7){print $0}' | grep "" -c
+ zcat $1.TSS_hg19.bedGraph.gz | awk '($4 > 0.3){print $0}' | grep "" -c
  zcat $1.TSS_hg19.bedGraph.gz | grep "" -c
 }
 

@@ -53,7 +53,10 @@ drawCor <- function(indx) {
 	 ord.hc2 <- order.dendrogram(hc2)
 	 #region.colors <- trellis.par.get("superpose.polygon")$col
 
-	 pl <- levelplot((cc)[ord.hc2, ord.hc2], col.regions= yb.sig.pal(100, scale=3), xlab="", ylab="", #rev(cm.colors(100)),  # #c("white", "yellow", "blue") # c("#E9F231", "#B1EC2C", "#5DBDEF")
+	cols <- yb.sig.pal(300, scale=3)
+	brks <- seq(0.3, max(cc), length.out=NROW(cols)+1)
+
+	 pl <- levelplot((cc)[ord.hc2, ord.hc2], at= brks, col.regions= cols, xlab="", ylab="", #rev(cm.colors(100)),  # #c("white", "yellow", "blue") # c("#E9F231", "#B1EC2C", "#5DBDEF")
 		 colorkey = list(space="left", labels=list(cex=1.5)), 
 		 scales = list(x= list(rot=90, cex=1.5, labels=labs[ord.hc2]), y=list(draw=FALSE)), #scales = list(x = list(rot = 90)), 
 		 legend = list(

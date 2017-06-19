@@ -33,7 +33,7 @@ istss <- fdr_df$annot_type=="dREG_ENH" | fdr_df$annot_type=="dREG_INGENE" | fdr_
 
 ## Take anything that's changed in human, not in rhesus or chimp.
 MAXNEG <- 0.25#5
-FCNEG  <- 0.75
+FCNEG  <- 0.5 #0.75
 ishumspec <- fdr_df$U2PIFDR_H < PVAL & (fdr_df$U2PIFDR_C > MAXNEG & fdr_df$U2PIFDR_M > MAXNEG) & abs(fdr_df$U2PIFC_H) > 1 & abs(fdr_df$U2PIFC_C) < FCNEG & abs(fdr_df$U2PIFC_M) < FCNEG
 ishumloss <- fdr_df$U2PIFDR_H > MAXNEG & (fdr_df$U2PIFDR_C < PVAL & fdr_df$U2PIFDR_M < PVAL) & ((fdr_df$U2PIFC_M>1 & fdr_df$U2PIFC_C>1)|(fdr_df$U2PIFC_M< -1 & fdr_df$U2PIFC_C< -1)) & abs(fdr_df$U2PIFC_H) < FCNEG
 summary(ishumspec & istss)
@@ -71,7 +71,8 @@ write.table(fdr_df[((ishumloss & rowMeans(fdr_df[,c("U2PIFC_C", "U2PIFC_M")]) > 
 ## Write out background sets.
 fdr_df$score <- fdr_df$U2PIFC
 
-write.table(fdr_df[isresp & istss, c(1:6)], "all.conservedActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(fdr_df[isresp & fdr_df$U2PIFC_H < 0 & istss, c(1:6)], "all.conservedActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
+write.table(fdr_df[isresp & fdr_df$U2PIFC_H > 0 & istss, c(1:6)], "all.conservedSuppression.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 write.table(fdr_df[noresp & istss, c(1:6)], "all.noActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 #write.table(fdr_df[(ishumspec & fdr_df$U2PIFC_H < 0) & istss,], "Human.gainActivation.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")

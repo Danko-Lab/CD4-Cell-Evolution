@@ -329,16 +329,19 @@ loops1<- loops; loops1[,3] <- loops[,2]+loopdist(1) +dist
 loops2<- loops; loops2[,2] <- loops[,3]-loopdist(2) -dist
 
 nsamp <- 1000
+dist_to_promoter <- 5000 ## Small numbers very quickly provide too few sites.
 
 indx_distal <- list()
 indx_proximal<-list()
 
-for(i in 1:6) {
+bk <- seq(1, 8, 1)
+
+for(i in 1:10) {
  print(paste(i, sum(rowSums(bed[,5:6]) == i)))
  indx_distal[[i]] <- integer()
  indx_proximal[[i]]<-integer()
  
- criterion <- which(rowSums(bed[,5:6]) == i & abs(bed$V4) < 10000)
+ criterion <- which(rowSums(bed[,5:6]) == i & abs(bed$V4) < dist_to_promoter)
  for(j in sample(criterion, min(nsamp, NROW(criterion)))) {
    indx_proximal[[i]]<-c(indx_proximal[[i]], j)
 
@@ -356,47 +359,103 @@ for(i in 1:6) {
 
 }
 
+nprox_sites <- sapply(1:10, function(i) {min(nsamp, sum(rowSums(bed[,5:6]) == i & abs(bed$V4)< dist_to_promoter))})
+
 save.image("enhancer_sequence_conservation_at_multi_loop_genes.RData")
 load("enhancer_sequence_conservation_at_multi_loop_genes.RData")
 
+require(boot)
+
+getCex <- function(n) { y=0.005*n+0.1; y[y>3] <- 3; y[y<0.1] <- 0.1; y }
 
 pdf("Proximal.Distal.Loop.pdf")
 ## Distal.  Are low loop numbers more conserved?
 ld<-2; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
-cd.cdf(mean_con[rowSums(bed[,5:6]) == 0], col="light gray", lwd=ld, xlim=xlim_s, type="l")
-#plot(ecdf(mean_con[rowSums(bed[,5:6]) == 0]), col="light gray", lwd=ld, xlim=xlim_s)
+#cd.cdf(mean_con[rowSums(bed[,5:6]) == 0], col="light gray", lwd=ld, xlim=xlim_s, type="l")
+plot(ecdf(mean_con[rowSums(bed[,5:6]) == 0]), col="light gray", lwd=ld, xlim=xlim_s)
 
-bk <- seq(1, 6, 1)
 colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(max(bk))
 for(i in bk) {
  print(i)
- cd.cdf(mean_con[unique(sort(indx_distal[[i]]))], col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
- #plot(ecdf(mean_con[unique(sort(indx_distal[[i]]))]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
+ #cd.cdf(mean_con[unique(sort(indx_distal[[i]]))], col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
+ plot(ecdf(mean_con[unique(sort(indx_distal[[i]]))]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
 }
 
 dist_med <- sapply(bk, function(i) {median(mean_con[unique(sort(indx_distal[[i]]))])})
+nelem    <- sapply(bk, function(i) {NROW(unique(sort(indx_distal[[i]])))})
 #dist_low <- sapply(bk, function(i) {quantile(mean_con[unique(sort(indx_distal[[i]]))], probs=0.25)})
 #dist_hig <- sapply(bk, function(i) {quantile(mean_con[unique(sort(indx_distal[[i]]))], probs=0.75)})
-plot(bk, dist_med, pch=6, lwd=6, cex=5, col="dark blue", main="Distal DNA sequence conservation", ylab="Median PhyloP (distal)", xlab="Num. Loops (proximal)")
+plot(bk, dist_med, pch=6, lwd=6, cex=2*getCex(nelem/10), col="dark blue", main="Distal DNA sequence conservation", ylab="Median PhyloP (distal)", xlab="Num. Loops (proximal)")
+
+cor.test(bk, dist_med)
+corr(data.frame(bk, dist_med), w= nelem/sum(nelem))
+corr(data.frame(bk, dist_med), w= nprox_sites[bk]/sum(nprox_sites[bk]))
+
+## Bootstrap to test significance of negative correlation.
+# 1. combine all data points.
+all_data_points <- unlist(indx_distal)
+n_non_unique    <- sapply(bk, function(i) {NROW(indx_distal[[i]])})
+
+boot_data <- sapply(1:1000, function(qwi) {
+ # 2. split back up into hte same sizes at random.
+ indx_distal_boot <- list()
+ for(i in bk) {
+ 	indx_distal_boot[[i]] <- sample(all_data_points, n_non_unique[i], replace=FALSE)
+ }
+ 
+ # 3. Get the corr.
+ dist_med_boot <- sapply(bk, function(i) {median(mean_con[unique(sort(indx_distal_boot[[i]]))])})
+ nelem_boot <- sapply(bk, function(i) {NROW(unique(sort(indx_distal_boot[[i]])))})
+ corr(data.frame(bk, dist_med_boot), w=nelem_boot/sum(nelem_boot))
+})
+hist(boot_data, 100)
+real_cor <- corr(data.frame(bk, dist_med), w= nelem/sum(nelem))
+abline(v=real_cor, lty="dotted", lwd=2, col="red")
+sum(boot_data <= -1*abs(real_cor) | boot_data >= abs(real_cor))/ NROW(boot_data) ## Actual statistical test.
 
 ## Significant difference in conservation.
 ks.test(mean_con[unique(sort(indx_distal[[1]]))], mean_con[unique(sort(indx_distal[[5]]))])
 ks.test(mean_con[unique(sort(indx_distal[[1]]))], mean_con[unique(sort(indx_distal[[6]]))])
 
 ## Proximal.  Are high loop numbers more conserved?
-cd.cdf(mean_con[rowSums(bed[,5:6]) == 0], col="light gray", lwd=ld, xlim=xlim_s, type="l")
-#plot(ecdf(mean_con[rowSums(bed[,5:6]) == 0]), col="light gray", lwd=ld, xlim=xlim_s)
+#cd.cdf(mean_con[rowSums(bed[,5:6]) == 0], col="light gray", lwd=ld, xlim=xlim_s, type="l")
+plot(ecdf(mean_con[rowSums(bed[,5:6]) == 0]), col="light gray", lwd=ld, xlim=xlim_s)
 
-bk <- seq(1, 6, 1)
 colrs <- colorRampPalette(c("#fe0000", "#0000fe"))(max(bk))
 for(i in bk) {
  print(i)
- cd.cdf(mean_con[indx_proximal[[i]]], col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
- #plot(ecdf(mean_con[indx_proximal[[i]]]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
+# cd.cdf(mean_con[indx_proximal[[i]]], col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE, type="l")
+ plot(ecdf(mean_con[indx_proximal[[i]]]), col=colrs[i], xlim=xlim_s, lwd=ld, add=TRUE)
 }
 
 pro_med <- sapply(bk, function(i) {median(mean_con[unique(sort(indx_proximal[[i]]))])})
-plot(bk, pro_med, pch=6, lwd=6, cex=5, col="dark blue", main="Proximal DNA sequence conservation", ylab="Median PhyloP (proximal)", xlab="Num. Loops (proximal)")
+n_prox  <- sapply(bk, function(i) {NROW(unique(sort(indx_proximal[[i]])))})
+plot(bk, pro_med, pch=6, lwd=6, cex=2*getCex(n_prox), col="dark blue", main="Proximal DNA sequence conservation", ylab="Median PhyloP (proximal)", xlab="Num. Loops (proximal)")
+
+cor.test(bk, pro_med)
+corr(data.frame(bk, pro_med), w= n_prox/sum(n_prox))
+
+## Bootstrap to test significance of negative correlation.
+# 1. combine all data points.
+all_data_points <- unlist(indx_proximal)
+n_non_unique    <- sapply(bk, function(i) {NROW(indx_proximal[[i]])})
+
+boot_data <- sapply(1:1000, function(qwi) {
+ # 2. split back up into hte same sizes at random.
+ indx_proximal_boot <- list()
+ for(i in bk) {
+        indx_proximal_boot[[i]] <- sample(all_data_points, n_non_unique[i], replace=FALSE)
+ }
+
+ # 3. Get the corr.
+ prox_med_boot <- sapply(bk, function(i) {median(mean_con[unique(sort(indx_proximal_boot[[i]]))])})
+ nelem_boot <- sapply(bk, function(i) {NROW(unique(sort(indx_proximal_boot[[i]])))})
+ corr(data.frame(bk, prox_med_boot), w=nelem_boot/sum(nelem_boot))
+})
+hist(boot_data, 100)
+real_cor <- corr(data.frame(bk, pro_med), w= nelem/sum(nelem))
+abline(v=real_cor, lty="dotted", lwd=2, col="red")
+sum(boot_data <= -1*abs(real_cor) | boot_data >= abs(real_cor))/ NROW(boot_data) ## Actual statistical test.
 
 ## Significant difference in conservation.
 ks.test(mean_con[unique(sort(indx_proximal[[1]]))], mean_con[unique(sort(indx_proximal[[5]]))])
@@ -409,7 +468,7 @@ dev.off()
 
 ######################################################
 ## Specifically get loops with gene at the other end.
-tss   <- read.table("../../tss_caller/refGene.hg19.bed.gz")
+tss   <- read.table("../../tss_caller/gencode19.hg19.bed.gz")
 tss[tss[,6] == "+",2] <- tss[tss[,6] == "+",2]; tss[tss[,6] == "+",3] <- tss[tss[,6] == "+",2]+1
 tss[tss[,6] == "-",3] <- tss[tss[,6] == "-",3]; tss[tss[,6] == "-",2] <- tss[tss[,6] == "-",3]-1
 
@@ -441,6 +500,8 @@ for(i in c(1:NROW(loops))) {
 
 }
 
+pdf("Loops.With.Without.Gene.pdf")
+
 ## Plot results.
 plot(ecdf(mean_con[nloops>0]), col="red", xlim=c(-1,6)) ## Should match those above.
 plot(ecdf(mean_con[nloops==0]), col="black", add=TRUE)
@@ -456,7 +517,7 @@ plot(ecdf(mean_con[nloops>0 & ngenesl==0 & ngenes==0]), col="red", xlim=c(-1,6))
 plot(ecdf(mean_con[nloops==0 & ngenes==0]), col="black", add=TRUE)
 plot(ecdf(mean_con[ngenesl>0 & ngenes==0]), col="dark blue", add=TRUE)            
 
-
+dev.off()
 ## DONE!
 
 

@@ -17,8 +17,8 @@ load("APCluster.rdata")
 
 ## Now get enriched motifs...
 PVAL <- 0.01
-FOLD <- 1 #1 #3
-mTH  <- 8 # 7
+FOLD <- 2 #1 #3
+mTH  <- 9 # 7
 min.size <- 2500
 
 ## Do human
@@ -33,7 +33,7 @@ enh <- read.table("results/human-changed.TREs.tsv"); enh$V4 <- 1:NROW(enh$V4)
 enh <- enh[(enh$V3 - enh$V2)>0,] ## CURRENTLY BUGGED.
 enh.up <- enh[enh$V9 < PVAL & enh$V5 > FOLD & !is.na(enh$V9),]
 enh.dn <- enh[enh$V9 < PVAL & enh$V5 < (-1*FOLD) & !is.na(enh$V9),]
-enh.unc<- enh[enh$V9 > 0.1 & abs(enh$V5) < 1 & !is.na(enh$V9), ]
+enh.unc<- enh[enh$V9 > 0.25 & abs(enh$V5) < 0.5 & !is.na(enh$V9), ]
 print(paste("Human: ", NROW(enh.up), NROW(enh.dn), NROW(enh.unc)))
 
 tf_up <- tfbs.enrichmentTest(
@@ -73,7 +73,7 @@ enh <- read.table("results/chimp-changed.TREs.tsv"); enh$V4 <- 1:NROW(enh$V4)
 enh <- enh[(enh$V3 - enh$V2)>0,] ## CURRENTLY BUGGED.
 enh.up <- enh[enh$V9 < PVAL & enh$V5 > FOLD & !is.na(enh$V9),]
 enh.dn <- enh[enh$V9 < PVAL & enh$V5 < (-1*FOLD) & !is.na(enh$V9),]
-enh.unc<- enh[enh$V9 > 0.1 & abs(enh$V5) < 1 & !is.na(enh$V9), ]
+enh.unc<- enh[enh$V9 > 0.25 & abs(enh$V5) < 0.5 & !is.na(enh$V9), ]
 print(paste("Chimp: ", NROW(enh.up), NROW(enh.dn), NROW(enh.unc)))
 
 tf_up <- tfbs.enrichmentTest(
@@ -110,7 +110,7 @@ enh <- read.table("results/rhesus-changed.TREs.tsv"); enh$V4 <- 1:NROW(enh$V4)
 enh <- enh[(enh$V3 - enh$V2)>0,] ## CURRENTLY BUGGED.
 enh.up <- enh[enh$V9 < PVAL & enh$V5 > FOLD & !is.na(enh$V9),]
 enh.dn <- enh[enh$V9 < PVAL & enh$V5 < (-1*FOLD) & !is.na(enh$V9),]
-enh.unc<- enh[enh$V9 > 0.1 & abs(enh$V5) < 1 & !is.na(enh$V9), ]
+enh.unc<- enh[enh$V9 > 0.25 & abs(enh$V5) < 0.5 & !is.na(enh$V9), ]
 print(paste("Rhesus: ", NROW(enh.up), NROW(enh.dn), NROW(enh.unc)))
 
 tf_up <- tfbs.enrichmentTest(
@@ -140,6 +140,6 @@ tf_dn <- tfbs.enrichmentTest(
         ncores = 21);
 tfbs.reportEnrichment(tfs, tf_dn, file.pdf="Rhesus.TF-dn.full.pdf", sig.only=TRUE, report.title="TEST FULL", enrichment.type="enriched", pv.threshold= 0.1);
 options$y.max <- 6
-tfbs.plotEnrichment(tfs, tf_dn, file.pdf=paste("Rhesus.TF-dn.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options, y.max= -6)
+tfbs.plotEnrichment(tfs, tf_dn, file.pdf=paste("Rhesus.TF-dn.QQ.",mTH,".pdf", sep=""), enrichment.type="enriched", options= options)
 
 

@@ -13,7 +13,7 @@ cd.circle <- function(x, y, r) {
 } ## TEST!
 
 
-cd.circplot<- function(data, names, lims=c(min(data), max(data)), title= "name", fill="black") {
+cd.circplot<- function(data, names, lims=c(min(data), max(data)), title= "name", fill="black", jidder=FALSE) {
 	lab <- pretty(lims, n=5)
         data <- (data - min(lab)) / (max(lab) - min(lab))
 	labels <- unique(names)
@@ -28,6 +28,7 @@ cd.circplot<- function(data, names, lims=c(min(data), max(data)), title= "name",
 	width <- 1/NROW(labels)/20
 	centerseq <- seq(width, 1, 1/NROW(labels))
 	centers <- centerseq[match(names, labels)] #as.integer(as.factor(names))]
+	if(jidder) centers <- centers+rnorm(NROW(centers), 0, 0.01)
 	next.vp <- viewport(x= 0.1, y= 0.15, width = 0.9, height = 0.85, just=c("left","bottom"))
 	pushViewport(next.vp)
 

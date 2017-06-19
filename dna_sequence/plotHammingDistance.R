@@ -1,5 +1,6 @@
 require(bigWig)
 source("../lib/avg.metaprofile.R")
+source("../lib/normalizeSubsample.R")
 
 center.bed.one.off <- function(bed, halfWindow) {
 
@@ -23,11 +24,18 @@ exact.bed <- function(bed, halfWindow) {
   return(bed)
 }
 
-doplot <- function(bw_file, bed_file_conserved, bed_file_gain, bed_file_loss, bed.op = center.bed.one.off, stp=100, halfWindow=10000, ...) {
+doplot <- function(bw_file, bed_file_conserved, bed_file_gain, bed_file_loss, bed.op = center.bed.one.off, correct.distance=FALSE, stp=1, halfWindow=100, ...) {
  bw <- load.bigWig(bw_file)
  bedg <- read.table(bed_file_gain)
  bedl <- read.table(bed_file_loss)
  bed_conserved <- read.table(bed_file_conserved)
+
+ if(correct.distance) {
+    ss <- norm.subsample.n(list(log(bed_conserved[,4]+1), log(bedg[,4]+1), log(bedl[,4]+1)), alpha=0.1, boot.replace=FALSE, plot.cdf=TRUE)
+    bed_conserved <- bed_conserved[ss[[1]],]
+    bedg <- bedg[ss[[2]],]
+    bedl <- bedl[ss[[3]],]
+ }
 
  meta_g <- avg.metaprofile.bigWig(bed.op(bedg, halfWindow), bw, bw, step=stp, abs.value = FALSE) # bedg[,6] == "+",1:3
  meta_l <- avg.metaprofile.bigWig(bed.op(bedl, halfWindow), bw, bw, step=stp, abs.value = FALSE) # bedl[,6] == "+",1:3
@@ -46,6 +54,7 @@ doplot <- function(bw_file, bed_file_conserved, bed_file_gain, bed_file_loss, be
  else typ="l"
 
  plot(-500, -500, ylim=ylim, xlim=c(min(x), max(x)), xlab= "Distance [bp]", ylab= "Signal", ...) ## ylab= "Divergences/ 100 bp"
+# plot(-500, -500, ylim=ylim, xlim=c(min(x), max(x)), xlab= "Distance [bp]", ylab= "Signal")#, ...) ## ylab= "Divergences/ 100 bp"
  lines(x, signal_g, col="dark red", type=typ, pch=19)
  lines(x, signal_l, col="dark blue", type=typ, pch=19)
  lines(x, signal_conserved, col="dark green", type=typ, pch=19)
@@ -58,8 +67,10 @@ tfbsdoplot <- function(bw, tf_name) {
 }
 
 pdf("TFBS.pdf")
+
 doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "conserved.TFBS.bed.gz", "Hgain.TFBS.bed.gz", "Hloss.TFBS.bed.gz", halfWindow= 100, stp=1, main="All TFs, 100-way")
-doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "conserved.TFBS.bed.gz", "Hgain.TFBS.bed.gz", "Hloss.TFBS.bed.gz", halfWindow= 100, stp=1, main="All TFs, Primate PhyloP")
+doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "conserved.TFBS.bed.gz", "Hgain.TFBS.bed.gz", "Hloss.TFBS.bed.gz", halfWindow= 100, stp=1, main="All TFs, 100-way", correct.distance=TRUE)
+#doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "conserved.TFBS.bed.gz", "Hgain.TFBS.bed.gz", "Hloss.TFBS.bed.gz", halfWindow= 100, stp=1, main="All TFs, Primate PhyloP")
 
 tfbsdoplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "ELF1")
 tfbsdoplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "GABPA")
@@ -77,18 +88,21 @@ tfbsdoplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.b
 dev.off()
 
 
-pdf("TFBS.byDist.pdf")
-
-doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "tfbs.all.dist_0-10kb.bed.gz", "tfbs.all.dist_10-100kb.bed.gz", "tfbs.all.dist_100-1000kb.bed.gz", halfWindow= 100, stp=1, main="All TFs, 100-way")
-doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "tfbs.all.dist_0-10kb.bed.gz", "tfbs.all.dist_10-100kb.bed.gz", "tfbs.all.dist_100-1000kb.bed.gz", halfWindow= 100, stp=1, main="All TFs, 100-way")
-
-dev.off()
+#pdf("TFBS.byDist.pdf")
+#
+#doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "tfbs.all.dist_0-10kb.bed.gz", "tfbs.all.dist_10-100kb.bed.gz", "tfbs.all.dist_100-1000kb.bed.gz", halfWindow= 100, stp=1, main="All TFs, 100-way")
+#doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "tfbs.all.dist_0-10kb.bed.gz", "tfbs.all.dist_10-100kb.bed.gz", "tfbs.all.dist_100-1000kb.bed.gz", halfWindow= 100, stp=1, main="All TFs, 100-way")
+#
+#dev.off()
 
 
 pdf("PhyloP_100way.pdf")
 
-doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "conserved.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", main="PhyloP at Human LS dREG sites")
-doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "conserved-distal.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", main="PhyloP at Human LS dREG sites")
+doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "conserved.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", stp=10, halfWindow=200, main="PhyloP at Human LS dREG sites")
+doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "conserved.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", stp=10, halfWindow=200, main="PhyloP at Human LS dREG sites", correct.distance=TRUE)
+
+doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "conserved.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", stp=25, halfWindow=5000, main="PhyloP at Human LS dREG sites")
+doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "conserved.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", stp=25, halfWindow=5000, main="PhyloP at Human LS dREG sites", correct.distance=TRUE)
 
 #doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "H-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at Human LS dREG sites")
 #doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", "C-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz")
@@ -96,16 +110,16 @@ doplot("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw", 
 
 dev.off()
 
-pdf("PrimatePhyloP.pdf")
-
-doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "conserved.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", main="PhyloP at Human LS dREG sites")
-doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "conserved-distal.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", main="PhyloP at Human LS dREG sites")
-
+#pdf("PrimatePhyloP.pdf")
+#
+#doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "conserved.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", stp=25, halfWindow=5000, main="PhyloP at Human LS dREG sites")
+#doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "conserved-distal.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", stp=25, halfWindow=5000, main="PhyloP at Human LS dREG sites")
+#
 #doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "H-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at Human LS dREG sites")
 #doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "C-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at Chimp LS dREG sites")
 #doplot("/local/storage/data/hg19/all/phylopprimate/phyloP46way.primate.bw", "M-U.gain-loss.dREG_HD.bed.gz", "conserved.dREG_HD.bed.gz", main="PhyloP at R.Macaque LS dREG sites")
-
-dev.off()
+#
+#dev.off()
 
 pdf("DNASequence.pdf")
 
@@ -114,7 +128,9 @@ doplot("/home/cgd24/cbsudanko/data/hg19/all/neanderthal_ss_green/ntSssZScorePMVa
 doplot("hs.ls.diff.bigWig", "conserved.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", main="Human SNPs at Human LS dREG sites", stp=300, halfWindow=25000)
 doplot("hs.ls.diff.bigWig", "conserved-distal.dREG_HD.bed.gz", "H-U.gain.dREG_HD.bed.gz", "H-U.loss.dREG_HD.bed.gz", main="Human SNPs at Human LS dREG sites", stp=300, halfWindow=25000)
 
-doplot("hs.ls.diff.bigWig", "conserved.TFBS.bed.gz", "Hgain.TFBS.bed.gz", "Hloss.TFBS.bed.gz", halfWindow= 100, stp=1, main="All TFs, 100-way")
+doplot("hs.ls.diff.bigWig", "conserved.TFBS.bed.gz", "Hgain.TFBS.bed.gz", "Hloss.TFBS.bed.gz", halfWindow= 100, stp=1, main="All TFBS.")
+doplot("hs.ls.diff.bigWig", "conserved-distal.TFBS.bed.gz", "Hgain.TFBS.bed.gz", "Hloss.TFBS.bed.gz", halfWindow= 100, stp=1, main="All TFBS.")
+
 tfbsdoplot("hs.ls.diff.bigWig", "ELF1")
 tfbsdoplot("hs.ls.diff.bigWig", "STAT2")
 

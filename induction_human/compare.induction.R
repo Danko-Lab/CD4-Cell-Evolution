@@ -21,7 +21,7 @@ cc<- cor(cbind(hs$V15, pt$V15, rm$V15))
 cc
 pairs(cbind(hs$V15, pt$V15, rm$V15))
 
-plot(c(0, 6, 25+25-6), cc[,1])
+plot(c(0, 12, 25+25-12), cc[,1])
 
 ## Get number of genes.
 PVAL <- 0.01
@@ -30,7 +30,7 @@ cngAll <- hs$V19 < PVAL & pt$V19 < PVAL & rm$V19 < PVAL; cngAll <- cngAll & !is.
 
 sum(cngOne); sum(cngAll)
 
-NROW(unique(hs$V7[cngAll])) ## Yep. 2,953.  A few that change directions.  Not many.
+NROW(unique(hs$V7[cngAll])) ## Yep. 3,121.  A few that change directions.  Not many.
 
 cor(cbind(hs$V15[cngAll], pt$V15[cngAll], rm$V15[cngAll]))
 pairs(cbind(hs$V15[cngAll], pt$V15[cngAll], rm$V15[cngAll]))

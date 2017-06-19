@@ -2,7 +2,7 @@
 # Breaks enhancers down into groups for INSIGHT analysis.
 
 FARDIST=50000
-NEARDIST=10000
+NEARDIST=5000
 
 ## All REs.
 
@@ -13,7 +13,7 @@ cat tss.tsv | awk 'BEGIN{OFS="\t"} ($13 > '"$FARDIST"') {print $0}' | bedops -i 
 cat tss.tsv.loop | awk 'BEGIN{OFS="\t"} ($5 == 0 && $6 == 0) {print $0}' | bedops -i distal.hg19.bed - > distal.noloop.hg19.bed
 cat tss.tsv.loop | awk 'BEGIN{OFS="\t"} ($5 > 0 || $6 > 0) {print $0}' | bedops -i distal.hg19.bed - > distal.doloop.hg19.bed
 
-rm distal.hg19.bed
+#rm distal.hg19.bed
 
 ## Distance bins.
 cat tss.tsv | awk 'BEGIN{OFS="\t"} ($13 > 100000) {print $0}' | bedops -i ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed - > distal100kb.hg19.bed
@@ -32,7 +32,7 @@ cat tss.tsv | awk 'BEGIN{OFS="\t"} ($13 > 1000 && $13 < 10000) {print $0}' | bed
 cat tss.tsv | awk 'BEGIN{OFS="\t"} ($13 > '"$FARDIST"') {print $0}' | bedops -i ../dREG_HD/H-U_dREG_HD.bed - hg19.gain.loss.bed > distal.hg19.gain.loss.bed
 cat tss.tsv.loop | awk 'BEGIN{OFS="\t"} ($5 == 0 && $6 == 0) {print $0}' | bedops -i distal.hg19.gain.loss.bed - > distal.noloop.hg19.gain.loss.bed
 
-rm distal.hg19.gain.loss.bed
+#rm distal.hg19.gain.loss.bed
 
 
 ## Look at REs near genes.
@@ -42,7 +42,7 @@ cat tss.tsv.loop | awk 'BEGIN{OFS="\t"} ($5 == 0 || $6 == 0) {print $0}' | bedop
 rm proximal.hg19.gain.loss.bed
 
 ## Look at REs near changed genes.
-DIST=10000
+DIST=5000
 
 cat ../annotations/chage_expr/H.change-U.tsv | grep "protein_coding" | awk 'BEGIN{OFS="\t"} {print $1,$2-'"$DIST"',$3+'"$DIST"'}' > changeGeneRegions.bed
 cat tss.tsv | bedops -i ../dREG_HD/H-U_dREG_HD.bed - hg19.gain.loss.bed changeGeneRegions.bed > near.changed.genes.bed

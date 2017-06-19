@@ -2,16 +2,16 @@
 source("../lib/getOverlap.R")
 
 ##Prepare loops.
-dist<- 5000 # 15000 # 1000
+dist<- 0 # 5000 # 15000 # 1000
 loops <- read.table("/local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz")
 loopdist <- function(i) { ## Get the actual distance in the detected loop interaction.
  loop1 <- sapply(strsplit(as.character(loops$V4), split=";"), function(x) {x[[i]]})
  sapply(strsplit(loop1, split="-"), function(x) {as.double(x[[2]])-as.double(x[[1]])})
 }
-loops1<- loops; loops1[,2] <- loops[,2]+as.integer(loopdist(1)/2)-dist; loops1[,3] <- loops[,2]+as.integer(loopdist(1)/2)+dist
-loops2<- loops; loops2[,2] <- loops[,3]+as.integer(loopdist(2)/2)-dist; loops2[,3] <- loops[,3]+as.integer(loopdist(2)/2)+dist
-#loops1<- loops; loops1[,3] <- loops[,2]+loopdist(1) #+dist
-#loops2<- loops; loops2[,2] <- loops[,3]-loopdist(2) #-dist
+#loops1<- loops; loops1[,2] <- loops[,2]+as.integer(loopdist(1)/2)-dist; loops1[,3] <- loops[,2]+as.integer(loopdist(1)/2)+dist
+#loops2<- loops; loops2[,2] <- loops[,3]+as.integer(loopdist(2)/2)-dist; loops2[,3] <- loops[,3]+as.integer(loopdist(2)/2)+dist
+loops1<- loops; loops1[,3] <- loops[,2]+loopdist(1) +dist
+loops2<- loops; loops2[,2] <- loops[,3]-loopdist(2) -dist
 hist(log(loops[,3]-loops[,2], 10), 20) ## Summary stats on loop distances.
 
 ##Prepare TADS.
@@ -43,8 +43,8 @@ getLoopNearby <- function(prefix="H", column=21, post_pro= ".change-U.tsv", post
 
  uas <- read.table(paste("../annotations/chage_expr/",prefix,post_enh, sep="")) ## post_enh b/c usually want regardless of change.
  uas <- uas[uas$V7 == "ups_antisense", ]
- uas[,2] <- uas[,2] - 2000 ## Look nearby ... up to 2kb.
- uas[,3] <- uas[,3] + 2000
+ uas[,2] <- uas[,2] - 2500 ## Look nearby ... in a window of 5 kb centered on the TSS.
+ uas[,3] <- uas[,3] + 2500
 
  as <- read.table(paste("../annotations/chage_expr/",prefix,post_enh, sep="")) ## post_enh b/c usually want regardless of change.
  as <- as[as$V7 == "antisense", ]
@@ -141,6 +141,11 @@ indx <- which(enh_pro_change$loop != 0)
 cor.test(enh_pro_change$loop[indx], enh_pro_change$pro[indx], method="pearson")
 plot(enh_pro_change$pro[indx], enh_pro_change$loop[indx], xlab= "Gene Expression", ylab="Loop", pch=19)
 
+# Check correlation of loops.
+indx <- which(enh_pro_change$uas != 0)
+cor.test(enh_pro_change$uas[indx], enh_pro_change$pro[indx], method="pearson")
+plot(enh_pro_change$pro[indx], enh_pro_change$uas[indx], xlab= "Gene Expression", ylab="Loop", pch=19)
+
 require(vioplot)
 vioplot(enh_pro_change$enh[enh_pro_change$pro < 0 & !is.nan(enh_pro_change$enh)], enh_pro_change$enh[enh_pro_change$pro > 0 & !is.nan(enh_pro_change$enh)]); abline(h=0)
 
@@ -153,6 +158,7 @@ cor.test(enh_pro_change$pro, enh_pro_change$enh)
 indx<- rep(TRUE, NROW(enh_pro_change)) 
 indx <- enh_pro_change$uas!=0 #|| enh_pro_change$near!=0
 cor.test(enh_pro_change$pro[indx], enh_pro_change$enh[indx])
+cor.test(predict(gl, enh_pro_change), enh_pro_change$pro)$estimate*cor.test(predict(gl, enh_pro_change), enh_pro_change$pro)$estimate
 plot(enh_pro_change$pro[indx], enh_pro_change$enh[indx])
 
 sm_cng <- enh_pro_change[indx,]
@@ -164,17 +170,18 @@ gl <- glm(pro~near+uas+loop+as+tad+near:uas+near:tad+loop:tad+loop:near+uas:as+u
 #cor.test(sm_cng$enh[test], sm_cng$pro[test])
 #cor.test(sm_cng$uas[test], sm_cng$pro[test])
 cor.test(predict(gl, sm_cng[test,]), sm_cng$pro[test])
+cor.test(predict(gl, sm_cng[test,]), sm_cng$pro[test])$estimate*cor.test(predict(gl, sm_cng[test,]), sm_cng$pro[test])$estimate
 cor.test(predict(gl, sm_cng[train,]), sm_cng$pro[train])
+cor.test(predict(gl, sm_cng[train,]), sm_cng$pro[train])$estimate*cor.test(predict(gl, sm_cng[train,]), sm_cng$pro[train])$estimate
 plot(predict(gl, sm_cng[test,]), sm_cng$pro[test], pch=19); abline(0,1)
 
 cor.test(predict(gl, sm_cng[test,]), sm_cng$pro[test], method="spearman")
 source("../lib/densScatterplot.R")
-densScatterplot(sm_cng$pro[test], predict(gl, sm_cng[test,]), xlab= "Fold Change in Gene Transcription", ylab="Predicted Change in Gene Transcription")
+densScatterplot(sm_cng$pro[test], predict(gl, sm_cng[test,]), xlab= "Fold Change in Gene Transcription", ylab="Predicted Change in Gene Transcription", xlim=c(-10,10), ylim=c(-10,10))
 abline(a=0, b=1)
 
-
 pdf("Predicting_Changes_in_transcription.pdf")
-  densScatterplot(sm_cng$pro[test], predict(gl, sm_cng[test,]), xlab= "Fold Change in Gene Transcription", ylab="Predicted Change in Gene Transcription")
+  densScatterplot(sm_cng$pro[test], predict(gl, sm_cng[test,]), xlab= "Fold Change in Gene Transcription", ylab="Predicted Change in Gene Transcription", xlim=c(-10,10), ylim=c(-10,10))
   abline(a=0, b=1)
 dev.off()
 

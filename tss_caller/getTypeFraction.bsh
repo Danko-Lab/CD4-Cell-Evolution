@@ -13,7 +13,7 @@ pro=/usr/data/GROseq.parser/hg19/cd4/chromhmm/CD4.chromHMM.Ernst2010.hg19.Prom.b
 ################################################################
 ## Test sensitivity ...
 
-for th in 0.5 0.6 0.7 0.8 0.9 
+for th in 0.25 0.3
 do
  echo $th
 

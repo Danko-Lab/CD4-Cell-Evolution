@@ -2,7 +2,7 @@
 
 #########################################
 ## Prep files for loop determination.
-loopsize=5000 ## Assume rough constant size.  Most are big ==> 2-10kb...
+loopsize=1000 ## Assume rough constant size.  Most are big ==> 2-10kb...
 zcat ../tss_caller/gencode19.hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$6=="+"?$2:$3-1,$6=="+"?$2+1:$3,$4,$5,$6}' | sort-bed - > tss.tmp
 
 zcat /local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz | awk 'BEGIN{OFS="\t"} {print $1,$2,$2+'"$loopsize"',$4}' | sort-bed - > first
@@ -12,9 +12,9 @@ zcat /local/storage/data/hg19/cd4/chiapet_h3k4me2/H3K4me2_interact_hg19.bed.gz |
 cat second | bedmap --echo --indicator --echo-map - tss.tmp | grep "|1|" | sed "s/|1|/\t/g" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4,$8}' > second.tss
 
 ## Capture Hi-C
-zcat /local/storage/data/hg19/cd4/capture_hic/tCD4.PCHiC_peak_matrix_cutoff5.tsv.gz | grep "chr" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$22}' | sort-bed - > first.capturehic
+zcat /local/storage/data/hg19/cd4/capture_hic/tCD4.PCHiC_peak_matrix_cutoff5.tsv.gz | grep "chr" | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,"n",$22}' | sort-bed - > first.capturehic
 
-zcat /local/storage/data/hg19/cd4/capture_hic/tCD4.PCHiC_peak_matrix_cutoff5.tsv.gz | grep "chr" | awk 'BEGIN{OFS="\t"} {print $6,$7,$8,$22}' | sort-bed - > second.capturehic
+zcat /local/storage/data/hg19/cd4/capture_hic/tCD4.PCHiC_peak_matrix_cutoff5.tsv.gz | grep "chr" | awk 'BEGIN{OFS="\t"} {print $6,$7,$8,"n",$22}' | sort-bed - > second.capturehic
 
 ## Get info on whether enhancers for a loop ...
 cat tss.tsv | sort-bed - | awk 'BEGIN{OFS="\t"} {print $1,$2,$3,$4}' > tss.tsv.reduced
@@ -22,7 +22,10 @@ cat tss.tsv.reduced | bedmap --count - first  > tss.tsv.first
 cat tss.tsv.reduced | bedmap --count - second > tss.tsv.second
 cat tss.tsv.reduced | bedmap --count - first.capturehic > tss.tsv.capturehic.first
 cat tss.tsv.reduced | bedmap --count - second.capturehic> tss.tsv.capturehic.second
-paste tss.tsv.reduced tss.tsv.first tss.tsv.second tss.tsv.capturehic.first tss.tsv.capturehic.second > tss.tsv.loop
+cat tss.tsv.reduced | bedmap --max   - second.capturehic | sed s/NAN/0/g > tss.tsv.capturehic.max
+cat tss.tsv.reduced | bedmap --mean  - second.capturehic | sed s/NAN/0/g > tss.tsv.capturehic.mean
+
+paste tss.tsv.reduced tss.tsv.first tss.tsv.second tss.tsv.capturehic.first tss.tsv.capturehic.second tss.tsv.capturehic.max tss.tsv.capturehic.mean > tss.tsv.loop
 
 ## ... and whether that is to a TSS.
 

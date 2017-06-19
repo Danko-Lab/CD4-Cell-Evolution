@@ -9,8 +9,8 @@ source("../../lib/getOverlap.R")
 bed <- read.table("tfbs.merge.bed") # dREG_HD.merge.bed")#/local/storage/projects/NHP/dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed")
 
 ## Read in MAFs
-con <- load.bigWig("/local/storage/data/hg19/all/phylopprimate/chr1.phyloP46way.bw")
-#con <- load.bigWig("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw")
+#con <- load.bigWig("/local/storage/data/hg19/all/phylopprimate/phyloP46way.bw")
+con <- load.bigWig("/local/storage/data/hg19/all/phyloP100way/hg19.100way.phyloP100way.bw")
 
 ## Get mean conservation for each h_bed.
 mean_con <- bed.region.bpQuery.bigWig(con, bed[,1:3], op="max")# op="avg")

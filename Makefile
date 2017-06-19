@@ -12,3 +12,4 @@ run_all:
 	make -C ../enhancer/superenhancer
 	make -C ../../dna_sequence
 	make -C dna_sequence_conservation/
+

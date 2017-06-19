@@ -4,6 +4,10 @@
 #
 
 require(Hmisc)
+require(boot)
+
+lnTH= 0.05
+hcTH= 0.25
 
 ## Returns indices in BED2 that intersect BED1.
 source("../lib/getOverlap.R")
@@ -67,12 +71,12 @@ save.image("enhancer_conservation_at_conserved_genes.RData")
 
 doesChange <- function(re) {
 
- total <- NROW(re) 
- one2m <- sum(re$V20 > 0 & !is.na(re$mapSize)) ## Possible 1:many orthology
+ total <- NROW(re)
+ one2m <- sum(re$V20 > 0) ## Possible 1:many orthology
  unmap <- sum(re$V20 == 0 & is.na(re$mapSize)) ## INDEL
- lccng <- sum((re$V7 < 0.1 | re$V8 < 0.1 | re$V9 < 0.1) & (re$V7 > 0.7 | re$V8 > 0.7 | re$V9 > 0.7) & re$V20 == 0 & !is.na(re$mapSize)) # 'Low-confidence'
- chang <- sum(re$V20 == 0 & !is.na(re$mapSize) & re$fdr_min < 0.05 & (re$V7 > 0.7 | re$V8 > 0.7 | re$V9 > 0.7) & (re$V7 > 0.1 & re$V8 > 0.1 & re$V9 > 0.1)) # 'High-confidence'
- allcng<- sum(re$V20 == 0 & !is.na(re$mapSize) & re$fdr_min < 0.05)
+ lccng <- sum((re$V7 < lnTH | re$V8 < lnTH | re$V9 < lnTH) & (re$V7 > hcTH | re$V8 > hcTH | re$V9 > hcTH) & re$V20 == 0 & !is.na(re$mapSize))  # 'Low-confidence'
+ chang <- sum(re$V20 == 0 & !is.na(re$mapSize) & re$fdr_min < PVAL & (re$V7 > hcTH | re$V8 > hcTH | re$V9 > hcTH) & (re$V7 > lnTH & re$V8 > lnTH & re$V9 > lnTH)) # 'High-confidence'
+ allcng<- sum(re$V20 == 0 & !is.na(re$mapSize) & re$fdr_min < PVAL)
 
  tot <- total-one2m
  con <- total-one2m-unmap-chang-lccng
@@ -94,11 +98,16 @@ plot(nloops, dc, xlab="Number of loops", ylab="Conservation")
 getCex <- function(n) { y=0.035*n+0.05; y[y>3] <- 3; y[y<0.05] <- 0.05; y }
 n <- sapply(nloops, function(x) {NROW(unique(sort(indxTREs[[x]])))})
 
+size_key <- seq(0, 100,by= 10)
+
 pdf("DistalEnhancer.ChangeOverDistance.pdf")
- plot(nloops, dc, type="p", xlab="Number of Loops (proximal end)", ylab="% Conserved", pch=19, cex=3*getCex(n))
+ plot(nloops, dc, type="p", xlab="Number of Loops (proximal end)", ylab="% Conserved", pch=19, cex=3*getCex(n), xlim=c(-1,8), ylim=c(0.4, 0.8))
+ plot(size_key, rep(1, NROW(size_key)), cex=3*getCex(size_key))
 dev.off()
 
 ## Correlations...
+require(boot)
+
 cor.test(nloops, dc)
 corr(as.matrix(cbind(nloops, dc)), w = n/sum(n))
 

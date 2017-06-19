@@ -9,7 +9,7 @@ function testDataset {
  echo $2
  
  bedops --element-of 1 ../dREG_HD/dREG_HD.merge.HCM.UPI.hg19.bed $1 > tmp.dreg-hd.bed #../dREG_HD/H-U_dREG_HD.bed
- unstarch ../tfbs/tf.u.hg19.bed.starch | grep "$2" | awk '($5 > 6) {print $0}' | bedops --element-of 1 - tmp.dreg-hd.bed | bedops --merge - > tmp.tfbs.bed ## tmp.bed ==> merged TFBS
+ unstarch ../tfbs/tf.u.hg19.bed.starch | grep "$2" | awk '($5 > 10) {print $0}' | bedops --element-of 1 - tmp.dreg-hd.bed | bedops --merge - > tmp.tfbs.bed ## tmp.bed ==> merged TFBS
 
  echo "" 
  echo "Number of dREG-HD sites:"
