@@ -4,11 +4,11 @@ require(bigWig)
 refGene <- read.table("tuSelecter/final_tus.txt", header=TRUE)  #refGene.bed.gz")
 
 refGene <- refGene[grep("random|Un|hap", refGene$TXCHROM, invert=TRUE),]
-refGene <- refGene[(refGene$TXEND-refGene$TXSTART)>1000,]
+refGene <- refGene[(refGene$TXEND-refGene$TXSTART)>500,]
 
 bodies <- refGene
-bodies$TXSTART[bodies$TXSTRAND == "+"] <-bodies$TXSTART[bodies$TXSTRAND == "+"]+500
-bodies$TXEND[bodies$TXSTRAND == "-"] <- bodies$TXEND[bodies$TXSTRAND == "-"]-500
+bodies$TXSTART[bodies$TXSTRAND == "+"] <-bodies$TXSTART[bodies$TXSTRAND == "+"]+250
+bodies$TXEND[bodies$TXSTRAND == "-"] <- bodies$TXEND[bodies$TXSTRAND == "-"]-250
 
 bodies$TXEND[(bodies$TXEND - bodies$TXSTART) > 60000 & bodies$TXSTRAND == "+"] <- bodies$TXSTART[(bodies$TXEND - bodies$TXSTART) > 60000 & bodies$TXSTRAND == "+"]+60000
 bodies$TXSTART[(bodies$TXEND - bodies$TXSTART) > 60000 & bodies$TXSTRAND == "-"] <- bodies$TXEND[(bodies$TXEND - bodies$TXSTART) > 60000 & bodies$TXSTRAND == "-"]-60000

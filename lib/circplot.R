@@ -46,7 +46,7 @@ cd.circplot<- function(data, names, lims=c(min(data), max(data)), title= "name",
 	for(i in 1:NROW(labels)) {
 		#indx <- levels(as.factor(names))==labels[i]
 		indx <- names==labels[i]
-                grid.lines(centerseq[i]+c(-1/12/NROW(labels),1/12/NROW(labels)), mean(data[indx])) ## Draw horizontal line at mean.
+                grid.lines(centerseq[i]+c(-1/12/NROW(labels),1/12/NROW(labels)), median(data[indx])) ## Draw horizontal line at mean.
 	}
 	popViewport()
 

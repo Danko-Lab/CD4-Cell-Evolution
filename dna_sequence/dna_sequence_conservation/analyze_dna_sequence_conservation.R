@@ -177,38 +177,38 @@ pdf(paste("DNASequence.",word,".phyloP.Conservation.pdf", sep=""))
 ## Now seperate by distance. 
 
  ## 1-10k
- indx <- abs(bed$V4) < 10000
- cd.cdf(mean_con[bed[,7]>0 & indx], col="#00A63E", xlim=xlim_s, lwd=ld, type="l")
- cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx], col="black", add=TRUE, lwd=ld, type="l")
- cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx], col="#b70000", add=TRUE, lwd=ld, type="l")
- cd.cdf(mean_con_null1[abs(bed_null1$V4) < 10000], col="gray", add=TRUE, lwd=ld, type="l")
- cd.cdf(mean_con_null2[abs(bed_null2$V4) < 10000], col="dark gray", add=TRUE, lwd=ld, type="l")
-
-
- ## 10-100k
- indx <- abs(bed$V4) < 100000 & abs(bed$V4) > 10000
- cd.cdf(mean_con[bed[,7]>0 & indx], col="#00A63E", xlim=xlim_s, lwd=ld, type="l")
- cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx], col="black", add=TRUE, lwd=ld, type="l")
- cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx], col="#b70000", add=TRUE, lwd=ld, type="l")
- cd.cdf(mean_con_null1[abs(bed_null1$V4) > 10000 & abs(bed_null1$V4) < 100000], col="gray", add=TRUE, lwd=ld, type="l")
- cd.cdf(mean_con_null2[abs(bed_null2$V4) > 10000 & abs(bed_null2$V4) < 100000], col="dark gray", add=TRUE, lwd=ld, type="l")
-
- ## 100-1,000k
- indx <- abs(bed$V4) < 1000000 & abs(bed$V4) > 100000
- cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0  & indx], col="black", xlim=xlim_s, lwd=ld, type="l")
- cd.cdf(mean_con[bed[,7]>0 & indx], col="#00A63E", add=TRUE, lwd=ld, type="l")
- cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx], col="#b70000", add=TRUE, lwd=ld, type="l")
- cd.cdf(mean_con_null1[abs(bed_null1$V4) > 100000 & abs(bed_null1$V4) < 1000000], col="gray", add=TRUE, lwd=ld, type="l")
- cd.cdf(mean_con_null2[abs(bed_null2$V4) > 100000 & abs(bed_null2$V4) < 1000000], col="dark gray", add=TRUE, lwd=ld, type="l")
-
- ## Difference based on distance...
- ld<- 3; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
- indx <- bed$V4 < 10000
- cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx], col="black", xlim=xlim_s, lwd=ld, type="l")
- indx <- bed$V4 < 100000 & bed$V4 > 10000
- cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx], col="dark gray", add=TRUE, lwd=ld, type="l")
- indx <- bed$V4 < 1000000 & bed$V4 > 100000
- cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0  & indx], col="gray", lwd=ld, add=TRUE, type="l")
+# indx <- abs(bed$V4) < 10000
+# cd.cdf(mean_con[bed[,7]>0 & indx], col="#00A63E", xlim=xlim_s, lwd=ld, type="l")
+# cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx], col="black", add=TRUE, lwd=ld, type="l")
+# cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx], col="#b70000", add=TRUE, lwd=ld, type="l")
+# cd.cdf(mean_con_null1[abs(bed_null1$V4) < 10000], col="gray", add=TRUE, lwd=ld, type="l")
+# cd.cdf(mean_con_null2[abs(bed_null2$V4) < 10000], col="dark gray", add=TRUE, lwd=ld, type="l")
+#
+#
+# ## 10-100k
+# indx <- abs(bed$V4) < 100000 & abs(bed$V4) > 10000
+# cd.cdf(mean_con[bed[,7]>0 & indx], col="#00A63E", xlim=xlim_s, lwd=ld, type="l")
+# cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx], col="black", add=TRUE, lwd=ld, type="l")
+# cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx], col="#b70000", add=TRUE, lwd=ld, type="l")
+# cd.cdf(mean_con_null1[abs(bed_null1$V4) > 10000 & abs(bed_null1$V4) < 100000], col="gray", add=TRUE, lwd=ld, type="l")
+# cd.cdf(mean_con_null2[abs(bed_null2$V4) > 10000 & abs(bed_null2$V4) < 100000], col="dark gray", add=TRUE, lwd=ld, type="l")
+#
+# ## 100-1,000k
+# indx <- abs(bed$V4) < 1000000 & abs(bed$V4) > 100000
+# cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0  & indx], col="black", xlim=xlim_s, lwd=ld, type="l")
+# cd.cdf(mean_con[bed[,7]>0 & indx], col="#00A63E", add=TRUE, lwd=ld, type="l")
+# cd.cdf(mean_con[rowSums(bed[,c(5:6)])>0 & indx], col="#b70000", add=TRUE, lwd=ld, type="l")
+# cd.cdf(mean_con_null1[abs(bed_null1$V4) > 100000 & abs(bed_null1$V4) < 1000000], col="gray", add=TRUE, lwd=ld, type="l")
+# cd.cdf(mean_con_null2[abs(bed_null2$V4) > 100000 & abs(bed_null2$V4) < 1000000], col="dark gray", add=TRUE, lwd=ld, type="l")
+#
+# ## Difference based on distance...
+# ld<- 3; xlim_s=c(-1, 2) #c(-0.4, 0.5) #PRIMATE
+# indx <- bed$V4 < 10000
+# cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx], col="black", xlim=xlim_s, lwd=ld, type="l")
+# indx <- bed$V4 < 100000 & bed$V4 > 10000
+# cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0 & indx], col="dark gray", add=TRUE, lwd=ld, type="l")
+# indx <- bed$V4 < 1000000 & bed$V4 > 100000
+# cd.cdf(mean_con[bed[,7]==0 & rowSums(bed[,c(5:6)])==0  & indx], col="gray", lwd=ld, add=TRUE, type="l")
 
 dev.off()
 

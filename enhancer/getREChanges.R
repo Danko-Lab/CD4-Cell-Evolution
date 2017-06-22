@@ -9,20 +9,21 @@ lowth  <- 0.05
 require(boot)
 
 tss_aln <- fdr_df[grepl("dREG", ca$annot_type),]
+hspv    <- hs[grepl("dREG", ca$annot_type),]
 tss <- read.table("tss.tsv")
-tss <- data.frame(tss, tss_aln[match(tss$V4, tss_aln$name),c(9,33:50)])
+tss <- data.frame(tss, tss_aln[match(tss$V4, tss_aln$name),c(9,33:50)], HumanP= hspv$pvalue[match(tss$V4, tss_aln$name)])
 
 ## Alignable fraction (V20) denotes a gap in either species.  Make sure gaps are in both.
 
 ## Classify as 'promoter'/ 'enhancer'
-stab <- rowMax(tss[,17:18])
-dist <- tss[,13]
-class <- rep("tss", NROW(tss)) ## tss is then unclassified as a promoter or enhancer
-class[stab < 0.1 & dist < 500]  <- "Prox_Stab" ## Clearly protein coding promoter
-class[stab > 0.1  & dist > 10000] <- "Dist_UnSt" ## Clearly distal enhancer
-class[stab < 0.1  & dist > 125000] <- "Dist_Stab" ## Clearly stable, but distal
-summary(as.factor(class))
-tss$V5 <- as.factor(class)
+#stab <- rowMax(tss[,17:18])
+#dist <- tss[,13]
+#class <- rep("tss", NROW(tss)) ## tss is then unclassified as a promoter or enhancer
+#class[stab < 0.1 & dist < 500]  <- "Prox_Stab" ## Clearly protein coding promoter
+#class[stab > 0.1  & dist > 10000] <- "Dist_UnSt" ## Clearly distal enhancer
+#class[stab < 0.1  & dist > 125000] <- "Dist_Stab" ## Clearly stable, but distal
+#summary(as.factor(class))
+#tss$V5 <- as.factor(class)
 
 ## Change unscored to 0
 for(i in 7:12) { tss[is.na(tss[,i]),i] <- 0 }
@@ -72,6 +73,18 @@ sum(indx)
 
 write.table(tss[indx,], "all.conserved.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
+## QQ Plot to show enrichment of quantiles.
+qqplot(-log(seq(0, 1, 1/50000),10), -log(tss$HumanP[indx_hg19_loss | indx_hg19_gain],10), col="red", ylim=c(0,30), xlim=c(0,3.5)); #abline(0,1)
+par(new=TRUE)
+qqplot(-log(seq(0, 1, 1/50000),10), -log(tss$HumanP,10), ylim=c(0,30), xlim=c(0,3.5))
+par(new=TRUE)
+qqplot(-log(seq(0, 1, 1/50000),10), -log(tss$HumanP[indx],10), col="gray", ylim=c(0,30), xlim=c(0,3.5)); abline(0,1)
+
+# Thanks: http://web.mit.edu/~r/current/arch/i386_linux26/lib/R/library/limma/html/propTrueNull.html
+# Note: Returns percent of null hypotheses that are true (i.e., fraction non-significant).
+require(limma)
+propTrueNull(tss$HumanP[indx_hg19_loss | indx_hg19_gain]) ## Estimate proportion of true null hypotheses.  Raw pvalues: 15%
+propTrueNull(tss$HumanP[indx_hg19_loss | indx_hg19_gain], method="hist") ## By this method: 9.88%
 
 ## Validation in humans.
 require(bigWig)

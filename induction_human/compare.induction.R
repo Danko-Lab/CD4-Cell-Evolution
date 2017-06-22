@@ -30,7 +30,7 @@ cngAll <- hs$V19 < PVAL & pt$V19 < PVAL & rm$V19 < PVAL; cngAll <- cngAll & !is.
 
 sum(cngOne); sum(cngAll)
 
-NROW(unique(hs$V7[cngAll])) ## Yep. 3,121.  A few that change directions.  Not many.
+NROW(unique(hs$V7[cngAll])) ## Yep. 3,157.  A few that change directions.  Not many.
 
 cor(cbind(hs$V15[cngAll], pt$V15[cngAll], rm$V15[cngAll]))
 pairs(cbind(hs$V15[cngAll], pt$V15[cngAll], rm$V15[cngAll]))
