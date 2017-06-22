@@ -74,11 +74,15 @@ sum(indx)
 write.table(tss[indx,], "all.conserved.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 ## QQ Plot to show enrichment of quantiles.
+pdf("QQ-plot.pdf")
+
 qqplot(-log(seq(0, 1, 1/50000),10), -log(tss$HumanP[indx_hg19_loss | indx_hg19_gain],10), col="red", ylim=c(0,30), xlim=c(0,3.5)); #abline(0,1)
 par(new=TRUE)
 qqplot(-log(seq(0, 1, 1/50000),10), -log(tss$HumanP,10), ylim=c(0,30), xlim=c(0,3.5))
 par(new=TRUE)
 qqplot(-log(seq(0, 1, 1/50000),10), -log(tss$HumanP[indx],10), col="gray", ylim=c(0,30), xlim=c(0,3.5)); abline(0,1)
+
+dev.off()
 
 # Thanks: http://web.mit.edu/~r/current/arch/i386_linux26/lib/R/library/limma/html/propTrueNull.html
 # Note: Returns percent of null hypotheses that are true (i.e., fraction non-significant).
