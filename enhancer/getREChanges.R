@@ -68,7 +68,7 @@ write.table(tss[indx_panTro4_gain,], "panTro4.gain.bed", row.names=FALSE, col.na
 write.table(tss[indx_panTro4_loss,], "panTro4.loss.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")
 
 ## Conserved in all species.
-indx <- tss$V20 == 0 & !is.na(tss$mapSize) & (tss$V7 > highth & tss$V8 > highth & tss$V9 > highth) & (tss$HumanFDR > 0.5 & tss$ChimpFDR > 0.5 & tss$MacaqueFDR > 0.5) & (abs(tss$HumanFC) < 0.25 & abs(tss$ChimpFC) < 0.25 & abs(tss$MacaqueFC) < 0.25)
+indx <- tss$V20 == 0 & !is.na(tss$mapSize) & (tss$V7 > highth & tss$V8 > highth & tss$V9 > highth) & (tss$HumanFDR > 0.25 & tss$ChimpFDR > 0.25 & tss$MacaqueFDR > 0.25) & (abs(tss$HumanFC) < 0.5 & abs(tss$ChimpFC) < 0.5 & abs(tss$MacaqueFC) < 0.5)
 sum(indx) 
 
 write.table(tss[indx,], "all.conserved.bed", row.names=FALSE, col.names=FALSE, quote=FALSE, sep="\t")

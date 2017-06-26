@@ -387,6 +387,16 @@ nelem    <- sapply(bk, function(i) {NROW(unique(sort(indx_distal[[i]])))})
 #dist_hig <- sapply(bk, function(i) {quantile(mean_con[unique(sort(indx_distal[[i]]))], probs=0.75)})
 plot(bk, dist_med, pch=6, lwd=6, cex=2*getCex(nelem/10), col="dark blue", main="Distal DNA sequence conservation", ylab="Median PhyloP (distal)", xlab="Num. Loops (proximal)")
 
+## Now get best fit line...
+fit_line <- lm(dist_med~bk, w = nelem/sum(nelem))
+fit_line
+abline(fit_line)
+
+
+## Plot out a size key.
+size_key <- seq(0, 600,by= 100)
+plot(size_key, rep(1, NROW(size_key)), cex=3*getCex(size_key), col="dark blue", pch=6, lwd=6)
+
 cor.test(bk, dist_med)
 corr(data.frame(bk, dist_med), w= nelem/sum(nelem))
 corr(data.frame(bk, dist_med), w= nprox_sites[bk]/sum(nprox_sites[bk]))
@@ -430,10 +440,17 @@ for(i in bk) {
 
 pro_med <- sapply(bk, function(i) {median(mean_con[unique(sort(indx_proximal[[i]]))])})
 n_prox  <- sapply(bk, function(i) {NROW(unique(sort(indx_proximal[[i]])))})
-plot(bk, pro_med, pch=6, lwd=6, cex=2*getCex(n_prox), col="dark blue", main="Proximal DNA sequence conservation", ylab="Median PhyloP (proximal)", xlab="Num. Loops (proximal)")
+plot(bk, pro_med, pch=6, lwd=6, cex=3*getCex(n_prox), col="dark blue", main="Proximal DNA sequence conservation", ylab="Median PhyloP (proximal)", xlab="Num. Loops (proximal)")
+
+## Now get best fit line...
+fit_line <- lm(pro_med~bk, w = n_prox/sum(n_prox))
+fit_line
+abline(fit_line)
 
 cor.test(bk, pro_med)
 corr(data.frame(bk, pro_med), w= n_prox/sum(n_prox))
+
+
 
 ## Bootstrap to test significance of negative correlation.
 # 1. combine all data points.

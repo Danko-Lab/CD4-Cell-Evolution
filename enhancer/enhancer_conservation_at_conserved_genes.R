@@ -7,7 +7,7 @@ require(Hmisc)
 require(boot)
 
 lnTH= 0.05
-hcTH= 0.25
+hcTH= 0.30
 
 ## Returns indices in BED2 that intersect BED1.
 source("../lib/getOverlap.R")
@@ -81,7 +81,7 @@ doesChange <- function(re) {
  tot <- total-one2m
  con <- total-one2m-unmap-chang-lccng
 
- print(paste(tot, con))
+# print(paste(tot, con))
 
  return(con/tot)
 }
@@ -100,8 +100,15 @@ n <- sapply(nloops, function(x) {NROW(unique(sort(indxTREs[[x]])))})
 
 size_key <- seq(0, 100,by= 10)
 
+########
+## Get the best fit line.
+
+fit_line <- lm(dc~nloops, w = n/sum(n))
+fit_line
+
 pdf("DistalEnhancer.ChangeOverDistance.pdf")
  plot(nloops, dc, type="p", xlab="Number of Loops (proximal end)", ylab="% Conserved", pch=19, cex=3*getCex(n), xlim=c(-1,8), ylim=c(0.4, 0.8))
+ abline(fit_line)
  plot(size_key, rep(1, NROW(size_key)), cex=3*getCex(size_key))
 dev.off()
 
@@ -110,5 +117,27 @@ require(boot)
 
 cor.test(nloops, dc)
 corr(as.matrix(cbind(nloops, dc)), w = n/sum(n))
+
+## Bootstrap to test significance of negative correlation.
+# 1. combine all data points.
+all_data_points <- unlist(indxTREs)
+n_non_unique    <- sapply(nloops, function(i) {NROW(unique(indxTREs[[i]]))})
+
+boot_data <- sapply(1:1000, function(qwi) {
+ # 2. split back up into hte same sizes at random.
+ indxTREs_boot <- list()
+ for(i in nloops) {
+        indxTREs_boot[[i]] <- sample(all_data_points, n_non_unique[i], replace=FALSE)
+ }
+
+ # 3. Get the corr.
+ dc_boot <- sapply(nloops, function(i) {doesChange(tres[unique(indxTREs_boot[[i]]),])})
+ nelem_boot <- sapply(nloops, function(i) {NROW(unique(sort(indxTREs_boot[[i]])))})
+ corr(data.frame(nloops, dc_boot), w=nelem_boot/sum(nelem_boot))
+})
+hist(boot_data, 100)
+real_cor <- corr(as.matrix(cbind(nloops, dc)), w = n/sum(n))
+abline(v=real_cor, lty="dotted", lwd=2, col="red")
+sum(boot_data <= -1*abs(real_cor) | boot_data >= abs(real_cor))/ NROW(boot_data) ## Actual statistical test.
 
 
