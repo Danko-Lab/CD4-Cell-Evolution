@@ -16,11 +16,6 @@ data18s <- as.matrix(dat18s[,c("R1", "R2", "R3")])#, "R4", "R5", "R6")])
 #cor.test(c(data), c(data18s), method="spearman", na.rm=TRUE)
 data <- data/ data18s
 
-## Another sanity check ... scores are really driven by the one outlier: G4, R3.  
-## I believe the 40m and 0m conditions were switched inprocessing ... 
-#data[4,3] <- NA; data[12,3] <- NA
-#data[5,3] <- NA; data[15,3] <- NA
-
 tvc <- 12 #9
 
 #############################################################
