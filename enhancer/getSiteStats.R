@@ -266,6 +266,10 @@ size_key <- seq(0, 200,by= 20)
 ## Last point is [>=xaxis]. Each other point is [<point].
 idx <- 3:NROW(xaxis) ## As below, index 3 encodes [1000,10^3.02)
 
+## Compute for Supplementary Table 2
+cor.test(dist[idx], idx)
+corr(cbind(dist[idx], idx), w= n[idx]/sum(n[idx]))
+
 pdf("ChangeOverDistance.pdf")
  plot(10^xaxis[idx], dist[idx], type="p", xlab="Distance from TSS [bp]", ylab="Fraction conserved", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n[idx]))
  plot(10^xaxis[idx], glc[idx], type="p", xlab="Distance from TSS [bp]", ylab="Fraction gain/ loss", xlim=10^c(3, 6), log="x", pch=19, cex=getCex(n[idx]))
@@ -289,6 +293,7 @@ conserved <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == 
 gainloss <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x & type_max == "dREG_ENH",], "GL")})
 change   <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x & type_max == "dREG_ENH",], "CNG")})
 gaps     <- sapply(1:max(exp_vect), function(x) {fracConserved(tss[exp_vect == x & type_max == "dREG_ENH",], "UNM")})
+
 
 cor.test(conserved, c(1:NROW(conserved))) ## p= (for manuscript)
 
