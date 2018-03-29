@@ -1,2 +1,6 @@
 #!/usr/bin/bash
-cat results/human-changed.TREs.tsv | awk 'BEGIN{OFS="\t"} ($9 < 0.01) {print $1,$2-250,$3+250}' | sort-bed - | bedops --merge - | grep "" -c
+cat results/human-changed.TREs.tsv | awk 'BEGIN{OFS="\t"} ($9 < 0.01 && $5 > 1) {print $1,$2-250,$3+250}' | sort-bed - | bedops --merge - | grep "" -c
+cat results/chimp-changed.TREs.tsv | awk 'BEGIN{OFS="\t"} ($9 < 0.01 && $5 > 1) {print $1,$2-250,$3+250}' | sort-bed - | bedops --merge - | grep "" -c
+cat results/rhesus-changed.TREs.tsv | awk 'BEGIN{OFS="\t"} ($9 < 0.01 && $5 > 1) {print $1,$2-250,$3+250}' | sort-bed - | bedops --merge - | grep "" -c
+
+

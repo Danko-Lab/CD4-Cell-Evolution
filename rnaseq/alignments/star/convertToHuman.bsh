@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+function liftToHg19 {
+   echo ${1}
+   python /home/cgd24/python/CrossMap/usr/bin/CrossMap.py bam $MAPCHAIN ${1}.bam ${1}.hg19.bam
+}
+
+MAPCHAIN=/local/storage/projects/NHP/makeRecipBest/hg19.panTro4/panTro4.hg19.rbest.chain.gz # Use rbest
+liftToHg19 C5_U_Aligned.sortedByCoord.out
+liftToHg19 C4_U_Aligned.sortedByCoord.out
+
+MAPCHAIN=/local/storage/projects/NHP/makeRecipBest/hg19.rheMac3/rheMac3.hg19.rbest.chain.gz # Use rbest
+liftToHg19 M4_U_Aligned.sortedByCoord.out
+liftToHg19 M5_U_Aligned.sortedByCoord.out
+
+

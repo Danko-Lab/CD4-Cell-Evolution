@@ -29,6 +29,12 @@ cd.circplot(rpkm_df[ca$name == "chr17_38679750_38722150", c(1:9,18:19)], snU[c(1
 
 dev.off()
 
+pdf("SGPL1.circplot.pdf")
+
+cd.circplot(rpkm_df[ca$name == "chr10_72575600_72671450", ], snU) ## CCR7
+
+dev.off()
+
 pdf("MasterRegulators.circplot.pdf")
 
 cd.circplot(rpkm_df[ca$name == "chr17_45810350_45839600", c(1:9,18:19)], snU[c(1:9,18:19)], lims= c(-6, -14)) ## TBX21

@@ -18,7 +18,7 @@ load("APCluster.rdata")
 ## Now get enriched motifs...
 PVAL <- 0.01
 FOLD <- 2 #1 #3
-mTH  <- 9 # 7
+mTH  <- 8 # 10
 min.size <- 2500
 
 ## Do human
